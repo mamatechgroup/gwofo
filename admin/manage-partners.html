@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Partners - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            
+            <a href="manage-team.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </a>
+            
+            <a href="manage-partners.html" class="menu-item active">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+                <span class="badge">12</span>
+            </a>
+            
+            <a href="manage-slides.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+            </a>
+            
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Manage Partners</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img">
+                        <span>A</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin User</span>
+                        <span class="profile-role">Administrator</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search partners...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partners Management -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="filters">
+                    <select class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="ngo">NGO</option>
+                        <option value="government">Government</option>
+                        <option value="individual">Individual</option>
+                        <option value="academic">Academic</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="all">All Levels</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="gold">Gold</option>
+                        <option value="silver">Silver</option>
+                        <option value="bronze">Bronze</option>
+                    </select>
+                </div>
+                
+                <button class="btn-add" data-modal="partnerModal">
+                    <i class="fas fa-handshake"></i> Add Partner
+                </button>
+            </div>
+            
+            <!-- Partners Table -->
+            <div class="table-container">
+                <table class="data-table" id="partnersTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" class="select-all">
+                            </th>
+                            <th>Partner</th>
+                            <th>Type</th>
+                            <th>Contact</th>
+                            <th>Partnership Level</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Partner 1 -->
+                        <tr>
+                            <td><input type="checkbox" class="select-item"></td>
+                            <td>
+                                <div class="partner-preview">
+                                    <div class="partner-logo-small">
+                                        <img src="../assets/partners/unicef-logo.png" alt="UNICEF">
+                                    </div>
+                                    <div>
+                                        <strong>UNICEF Liberia</strong>
+                                        <small class="text-muted">United Nations Children's Fund</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="partner-type ngo">NGO</span></td>
+                            <td>
+                                <div class="contact-info-small">
+                                    <div><i class="fas fa-envelope"></i> contact@unicef.lr</div>
+                                    <div><i class="fas fa-phone"></i> +231 88 111 2222</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge platinum">Platinum</span>
+                            </td>
+                            <td>2022-01-15</td>
+                            <td><span class="status-badge status-published">Active</span></td>
+                            <td>
+                                <button class="btn-edit" data-id="1">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-delete" data-id="1">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-view" data-id="1">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Partner 2 -->
+                        <tr>
+                            <td><input type="checkbox" class="select-item"></td>
+                            <td>
+                                <div class="partner-preview">
+                                    <div class="partner-logo-small">
+                                        <div class="logo-placeholder">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong>Liberia Bank</strong>
+                                        <small class="text-muted">Financial Institution</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="partner-type corporate">Corporate</span></td>
+                            <td>
+                                <div class="contact-info-small">
+                                    <div><i class="fas fa-envelope"></i> partnership@liberiabank.com</div>
+                                    <div><i class="fas fa-phone"></i> +231 77 333 4444</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge gold">Gold</span>
+                            </td>
+                            <td>2022-06-30</td>
+                            <td><span class="status-badge status-published">Active</span></td>
+                            <td>
+                                <button class="btn-edit" data-id="2">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-delete" data-id="2">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-view" data-id="2">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Partner 3 -->
+                        <tr>
+                            <td><input type="checkbox" class="select-item"></td>
+                            <td>
+                                <div class="partner-preview">
+                                    <div class="partner-logo-small">
+                                        <img src="../assets/partners/moe-logo.png" alt="Ministry of Education">
+                                    </div>
+                                    <div>
+                                        <strong>Ministry of Education</strong>
+                                        <small class="text-muted">Government Agency</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="partner-type government">Government</span></td>
+                            <td>
+                                <div class="contact-info-small">
+                                    <div><i class="fas fa-envelope"></i> info@moe.gov.lr</div>
+                                    <div><i class="fas fa-phone"></i> +231 88 777 8888</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge platinum">Platinum</span>
+                            </td>
+                            <td>2021-03-10</td>
+                            <td><span class="status-badge status-published">Active</span></td>
+                            <td>
+                                <button class="btn-edit" data-id="3">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-delete" data-id="3">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-view" data-id="3">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Partner 4 -->
+                        <tr>
+                            <td><input type="checkbox" class="select-item"></td>
+                            <td>
+                                <div class="partner-preview">
+                                    <div class="partner-logo-small">
+                                        <img src="../assets/partners/uw-logo.png" alt="University of Liberia">
+                                    </div>
+                                    <div>
+                                        <strong>University of Liberia</strong>
+                                        <small class="text-muted">Academic Institution</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="partner-type academic">Academic</span></td>
+                            <td>
+                                <div class="contact-info-small">
+                                    <div><i class="fas fa-envelope"></i> partnerships@ul.edu.lr</div>
+                                    <div><i class="fas fa-phone"></i> +231 77 999 0000</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge silver">Silver</span>
+                            </td>
+                            <td>2023-02-20</td>
+                            <td><span class="status-badge status-published">Active</span></td>
+                            <td>
+                                <button class="btn-edit" data-id="4">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-delete" data-id="4">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-view" data-id="4">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Partner 5 -->
+                        <tr>
+                            <td><input type="checkbox" class="select-item"></td>
+                            <td>
+                                <div class="partner-preview">
+                                    <div class="partner-logo-small">
+                                        <div class="logo-placeholder">
+                                            <i class="fas fa-user-tie"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong>John Smith Foundation</strong>
+                                        <small class="text-muted">Private Foundation</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="partner-type individual">Individual</span></td>
+                            <td>
+                                <div class="contact-info-small">
+                                    <div><i class="fas fa-envelope"></i> john@smithfoundation.org</div>
+                                    <div><i class="fas fa-phone"></i> +231 66 123 4567</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="level-badge gold">Gold</span>
+                            </td>
+                            <td>2023-08-15</td>
+                            <td><span class="status-badge status-draft">Pending</span></td>
+                            <td>
+                                <button class="btn-edit" data-id="5">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-delete" data-id="5">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-view" data-id="5">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div class="bulk-actions">
+                <select class="bulk-action-select">
+                    <option value="">Bulk Actions</option>
+                    <option value="activate">Activate</option>
+                    <option value="deactivate">Deactivate</option>
+                    <option value="update-level">Update Level</option>
+                    <option value="delete">Delete</option>
+                </select>
+                <button class="btn-secondary bulk-apply">Apply</button>
+                
+                <div class="pagination">
+                    <span class="pagination-info">Showing 1-5 of 12 partners</span>
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner Statistics -->
+        <div class="content-grid">
+            <div class="content-section">
+                <h3>Partner Overview</h3>
+                <div class="stats-summary">
+                    <div class="stat-item">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Total Partners</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">10</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">$450K</div>
+                        <div class="stat-label">Total Funding</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>Partnership Levels</h3>
+                <div class="levels-distribution">
+                    <div class="level-item">
+                        <div class="level-info">
+                            <span class="level-name platinum">Platinum</span>
+                            <span class="level-count">3 partners</span>
+                        </div>
+                        <div class="level-bar">
+                            <div class="level-fill" style="width: 25%; background: linear-gradient(135deg, #e5e4e2, #c0c0c0);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-item">
+                        <div class="level-info">
+                            <span class="level-name gold">Gold</span>
+                            <span class="level-count">4 partners</span>
+                        </div>
+                        <div class="level-bar">
+                            <div class="level-fill" style="width: 33%; background: linear-gradient(135deg, #ffd700, #daa520);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-item">
+                        <div class="level-info">
+                            <span class="level-name silver">Silver</span>
+                            <span class="level-count">3 partners</span>
+                        </div>
+                        <div class="level-bar">
+                            <div class="level-fill" style="width: 25%; background: linear-gradient(135deg, #c0c0c0, #a8a8a8);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-item">
+                        <div class="level-info">
+                            <span class="level-name bronze">Bronze</span>
+                            <span class="level-count">2 partners</span>
+                        </div>
+                        <div class="level-bar">
+                            <div class="level-fill" style="width: 17%; background: linear-gradient(135deg, #cd7f32, #8b4513);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Partnership Activities -->
+        <div class="content-section">
+            <div class="section-header">
+                <h3>Recent Partnership Activities</h3>
+                <button class="btn-secondary">
+                    <i class="fas fa-plus"></i> Add Activity
+                </button>
+            </div>
+            
+            <div class="activity-timeline">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Partnership Agreement</div>
+                        <div class="activity-desc">Signed MOU with University of Liberia for education programs</div>
+                        <div class="activity-time">2 days ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Funding Received</div>
+                        <div class="activity-desc">Received $50,000 from Liberia Bank for women entrepreneurship</div>
+                        <div class="activity-time">1 week ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Annual Review Meeting</div>
+                        <div class="activity-desc">Completed annual review with UNICEF for ongoing projects</div>
+                        <div class="activity-time">2 weeks ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Partner Modal -->
+    <div class="form-modal" id="partnerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Partner</h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="crud-form" data-type="partner">
+                <div class="form-group">
+                    <label for="partnerName">Organization Name *</label>
+                    <input type="text" id="partnerName" name="name" required placeholder="Enter organization name">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partnerType">Partner Type</label>
+                        <select id="partnerType" name="type">
+                            <option value="corporate">Corporate</option>
+                            <option value="ngo">NGO</option>
+                            <option value="government">Government</option>
+                            <option value="individual">Individual</option>
+                            <option value="academic">Academic</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerLevel">Partnership Level</label>
+                        <select id="partnerLevel" name="level">
+                            <option value="platinum">Platinum</option>
+                            <option value="gold">Gold</option>
+                            <option value="silver">Silver</option>
+                            <option value="bronze">Bronze</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partnerContact">Contact Person</label>
+                        <input type="text" id="partnerContact" name="contact_person" placeholder="Contact person name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerEmail">Email *</label>
+                        <input type="email" id="partnerEmail" name="email" required placeholder="contact@organization.com">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partnerPhone">Phone</label>
+                        <input type="tel" id="partnerPhone" name="phone" placeholder="+231 00 000 0000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerWebsite">Website</label>
+                        <input type="url" id="partnerWebsite" name="website" placeholder="https://www.example.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partnerDescription">Partnership Details</label>
+                    <textarea id="partnerDescription" name="description" rows="4" placeholder="Describe the partnership agreement and scope"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partnerStartDate">Start Date</label>
+                        <input type="date" id="partnerStartDate" name="start_date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerEndDate">End Date</label>
+                        <input type="date" id="partnerEndDate" name="end_date">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partnerFunding">Funding Amount ($)</label>
+                        <input type="number" id="partnerFunding" name="funding" min="0" step="1000" placeholder="Total funding amount">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partnerStatus">Status</label>
+                        <select id="partnerStatus" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partnerLogo">Organization Logo</label>
+                    <div class="file-upload">
+                        <input type="file" id="partnerLogo" name="logo" accept="image/*" class="file-input">
+                        <label for="partnerLogo" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Upload partner logo</span>
+                            <small>PNG, JPG, SVG up to 2MB</small>
+                        </label>
+                    </div>
+                    <div class="image-preview" id="partnerLogoPreview" style="display: none;">
+                        <img id="partnerPreviewImage" src="" alt="Logo Preview">
+                        <button type="button" class="remove-image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="partnerAgreement">Partnership Agreement</label>
+                    <div class="file-upload">
+                        <input type="file" id="partnerAgreement" name="agreement" accept=".pdf,.doc,.docx" class="file-input">
+                        <label for="partnerAgreement" class="file-label">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Upload agreement document</span>
+                            <small>PDF, DOC up to 10MB</small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Partner</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

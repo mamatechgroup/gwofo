@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Girls and Women Foundation Liberia</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            
+            <a href="manage-team.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </a>
+            
+            <a href="manage-partners.html" class="menu-item">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+            </a>
+            
+            <a href="manage-slides.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+            </a>
+            
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+                <span class="badge">24</span>
+            </a>
+            
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Dashboard Overview</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img">
+                        <span>A</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin User</span>
+                        <span class="profile-role">Administrator</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card" data-stat="totalPosts">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-number">45</div>
+                        <div class="stat-label">Total Posts</div>
+                    </div>
+                    <div class="stat-icon posts">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% increase</span>
+                </div>
+            </div>
+            
+            <div class="stat-card" data-stat="totalProjects">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-number">18</div>
+                        <div class="stat-label">Active Projects</div>
+                    </div>
+                    <div class="stat-icon projects">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8% increase</span>
+                </div>
+            </div>
+            
+            <div class="stat-card" data-stat="totalComments">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-number">236</div>
+                        <div class="stat-label">Comments</div>
+                    </div>
+                    <div class="stat-icon comments">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                </div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>5 new today</span>
+                </div>
+            </div>
+            
+            <div class="stat-card" data-stat="totalUsers">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-number">1,250</div>
+                        <div class="stat-label">Newsletter Subscribers</div>
+                    </div>
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>2% decrease</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Content -->
+        <div class="content-grid">
+            <!-- Recent Posts -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Recent Posts</h2>
+                    <button class="btn-add" data-modal="postModal">
+                        <i class="fas fa-plus"></i> Add New
+                    </button>
+                </div>
+                
+                <table class="data-table" id="recentPostsTable">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recent Projects -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>Recent Projects</h2>
+                    <button class="btn-add" data-modal="projectModal">
+                        <i class="fas fa-plus"></i> Add New
+                    </button>
+                </div>
+                
+                <table class="data-table" id="recentProjectsTable">
+                    <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Comments -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Recent Comments</h2>
+            </div>
+            
+            <div class="comments-list">
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            <strong>Sarah M. Johnson</strong>
+                            <span>on "Girls Education Program"</span>
+                        </div>
+                        <div class="comment-date">2 hours ago</div>
+                    </div>
+                    <div class="comment-content">
+                        <p>This is an amazing initiative! As a former beneficiary of similar programs, I can attest to the life-changing impact education has on girls.</p>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="btn-edit">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn-delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        <button class="btn-view">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            <strong>James Kollie</strong>
+                            <span>on "Women Entrepreneurship"</span>
+                        </div>
+                        <div class="comment-date">1 day ago</div>
+                    </div>
+                    <div class="comment-content">
+                        <p>How can I volunteer for this program? I'm a retired teacher with experience working with girls in rural communities.</p>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="btn-edit">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn-delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        <button class="btn-view">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Recent Activity</h2>
+            </div>
+            
+            <div class="activity-timeline">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New team member added</div>
+                        <div class="activity-desc">Mary Kamara was added to the team</div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Project updated</div>
+                        <div class="activity-desc">Girls Education Program progress updated to 75%</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New comment</div>
+                        <div class="activity-desc">Sarah Johnson commented on Girls Education Program</div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Post Modal -->
+    <div class="form-modal" id="postModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Post</h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="crud-form" data-type="post">
+                <div class="form-group">
+                    <label for="postTitle">Post Title *</label>
+                    <input type="text" id="postTitle" name="title" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postCategory">Category</label>
+                        <select id="postCategory" name="category">
+                            <option value="news">News</option>
+                            <option value="updates">Updates</option>
+                            <option value="success-stories">Success Stories</option>
+                            <option value="events">Events</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postStatus">Status</label>
+                        <select id="postStatus" name="status">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="postContent">Content *</label>
+                    <textarea id="postContent" name="content" rows="8" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="postImage">Featured Image</label>
+                    <input type="file" id="postImage" name="image" accept="image/*">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div class="form-modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Project</h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="crud-form" data-type="project">
+                <div class="form-group">
+                    <label for="projectName">Project Name *</label>
+                    <input type="text" id="projectName" name="name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="projectCategory">Category</label>
+                        <select id="projectCategory" name="category">
+                            <option value="education">Education</option>
+                            <option value="economic">Economic Empowerment</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="advocacy">Advocacy</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectStatus">Status</label>
+                        <select id="projectStatus" name="status">
+                            <option value="planning">Planning</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectDescription">Description *</label>
+                    <textarea id="projectDescription" name="description" rows="6" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="projectGoal">Goal Amount ($)</label>
+                        <input type="number" id="projectGoal" name="goal" min="0" step="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="projectProgress">Progress (%)</label>
+                        <input type="range" id="projectProgress" name="progress" min="0" max="100" value="0">
+                        <span id="progressValue">0%</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectLocation">Location</label>
+                    <input type="text" id="projectLocation" name="location">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

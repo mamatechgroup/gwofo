@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News & Updates - Girls and Women Foundation Liberia</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-hands-helping"></i>
+                <span>Girls & Women Foundation Liberia</span>
+            </a>
+            
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="posts-feed.html" class="active">News & Updates</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin/login.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <h1>News & Updates</h1>
+                <p>Stay updated with our latest activities, success stories, and announcements</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" id="postSearch" placeholder="Search posts...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All Posts</button>
+                    <button class="filter-btn" data-filter="news">News</button>
+                    <button class="filter-btn" data-filter="updates">Updates</button>
+                    <button class="filter-btn" data-filter="stories">Success Stories</button>
+                    <button class="filter-btn" data-filter="events">Events</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="posts-layout">
+            <!-- Posts Feed -->
+            <div class="posts-feed">
+                <!-- Create Post Card (for logged in users) -->
+                <div class="create-post-card">
+                    <div class="create-post-header">
+                        <div class="user-avatar">
+                            <img src="assets/images/avatar-default.jpg" alt="Your Avatar">
+                        </div>
+                        <div class="create-post-input">
+                            <textarea id="newPostContent" placeholder="What's happening in the foundation? Share an update..."></textarea>
+                        </div>
+                    </div>
+                    <div class="create-post-actions">
+                        <div class="attachment-options">
+                            <button class="attachment-btn" title="Add Photo">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="attachment-btn" title="Add Video">
+                                <i class="fas fa-video"></i>
+                            </button>
+                            <button class="attachment-btn" title="Add Document">
+                                <i class="fas fa-file-alt"></i>
+                            </button>
+                        </div>
+                        <button class="btn-primary" id="publishPost">
+                            <i class="fas fa-paper-plane"></i> Publish
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Post Cards will be loaded here by JavaScript -->
+                <div id="postsContainer"></div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner"></div>
+                    <p>Loading more posts...</p>
+                </div>
+
+                <!-- No Posts Message -->
+                <div class="no-posts" id="noPostsMessage" style="display: none;">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>No posts yet</h3>
+                    <p>Be the first to share something with the community!</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Popular Topics -->
+                <div class="sidebar-widget">
+                    <h3>Popular Topics</h3>
+                    <div class="topics-list">
+                        <a href="#" class="topic-tag" data-tag="education">
+                            <i class="fas fa-graduation-cap"></i> Education
+                        </a>
+                        <a href="#" class="topic-tag" data-tag="healthcare">
+                            <i class="fas fa-heartbeat"></i> Healthcare
+                        </a>
+                        <a href="#" class="topic-tag" data-tag="entrepreneurship">
+                            <i class="fas fa-briefcase"></i> Entrepreneurship
+                        </a>
+                        <a href="#" class="topic-tag" data-tag="advocacy">
+                            <i class="fas fa-bullhorn"></i> Advocacy
+                        </a>
+                        <a href="#" class="topic-tag" data-tag="volunteer">
+                            <i class="fas fa-hands-helping"></i> Volunteer Stories
+                        </a>
+                        <a href="#" class="topic-tag" data-tag="fundraising">
+                            <i class="fas fa-hand-holding-usd"></i> Fundraising
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="sidebar-widget">
+                    <h3>Recent Activities</h3>
+                    <div class="activities-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>Mary Kamara</strong> joined the foundation</p>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-donate"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>Liberia Bank</strong> donated $10,000</p>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p>New event: <strong>Women's Health Workshop</strong></p>
+                                <span class="activity-time">2 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="sidebar-widget newsletter-widget">
+                    <h3>Stay Updated</h3>
+                    <p>Subscribe to get the latest posts in your inbox</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email address" required>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-envelope"></i> Subscribe
+                        </button>
+                    </form>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Girls & Women Foundation Liberia</h3>
+                    <p>Empowering the next generation of Liberian women leaders through education, opportunity, and advocacy.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="posts-feed.html">News & Updates</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="partners.html">Partners</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Empowerment Street, Monrovia, Liberia</li>
+                        <li><i class="fas fa-phone"></i> +231 880 123 456</li>
+                        <li><i class="fas fa-envelope"></i> info@girlswomenliberia.org</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our projects</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your Email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Girls and Women Foundation Liberia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Post Detail Modal -->
+    <div class="modal" id="postDetailModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body" id="modalBody">
+                <!-- Post content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="/js/posts-feed.js"></script>
+</body>
+</html>

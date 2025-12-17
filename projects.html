@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Girls and Women Foundation Liberia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-hands-helping"></i>
+                <span>Girls & Women Foundation Liberia</span>
+            </a>
+            
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="projects.html" class="active">Projects</a></li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin/login.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>Our Projects</h1>
+            <p>Discover the initiatives transforming lives and building a brighter future for girls and women in Liberia</p>
+        </div>
+    </section>
+
+    <!-- Projects Filter -->
+    <section class="projects-filter">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Grid -->
+    <section class="all-projects">
+        <div class="container">
+            <div class="projects-container">
+                <!-- Project 1 -->
+                <div class="project-detail active" id="project1">
+                    <div class="project-header">
+                        <div class="project-meta">
+                            <span class="project-status active">Active</span>
+                            <span class="project-category">Education</span>
+                        </div>
+                        <h2>Girls Education Program</h2>
+                        <p class="project-location"><i class="fas fa-map-marker-alt"></i> Montserrado, Bomi, and Grand Bassa Counties</p>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-image-large">
+                            <img src="assets/images/project1-large.jpg" alt="Girls Education Program">
+                        </div>
+                        
+                        <div class="project-info">
+                            <div class="project-stats">
+                                <div class="stat">
+                                    <h3>75%</h3>
+                                    <p>Funded</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>$150,000</h3>
+                                    <p>Goal</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>1,200</h3>
+                                    <p>Girls Reached</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>18</h3>
+                                    <p>Months</p>
+                                </div>
+                            </div>
+                            
+                            <div class="project-description">
+                                <h3>About This Project</h3>
+                                <p>Our Girls Education Program addresses the critical barriers to education faced by young girls in Liberia. Through comprehensive support systems, we ensure that girls not only enroll in school but also complete their education successfully.</p>
+                                
+                                <h4>Key Objectives:</h4>
+                                <ul>
+                                    <li>Provide scholarships for 500 girls annually</li>
+                                    <li>Distribute school supplies to 1,200 girls</li>
+                                    <li>Establish mentorship programs in 15 schools</li>
+                                    <li>Conduct parent awareness workshops</li>
+                                    <li>Improve school infrastructure in 5 communities</li>
+                                </ul>
+                                
+                                <h4>Impact So Far:</h4>
+                                <p>Since inception, we have supported over 5,000 girls, resulting in a 40% increase in girls' school retention rates in target communities. 85% of scholarship recipients have progressed to higher education or vocational training.</p>
+                            </div>
+                            
+                            <div class="project-progress">
+                                <h4>Progress</h4>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 75%"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>$112,500 raised of $150,000 goal</span>
+                                    <span>150 days remaining</span>
+                                </div>
+                            </div>
+                            
+                            <div class="project-actions">
+                                <button class="btn-primary donate-btn"><i class="fas fa-heart"></i> Donate Now</button>
+                                <button class="btn-secondary share-btn"><i class="fas fa-share-alt"></i> Share Project</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comment Section -->
+                    <div class="comment-section">
+                        <div class="comment-header">
+                            <h3>Project Comments & Support</h3>
+                            <p>Join the conversation and show your support</p>
+                        </div>
+                        
+                        <div class="comment-form">
+                            <h4>Leave a Comment</h4>
+                            <form id="project1CommentForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <input type="text" id="name" placeholder="Your Name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="email" id="email" placeholder="Your Email" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <textarea id="comment" placeholder="Your Comment" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">Post Comment</button>
+                            </form>
+                        </div>
+                        
+                        <div class="comments-list">
+                            <div class="comment">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <strong>Sarah M. Johnson</strong>
+                                        <span class="comment-date">2 days ago</span>
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="like-btn" data-comment-id="1">
+                                            <i class="far fa-heart"></i> <span class="like-count">24</span>
+                                        </button>
+                                        <button class="reply-btn" data-comment-id="1">
+                                            <i class="fas fa-reply"></i> Reply
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    <p>This is an amazing initiative! As a former beneficiary of similar programs, I can attest to the life-changing impact education has on girls. Keep up the great work!</p>
+                                </div>
+                                <div class="replies">
+                                    <div class="comment reply">
+                                        <div class="comment-header">
+                                            <div class="comment-author">
+                                                <strong>Project Team</strong>
+                                                <span class="comment-date">1 day ago</span>
+                                            </div>
+                                            <div class="comment-actions">
+                                                <button class="like-btn" data-comment-id="2">
+                                                    <i class="far fa-heart"></i> <span class="like-count">8</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="comment-content">
+                                            <p>Thank you for sharing your experience, Sarah! Your success story inspires us to continue this important work.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="reply-form" id="reply-form-1">
+                                    <form>
+                                        <div class="form-group">
+                                            <textarea placeholder="Write a reply..." rows="2"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn-secondary">Post Reply</button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="comment">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <strong>James Kollie</strong>
+                                        <span class="comment-date">1 week ago</span>
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="like-btn" data-comment-id="3">
+                                            <i class="far fa-heart"></i> <span class="like-count">15</span>
+                                        </button>
+                                        <button class="reply-btn" data-comment-id="3">
+                                            <i class="fas fa-reply"></i> Reply
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    <p>How can I volunteer for this program? I'm a retired teacher with experience working with girls in rural communities.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="project-detail" id="project2">
+                    <div class="project-header">
+                        <div class="project-meta">
+                            <span class="project-status active">Active</span>
+                            <span class="project-category">Economic Empowerment</span>
+                        </div>
+                        <h2>Women Entrepreneurship Initiative</h2>
+                        <p class="project-location"><i class="fas fa-map-marker-alt"></i> Rural communities across Liberia</p>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-image-large">
+                            <img src="assets/images/project2-large.jpg" alt="Women Entrepreneurship">
+                        </div>
+                        
+                        <div class="project-info">
+                            <div class="project-stats">
+                                <div class="stat">
+                                    <h3>60%</h3>
+                                    <p>Funded</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>$200,000</h3>
+                                    <p>Goal</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>500</h3>
+                                    <p>Women Trained</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>24</h3>
+                                    <p>Months</p>
+                                </div>
+                            </div>
+                            
+                            <div class="project-description">
+                                <h3>About This Project</h3>
+                                <p>This initiative empowers women in rural Liberia through business skills training, micro-finance support, and market access facilitation, creating sustainable livelihoods and boosting local economies.</p>
+                                
+                                <h4>Key Components:</h4>
+                                <ul>
+                                    <li>Business management training</li>
+                                    <li>Micro-loans and financial literacy</li>
+                                    <li>Market linkage development</li>
+                                    <li>Mentorship from successful women entrepreneurs</li>
+                                    <li>Cooperative formation support</li>
+                                </ul>
+                                
+                                <h4>Success Stories:</h4>
+                                <p>Over 200 women have successfully started or expanded their businesses, creating employment opportunities for an additional 500 community members. Average household income has increased by 45% among participants.</p>
+                            </div>
+                            
+                            <div class="project-progress">
+                                <h4>Progress</h4>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 60%"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>$120,000 raised of $200,000 goal</span>
+                                    <span>240 days remaining</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="project-detail" id="project3">
+                    <div class="project-header">
+                        <div class="project-meta">
+                            <span class="project-status completed">Completed</span>
+                            <span class="project-category">Healthcare</span>
+                        </div>
+                        <h2>Healthcare Access Initiative</h2>
+                        <p class="project-location"><i class="fas fa-map-marker-alt"></i> Remote areas of Liberia</p>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-image-large">
+                            <img src="assets/images/project3-large.jpg" alt="Healthcare Access">
+                        </div>
+                        
+                        <div class="project-info">
+                            <div class="project-stats">
+                                <div class="stat">
+                                    <h3>100%</h3>
+                                    <p>Funded</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>$180,000</h3>
+                                    <p>Goal</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>3,000+</h3>
+                                    <p>Patients Served</p>
+                                </div>
+                                <div class="stat">
+                                    <h3>18</h3>
+                                    <p>Months</p>
+                                </div>
+                            </div>
+                            
+                            <div class="project-description">
+                                <h3>About This Project</h3>
+                                <p>This completed project provided essential healthcare services to women and girls in remote areas through mobile clinics, health education, and community health worker training.</p>
+                                
+                                <h4>Achievements:</h4>
+                                <ul>
+                                    <li>Established 5 mobile clinic units</li>
+                                    <li>Trained 50 community health workers</li>
+                                    <li>Conducted 120 health education workshops</li>
+                                    <li>Provided prenatal care to 800 women</li>
+                                    <li>Distributed 5,000 health kits</li>
+                                </ul>
+                                
+                                <h4>Impact Assessment:</h4>
+                                <p>The project achieved a 60% reduction in maternal complications and a 40% increase in immunization rates in target communities. Community health workers continue to provide services using skills gained from the project.</p>
+                            </div>
+                            
+                            <div class="project-progress">
+                                <h4>Status: Successfully Completed</h4>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 100%"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>Project completed in December 2023</span>
+                                    <span>Serving 5 communities</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Projects List Sidebar -->
+            <div class="projects-sidebar">
+                <h3>All Projects</h3>
+                <div class="projects-list">
+                    <a href="#project1" class="project-item active">
+                        <h4>Girls Education Program</h4>
+                        <p>Active • 75% funded</p>
+                    </a>
+                    <a href="#project2" class="project-item">
+                        <h4>Women Entrepreneurship</h4>
+                        <p>Active • 60% funded</p>
+                    </a>
+                    <a href="#project3" class="project-item">
+                        <h4>Healthcare Access</h4>
+                        <p>Completed • 100% funded</p>
+                    </a>
+                    <a href="#project4" class="project-item">
+                        <h4>Digital Literacy Program</h4>
+                        <p>Upcoming • Planning phase</p>
+                    </a>
+                    <a href="#project5" class="project-item">
+                        <h4>Leadership Training</h4>
+                        <p>Active • 45% funded</p>
+                    </a>
+                    <a href="#project6" class="project-item">
+                        <h4>Agricultural Empowerment</h4>
+                        <p>Completed • 100% funded</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Girls & Women Foundation Liberia</h3>
+                    <p>Empowering the next generation of Liberian women leaders through education, opportunity, and advocacy.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="partners.html">Partners</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Empowerment Street, Monrovia, Liberia</li>
+                        <li><i class="fas fa-phone"></i> +231 880 123 456</li>
+                        <li><i class="fas fa-envelope"></i> info@girlswomenliberia.org</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our projects</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your Email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Girls and Women Foundation Liberia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+   
+    <script src="js/comments.js"></script>
+    
+</body>
+</html>

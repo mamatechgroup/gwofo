@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Slides - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            
+            <a href="manage-team.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </a>
+            
+            <a href="manage-partners.html" class="menu-item">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+            </a>
+            
+            <a href="manage-slides.html" class="menu-item active">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+                <span class="badge">5</span>
+            </a>
+            
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Manage Homepage Slides</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img">
+                        <span>A</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin User</span>
+                        <span class="profile-role">Administrator</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search slides...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slides Management -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="filters">
+                    <select class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="all">Sort By</option>
+                        <option value="position">Position</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+                
+                <button class="btn-add" data-modal="slideModal">
+                    <i class="fas fa-plus"></i> Add Slide
+                </button>
+            </div>
+            
+            <!-- Slides Grid -->
+            <div class="slides-grid">
+                <!-- Slide 1 -->
+                <div class="slide-card active">
+                    <div class="slide-preview">
+                        <img src="../assets/slides/slide1.jpg" alt="Education for Girls">
+                        <div class="slide-overlay">
+                            <h3>Education for Girls</h3>
+                            <p>Empowering young girls through quality education</p>
+                            <button class="btn-view-slide">View Slide</button>
+                        </div>
+                    </div>
+                    <div class="slide-info">
+                        <div class="slide-details">
+                            <h4>Education for Girls</h4>
+                            <div class="slide-meta">
+                                <span class="slide-position">Position: 1</span>
+                                <span class="slide-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="slide-actions">
+                            <button class="btn-edit" data-id="1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <div class="drag-handle">
+                                <i class="fas fa-arrows-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="slide-card active">
+                    <div class="slide-preview">
+                        <img src="../assets/slides/slide2.jpg" alt="Women Entrepreneurship">
+                        <div class="slide-overlay">
+                            <h3>Women Entrepreneurship</h3>
+                            <p>Training women to start and grow businesses</p>
+                            <button class="btn-view-slide">View Slide</button>
+                        </div>
+                    </div>
+                    <div class="slide-info">
+                        <div class="slide-details">
+                            <h4>Women Entrepreneurship</h4>
+                            <div class="slide-meta">
+                                <span class="slide-position">Position: 2</span>
+                                <span class="slide-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="slide-actions">
+                            <button class="btn-edit" data-id="2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <div class="drag-handle">
+                                <i class="fas fa-arrows-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slide 3 -->
+                <div class="slide-card">
+                    <div class="slide-preview">
+                        <div class="slide-preview-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="slide-overlay">
+                            <h3>Healthcare Access</h3>
+                            <p>Improving healthcare for women and children</p>
+                            <button class="btn-view-slide">View Slide</button>
+                        </div>
+                    </div>
+                    <div class="slide-info">
+                        <div class="slide-details">
+                            <h4>Healthcare Access</h4>
+                            <div class="slide-meta">
+                                <span class="slide-position">Position: 3</span>
+                                <span class="slide-status inactive">Inactive</span>
+                            </div>
+                        </div>
+                        <div class="slide-actions">
+                            <button class="btn-edit" data-id="3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="3">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <div class="drag-handle">
+                                <i class="fas fa-arrows-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slide 4 -->
+                <div class="slide-card active">
+                    <div class="slide-preview">
+                        <img src="../assets/slides/slide4.jpg" alt="Community Impact">
+                        <div class="slide-overlay">
+                            <h3>Community Impact</h3>
+                            <p>Transforming communities through empowerment</p>
+                            <button class="btn-view-slide">View Slide</button>
+                        </div>
+                    </div>
+                    <div class="slide-info">
+                        <div class="slide-details">
+                            <h4>Community Impact</h4>
+                            <div class="slide-meta">
+                                <span class="slide-position">Position: 4</span>
+                                <span class="slide-status active">Active</span>
+                            </div>
+                        </div>
+                        <div class="slide-actions">
+                            <button class="btn-edit" data-id="4">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="4">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <div class="drag-handle">
+                                <i class="fas fa-arrows-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide Management Actions -->
+            <div class="slide-actions-panel">
+                <div class="actions-left">
+                    <button class="btn-secondary" id="reorderSlides">
+                        <i class="fas fa-sort"></i> Reorder Slides
+                    </button>
+                    <button class="btn-secondary" id="toggleAll">
+                        <i class="fas fa-toggle-on"></i> Toggle All
+                    </button>
+                </div>
+                <div class="actions-right">
+                    <button class="btn-primary" id="saveOrder">
+                        <i class="fas fa-save"></i> Save Order
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Preview -->
+        <div class="content-section">
+            <div class="section-header">
+                <h3>Live Slide Preview</h3>
+                <button class="btn-secondary" id="refreshPreview">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="slide-preview-container">
+                <div class="preview-window">
+                    <div class="preview-slide active">
+                        <div class="preview-image">
+                            <img src="../assets/slides/slide1.jpg" alt="Current Slide">
+                        </div>
+                        <div class="preview-content">
+                            <h2>Education for Girls</h2>
+                            <p>Empowering young girls through quality education and mentorship programs that build confidence and skills for the future.</p>
+                            <button class="preview-btn">Learn More</button>
+                        </div>
+                    </div>
+                    <div class="preview-controls">
+                        <button class="preview-control prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="preview-dots">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                        <button class="preview-control next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="preview-info">
+                    <h4>Slide Settings</h4>
+                    <div class="preview-stats">
+                        <div class="preview-stat">
+                            <span class="stat-label">Current Slide:</span>
+                            <span class="stat-value">Education for Girls</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Position:</span>
+                            <span class="stat-value">1 of 5</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Duration:</span>
+                            <span class="stat-value">5 seconds</span>
+                        </div>
+                        <div class="preview-stat">
+                            <span class="stat-label">Status:</span>
+                            <span class="stat-value active">Active</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-settings">
+                        <h5>Settings</h5>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" checked>
+                                Auto-rotate slides
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                Slide Duration (seconds)
+                                <input type="range" min="3" max="10" value="5">
+                                <span>5s</span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                Transition Effect
+                                <select>
+                                    <option>Fade</option>
+                                    <option>Slide</option>
+                                    <option>Zoom</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide Statistics -->
+        <div class="content-grid">
+            <div class="content-section">
+                <h3>Slide Performance</h3>
+                <div class="performance-stats">
+                    <div class="performance-item">
+                        <div class="performance-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div>
+                            <div class="performance-number">45,678</div>
+                            <div class="performance-label">Total Views</div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-item">
+                        <div class="performance-icon">
+                            <i class="fas fa-mouse-pointer"></i>
+                        </div>
+                        <div>
+                            <div class="performance-number">1,234</div>
+                            <div class="performance-label">Clicks</div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-item">
+                        <div class="performance-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div>
+                            <div class="performance-number">2.7%</div>
+                            <div class="performance-label">Click Rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-item">
+                        <div class="performance-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <div class="performance-number">+12%</div>
+                            <div class="performance-label">Engagement</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>Active Slides</h3>
+                <div class="active-slides-list">
+                    <div class="active-slide">
+                        <span class="slide-title">Education for Girls</span>
+                        <span class="slide-position">Position 1</span>
+                        <span class="slide-status-badge active">Active</span>
+                    </div>
+                    <div class="active-slide">
+                        <span class="slide-title">Women Entrepreneurship</span>
+                        <span class="slide-position">Position 2</span>
+                        <span class="slide-status-badge active">Active</span>
+                    </div>
+                    <div class="active-slide">
+                        <span class="slide-title">Community Impact</span>
+                        <span class="slide-position">Position 4</span>
+                        <span class="slide-status-badge active">Active</span>
+                    </div>
+                    <div class="active-slide">
+                        <span class="slide-title">Success Stories</span>
+                        <span class="slide-position">Position 5</span>
+                        <span class="slide-status-badge active">Active</span>
+                    </div>
+                </div>
+                <div class="slides-summary">
+                    <p><strong>4</strong> active slides out of <strong>5</strong> total slides</p>
+                    <small>Maximum recommended: 6 slides</small>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Slide Modal -->
+    <div class="form-modal" id="slideModal">
+        <div class="modal-content wide-modal">
+            <div class="modal-header">
+                <h2>Add New Slide</h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="crud-form" data-type="slide">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="slideTitle">Slide Title *</label>
+                        <input type="text" id="slideTitle" name="title" required placeholder="Enter slide title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slideSubtitle">Subtitle</label>
+                        <input type="text" id="slideSubtitle" name="subtitle" placeholder="Optional subtitle">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="slideDescription">Description *</label>
+                    <textarea id="slideDescription" name="description" rows="3" required placeholder="Slide description text"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="slidePosition">Position</label>
+                        <select id="slidePosition" name="position">
+                            <option value="1">1 - First</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6 - Last</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slideStatus">Status</label>
+                        <select id="slideStatus" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="slideButtonText">Button Text</label>
+                        <input type="text" id="slideButtonText" name="button_text" placeholder="e.g., Learn More">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slideButtonLink">Button Link</label>
+                        <input type="url" id="slideButtonLink" name="button_link" placeholder="https://example.com/page">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="slideImage">Slide Image *</label>
+                    <div class="image-upload-zone">
+                        <input type="file" id="slideImage" name="image" accept="image/*" class="file-input">
+                        <label for="slideImage" class="upload-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Upload Slide Image</h4>
+                            <p>Drag and drop or click to browse</p>
+                            <small>Recommended size: 1920x1080px, Max size: 5MB</small>
+                        </label>
+                    </div>
+                    <div class="image-requirements">
+                        <h5>Image Requirements:</h5>
+                        <ul>
+                            <li>Resolution: 1920x1080 pixels (16:9 ratio)</li>
+                            <li>File types: JPG, PNG, WebP</li>
+                            <li>Max file size: 5MB</li>
+                            <li>Optimize for web for faster loading</li>
+                        </ul>
+                    </div>
+                    <div class="image-preview-large" id="slideImagePreview" style="display: none;">
+                        <img id="slidePreviewImage" src="" alt="Slide Preview">
+                        <div class="preview-actions">
+                            <button type="button" class="btn-secondary replace-image">
+                                <i class="fas fa-sync-alt"></i> Replace
+                            </button>
+                            <button type="button" class="btn-secondary remove-image">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="slideOverlay">Overlay Opacity</label>
+                        <div class="range-group">
+                            <input type="range" id="slideOverlay" name="overlay" min="0" max="100" value="30">
+                            <span id="overlayValue">30%</span>
+                        </div>
+                        <small>Adjust text overlay darkness for better readability</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="slideDuration">Display Duration (seconds)</label>
+                        <input type="number" id="slideDuration" name="duration" min="3" max="10" value="5">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="slideTextColor">Text Color</label>
+                    <div class="color-picker">
+                        <input type="color" id="slideTextColor" name="text_color" value="#ffffff">
+                        <label for="slideTextColor">White (#ffffff)</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="overlay_enabled" checked>
+                        Enable text overlay
+                    </label>
+                    <label>
+                        <input type="checkbox" name="button_enabled" checked>
+                        Show action button
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Slide</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

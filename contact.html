@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Girls and Women Foundation Liberia</title>
+    <link rel="stylesheet" href="css/style.css">
+     <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-hands-helping"></i>
+                <span>Girls & Women Foundation Liberia</span>
+            </a>
+            
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="partners.html">Partners</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="admin/login.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p>Get in touch with us. We'd love to hear from you</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <!-- Contact Form -->
+                <div class="contact-form-container">
+                    <div class="section-header">
+                        <h2>Send Us a Message</h2>
+                        <div class="underline"></div>
+                        <p>Fill out the form below and we'll get back to you as soon as possible</p>
+                    </div>
+                    
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subject *</label>
+                                <select id="subject" name="subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="donation">Donation Information</option>
+                                    <option value="volunteer">Volunteer Opportunity</option>
+                                    <option value="partnership">Partnership Inquiry</option>
+                                    <option value="media">Media Request</option>
+                                    <option value="project">Project Information</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="6" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="newsletter" name="newsletter">
+                                <label for="newsletter">Subscribe to our newsletter for updates</label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Contact Info & Map -->
+                <div class="contact-info-container">
+                    <!-- Contact Information -->
+                    <div class="contact-info-section">
+                        <div class="section-header">
+                            <h2>Get in Touch</h2>
+                            <div class="underline"></div>
+                        </div>
+                        
+                        <div class="contact-info-grid">
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="contact-details">
+                                    <h4>Our Headquarters</h4>
+                                    <p>123 Empowerment Street<br>Monrovia, Liberia<br>1000 Monrovia</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="contact-details">
+                                    <h4>Phone Numbers</h4>
+                                    <p>Office: +231 880 123 456<br>Mobile: +231 770 987 654<br>Fax: +231 880 123 457</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-details">
+                                    <h4>Email Addresses</h4>
+                                    <p>General: info@girlswomenliberia.org<br>Donations: donate@girlswomenliberia.org<br>Partnerships: partners@girlswomenliberia.org</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-info-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="contact-details">
+                                    <h4>Office Hours</h4>
+                                    <p>Monday - Friday: 8:00 AM - 5:00 PM<br>Saturday: 9:00 AM - 1:00 PM<br>Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="emergency-contact">
+                            <h4><i class="fas fa-exclamation-circle"></i> Emergency Contact</h4>
+                            <p>For urgent matters outside office hours, please call: <strong>+231 777 555 888</strong></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Google Map -->
+                    <div class="map-section">
+                        <div class="section-header">
+                            <h2>Find Us</h2>
+                            <div class="underline"></div>
+                        </div>
+                        
+                        <div class="map-container">
+                            <div id="map" class="map-placeholder">
+                                <!-- Google Map will be embedded here -->
+                                <div class="map-fallback">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <h4>Our Location</h4>
+                                    <p>123 Empowerment Street, Monrovia, Liberia</p>
+                                    <a href="https://maps.google.com/?q=123+Empowerment+Street,+Monrovia,+Liberia" 
+                                       target="_blank" 
+                                       class="btn-secondary">
+                                        <i class="fas fa-directions"></i> Get Directions
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Regional Offices -->
+    <section class="regional-offices">
+        <div class="container">
+            <div class="section-header">
+                <h2>Regional Offices</h2>
+                <div class="underline"></div>
+                <p>We have offices across Liberia to better serve communities</p>
+            </div>
+            
+            <div class="offices-grid">
+                <div class="office-card">
+                    <h4><i class="fas fa-building"></i> Monrovia Office</h4>
+                    <p><strong>Address:</strong> 123 Empowerment Street, Monrovia</p>
+                    <p><strong>Phone:</strong> +231 880 123 456</p>
+                    <p><strong>Email:</strong> monrovia@girlswomenliberia.org</p>
+                    <p><strong>Manager:</strong> Sarah Johnson</p>
+                </div>
+                
+                <div class="office-card">
+                    <h4><i class="fas fa-building"></i> Gbarnga Office</h4>
+                    <p><strong>Address:</strong> Peace Avenue, Gbarnga, Bong County</p>
+                    <p><strong>Phone:</strong> +231 770 234 567</p>
+                    <p><strong>Email:</strong> gbarnga@girlswomenliberia.org</p>
+                    <p><strong>Manager:</strong> Mary Kamara</p>
+                </div>
+                
+                <div class="office-card">
+                    <h4><i class="fas fa-building"></i> Buchanan Office</h4>
+                    <p><strong>Address:</strong> Unity Street, Buchanan, Grand Bassa</p>
+                    <p><strong>Phone:</strong> +231 770 345 678</p>
+                    <p><strong>Email:</strong> buchanan@girlswomenliberia.org</p>
+                    <p><strong>Manager:</strong> James Cole</p>
+                </div>
+                
+                <div class="office-card">
+                    <h4><i class="fas fa-building"></i> Ganta Office</h4>
+                    <p><strong>Address:</strong> Progress Road, Ganta, Nimba</p>
+                    <p><strong>Phone:</strong> +231 770 456 789</p>
+                    <p><strong>Email:</strong> ganta@girlswomenliberia.org</p>
+                    <p><strong>Manager:</strong> Patricia B. Sherman</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="contact-faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <div class="underline"></div>
+                <p>Quick answers to common questions</p>
+            </div>
+            
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How can I donate to your foundation?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>You can donate through our secure online portal, bank transfer, or by visiting any of our offices. We accept donations in USD and Liberian dollars. All donations are tax-deductible.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How can I volunteer with your organization?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>We welcome volunteers in various capacities. Please fill out our volunteer application form on the website or contact our volunteer coordinator at volunteer@girlswomenliberia.org.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How do I apply for educational scholarships?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Scholarship applications are open twice a year (January and July). Visit our Projects page for details or contact our Education Program Manager at education@girlswomenliberia.org.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Are you looking for partnerships?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes! We welcome partnerships with organizations, corporations, and institutions. Please email our Partnership Director at partnerships@girlswomenliberia.org for more information.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>How can I stay updated on your work?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Subscribe to our newsletter, follow us on social media, or check our website regularly for updates on projects, events, and success stories.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Do you offer internships?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes, we offer internship opportunities for students and recent graduates. Send your CV and cover letter to internships@girlswomenliberia.org.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Media Connect -->
+    <section class="social-connect">
+        <div class="container">
+            <div class="section-header">
+                <h2>Connect With Us</h2>
+                <div class="underline"></div>
+                <p>Follow us on social media for the latest updates</p>
+            </div>
+            
+            <div class="social-links-large">
+                <a href="#" class="social-link facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="social-link twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </a>
+                <a href="#" class="social-link instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Instagram</span>
+                </a>
+                <a href="#" class="social-link linkedin">
+                    <i class="fab fa-linkedin-in"></i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="#" class="social-link youtube">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube</span>
+                </a>
+                <a href="#" class="social-link whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Girls & Women Foundation Liberia</h3>
+                    <p>Empowering the next generation of Liberian women leaders through education, opportunity, and advocacy.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="partners.html">Partners</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Empowerment Street, Monrovia, Liberia</li>
+                        <li><i class="fas fa-phone"></i> +231 880 123 456</li>
+                        <li><i class="fas fa-envelope"></i> info@girlswomenliberia.org</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to get updates on our projects</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your Email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Girls and Women Foundation Liberia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Team - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            
+            <a href="manage-team.html" class="menu-item active">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+                <span class="badge">8</span>
+            </a>
+            
+            <a href="manage-partners.html" class="menu-item">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+            </a>
+            
+            <a href="manage-slides.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+            </a>
+            
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Manage Team Members</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img">
+                        <span>A</span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">Admin User</span>
+                        <span class="profile-role">Administrator</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search team...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Management -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="filters">
+                    <select class="filter-select">
+                        <option value="all">All Departments</option>
+                        <option value="leadership">Leadership</option>
+                        <option value="programs">Programs</option>
+                        <option value="operations">Operations</option>
+                        <option value="volunteers">Volunteers</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="all">All Positions</option>
+                        <option value="director">Director</option>
+                        <option value="manager">Manager</option>
+                        <option value="coordinator">Coordinator</option>
+                        <option value="volunteer">Volunteer</option>
+                    </select>
+                </div>
+                
+                <button class="btn-add" data-modal="teamModal">
+                    <i class="fas fa-user-plus"></i> Add Team Member
+                </button>
+            </div>
+            
+            <!-- Team Grid -->
+            <div class="team-grid-admin">
+                <!-- Team Member 1 -->
+                <div class="team-member-card">
+                    <div class="team-member-header">
+                        <div class="team-member-image">
+                            <img src="../assets/images/team1.jpg" alt="Mary Kamara">
+                        </div>
+                        <div class="team-member-badge executive">
+                            <i class="fas fa-crown"></i> Executive
+                        </div>
+                    </div>
+                    
+                    <div class="team-member-content">
+                        <h3>Mary Kamara</h3>
+                        <div class="team-position">Executive Director</div>
+                        <div class="team-department">Leadership</div>
+                        
+                        <div class="team-contact">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>mary@foundation.org</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+231 88 123 4567</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-social">
+                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        </div>
+                        
+                        <div class="team-stats">
+                            <div class="team-stat">
+                                <strong>5</strong>
+                                <span>Projects</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>3</strong>
+                                <span>Years</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>98%</strong>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-actions">
+                            <button class="btn-edit" data-id="1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn-view" data-id="1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team Member 2 -->
+                <div class="team-member-card">
+                    <div class="team-member-header">
+                        <div class="team-member-image">
+                            <img src="../assets/images/team2.jpg" alt="John Doe">
+                        </div>
+                        <div class="team-member-badge manager">
+                            <i class="fas fa-briefcase"></i> Manager
+                        </div>
+                    </div>
+                    
+                    <div class="team-member-content">
+                        <h3>John Doe</h3>
+                        <div class="team-position">Program Manager</div>
+                        <div class="team-department">Programs</div>
+                        
+                        <div class="team-contact">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>john@foundation.org</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+231 77 987 6543</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-social">
+                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        </div>
+                        
+                        <div class="team-stats">
+                            <div class="team-stat">
+                                <strong>3</strong>
+                                <span>Projects</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>2</strong>
+                                <span>Years</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>95%</strong>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-actions">
+                            <button class="btn-edit" data-id="2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn-view" data-id="2">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team Member 3 -->
+                <div class="team-member-card">
+                    <div class="team-member-header">
+                        <div class="team-member-image">
+                            <img src="../assets/images/team3.jpg" alt="Sarah Johnson">
+                        </div>
+                        <div class="team-member-badge coordinator">
+                            <i class="fas fa-user-tie"></i> Coordinator
+                        </div>
+                    </div>
+                    
+                    <div class="team-member-content">
+                        <h3>Sarah Johnson</h3>
+                        <div class="team-position">Education Coordinator</div>
+                        <div class="team-department">Programs</div>
+                        
+                        <div class="team-contact">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>sarah@foundation.org</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+231 55 123 7890</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-social">
+                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        </div>
+                        
+                        <div class="team-stats">
+                            <div class="team-stat">
+                                <strong>2</strong>
+                                <span>Projects</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>1</strong>
+                                <span>Year</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>90%</strong>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-actions">
+                            <button class="btn-edit" data-id="3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="3">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn-view" data-id="3">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team Member 4 -->
+                <div class="team-member-card">
+                    <div class="team-member-header">
+                        <div class="team-member-image">
+                            <div class="team-image-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="team-member-badge volunteer">
+                            <i class="fas fa-hands-helping"></i> Volunteer
+                        </div>
+                    </div>
+                    
+                    <div class="team-member-content">
+                        <h3>James Kollie</h3>
+                        <div class="team-position">Field Volunteer</div>
+                        <div class="team-department">Volunteers</div>
+                        
+                        <div class="team-contact">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>james@foundation.org</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+231 66 555 4444</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-social">
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        </div>
+                        
+                        <div class="team-stats">
+                            <div class="team-stat">
+                                <strong>1</strong>
+                                <span>Project</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>6</strong>
+                                <span>Months</span>
+                            </div>
+                            <div class="team-stat">
+                                <strong>85%</strong>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        
+                        <div class="team-actions">
+                            <button class="btn-edit" data-id="4">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" data-id="4">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn-view" data-id="4">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Team Statistics -->
+        <div class="content-grid">
+            <div class="content-section">
+                <h3>Team Overview</h3>
+                <div class="stats-overview">
+                    <div class="overview-item">
+                        <div class="overview-icon team">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="overview-number">8</div>
+                            <div class="overview-label">Total Members</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-item">
+                        <div class="overview-icon department">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <div class="overview-number">4</div>
+                            <div class="overview-label">Departments</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-item">
+                        <div class="overview-icon active">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div>
+                            <div class="overview-number">7</div>
+                            <div class="overview-label">Active</div>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-item">
+                        <div class="overview-icon volunteers">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div>
+                            <div class="overview-number">3</div>
+                            <div class="overview-label">Volunteers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>Department Distribution</h3>
+                <div class="department-stats">
+                    <div class="department-item">
+                        <div class="department-info">
+                            <span class="department-name">Leadership</span>
+                            <span class="department-count">2 members</span>
+                        </div>
+                        <div class="department-bar">
+                            <div class="department-fill" style="width: 25%; background: #8a4fff;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="department-item">
+                        <div class="department-info">
+                            <span class="department-name">Programs</span>
+                            <span class="department-count">3 members</span>
+                        </div>
+                        <div class="department-bar">
+                            <div class="department-fill" style="width: 37.5%; background: #ff6b8b;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="department-item">
+                        <div class="department-info">
+                            <span class="department-name">Operations</span>
+                            <span class="department-count">2 members</span>
+                        </div>
+                        <div class="department-bar">
+                            <div class="department-fill" style="width: 25%; background: #4fc3f7;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="department-item">
+                        <div class="department-info">
+                            <span class="department-name">Volunteers</span>
+                            <span class="department-count">1 member</span>
+                        </div>
+                        <div class="department-bar">
+                            <div class="department-fill" style="width: 12.5%; background: #66bb6a;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Team Modal -->
+    <div class="form-modal" id="teamModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Team Member</h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="crud-form" data-type="team">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teamFirstName">First Name *</label>
+                        <input type="text" id="teamFirstName" name="first_name" required placeholder="Enter first name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamLastName">Last Name *</label>
+                        <input type="text" id="teamLastName" name="last_name" required placeholder="Enter last name">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teamPosition">Position *</label>
+                        <input type="text" id="teamPosition" name="position" required placeholder="e.g., Program Manager">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamDepartment">Department</label>
+                        <select id="teamDepartment" name="department">
+                            <option value="leadership">Leadership</option>
+                            <option value="programs">Programs</option>
+                            <option value="operations">Operations</option>
+                            <option value="volunteers">Volunteers</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teamEmail">Email *</label>
+                        <input type="email" id="teamEmail" name="email" required placeholder="member@foundation.org">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamPhone">Phone</label>
+                        <input type="tel" id="teamPhone" name="phone" placeholder="+231 00 000 0000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teamBio">Biography</label>
+                    <textarea id="teamBio" name="bio" rows="4" placeholder="Brief biography and background"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teamImage">Profile Image</label>
+                    <div class="file-upload">
+                        <input type="file" id="teamImage" name="image" accept="image/*" class="file-input">
+                        <label for="teamImage" class="file-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Upload profile photo</span>
+                            <small>PNG, JPG up to 2MB</small>
+                        </label>
+                    </div>
+                    <div class="image-preview" id="teamImagePreview" style="display: none;">
+                        <img id="teamPreviewImage" src="" alt="Profile Preview">
+                        <button type="button" class="remove-image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Social Media Links</label>
+                    <div class="social-inputs">
+                        <div class="social-input">
+                            <i class="fab fa-linkedin"></i>
+                            <input type="url" name="linkedin" placeholder="LinkedIn profile URL">
+                        </div>
+                        <div class="social-input">
+                            <i class="fab fa-twitter"></i>
+                            <input type="url" name="twitter" placeholder="Twitter profile URL">
+                        </div>
+                        <div class="social-input">
+                            <i class="fab fa-facebook"></i>
+                            <input type="url" name="facebook" placeholder="Facebook profile URL">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teamJoinDate">Join Date</label>
+                        <input type="date" id="teamJoinDate" name="join_date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teamStatus">Status</label>
+                        <select id="teamStatus" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="on-leave">On Leave</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>
