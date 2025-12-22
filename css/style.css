@@ -1,3 +1,4 @@
+/* CSS Variables - Updated to match Girls and Women Foundation - Liberia logo */
 :root {
     --primary-color: #003366; /* Deep blue from inner circle - for headers, navigation, buttons */
     --primary-light: #1a4d80; /* Lighter blue for hover states */
@@ -142,6 +143,7 @@ a:hover {
     justify-content: space-between;
     align-items: center;
 }
+
 
 .logo {
     display: flex;
