@@ -285,11 +285,11 @@ function clearFieldError(field) {
 }
 
 // ==========================================================================
-// SLIDER FUNCTIONS
+// SLIDER FUNCTIONS - FIXED VERSION
 // ==========================================================================
 
 function initSliders() {
-    // Initialize all sliders if they exist
+    // Initialize hero slider if exists
     if (document.querySelector('.hero-slider')) {
         const heroSlider = new Slider('.hero-slider', {
             autoPlay: true,
@@ -298,13 +298,147 @@ function initSliders() {
         });
     }
     
-    if (document.querySelector('.team-slider-container')) {
-        const teamSlider = new TeamSlider('.team-slider-container', {
-            cardsToShow: 3
-        });
+    // Initialize team slider if exists
+    const teamSliderContainer = document.querySelector('.team-slider-container');
+    if (teamSliderContainer) {
+        initTeamSlider();
     }
     
     initPartnersSlider();
+}
+
+// Team Slider Implementation - Fixed
+function initTeamSlider() {
+    const sliderContainer = document.querySelector('.team-slider-container');
+    const slider = document.querySelector('.team-slider');
+    const prevBtn = document.querySelector('.team-slider-prev');
+    const nextBtn = document.querySelector('.team-slider-next');
+    const cards = document.querySelectorAll('.team-card');
+    
+    if (!sliderContainer || !slider || cards.length === 0) return;
+    
+    let currentPosition = 0;
+    let currentIndex = 0;
+    const cardWidth = 300; // 300px card width + 30px gap
+    let cardsPerView = calculateCardsPerView();
+    
+    // Calculate how many cards fit in the viewport
+    function calculateCardsPerView() {
+        const containerWidth = sliderContainer.offsetWidth;
+        return Math.floor(containerWidth / cardWidth);
+    }
+    
+    // Calculate maximum scroll position
+    function getMaxPosition() {
+        const totalCards = cards.length;
+        const maxIndex = Math.max(0, totalCards - cardsPerView);
+        return -maxIndex * cardWidth;
+    }
+    
+    // Update slider position
+    function updateSliderPosition() {
+        slider.style.transform = `translateX(${currentPosition}px)`;
+        slider.style.transition = 'transform 0.5s ease';
+    }
+    
+    // Move to next set of cards
+    function nextSlide() {
+        const maxPosition = getMaxPosition();
+        const newPosition = currentPosition - (cardsPerView * cardWidth);
+        
+        if (newPosition < maxPosition) {
+            // If we're at the end, loop back to start
+            currentPosition = 0;
+            currentIndex = 0;
+        } else {
+            currentPosition = Math.max(newPosition, maxPosition);
+            currentIndex = Math.min(currentIndex + cardsPerView, cards.length - cardsPerView);
+        }
+        
+        updateSliderPosition();
+    }
+    
+    // Move to previous set of cards
+    function prevSlide() {
+        const newPosition = currentPosition + (cardsPerView * cardWidth);
+        
+        if (newPosition > 0) {
+            // If we're at the beginning, loop to end
+            const maxPosition = getMaxPosition();
+            currentPosition = maxPosition;
+            currentIndex = Math.max(0, cards.length - cardsPerView);
+        } else {
+            currentPosition = Math.min(newPosition, 0);
+            currentIndex = Math.max(currentIndex - cardsPerView, 0);
+        }
+        
+        updateSliderPosition();
+    }
+    
+    // Event listeners for buttons
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', prevSlide);
+    }
+    
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            cardsPerView = calculateCardsPerView();
+            // Adjust position if needed
+            const maxPosition = getMaxPosition();
+            currentPosition = Math.max(currentPosition, maxPosition);
+            updateSliderPosition();
+        }, 250);
+    });
+    
+    // Initialize slider position
+    updateSliderPosition();
+    
+    // Add keyboard navigation
+    sliderContainer.setAttribute('tabindex', '0');
+    sliderContainer.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight') {
+            nextSlide();
+            e.preventDefault();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+            e.preventDefault();
+        }
+    });
+    
+    // Add swipe functionality for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    sliderContainer.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    sliderContainer.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+        const minSwipeDistance = 50;
+        const distance = touchStartX - touchEndX;
+        
+        if (Math.abs(distance) < minSwipeDistance) return;
+        
+        if (distance > 0) {
+            // Swipe left - next slide
+            nextSlide();
+        } else {
+            // Swipe right - previous slide
+            prevSlide();
+        }
+    }
 }
 
 function initPartnersSlider() {
@@ -340,7 +474,7 @@ function initPartnersSlider() {
     }, 5000);
 }
 
-// Slider Class
+// Slider Class for Hero Slider
 class Slider {
     constructor(containerSelector, options = {}) {
         this.container = document.querySelector(containerSelector);
@@ -407,8 +541,8 @@ class Slider {
     }
     
     initControls() {
-        const prevBtn = this.container.querySelector('.slider-prev, .team-slider-prev');
-        const nextBtn = this.container.querySelector('.slider-next, .team-slider-next');
+        const prevBtn = this.container.querySelector('.slider-prev');
+        const nextBtn = this.container.querySelector('.slider-next');
         
         if (prevBtn) {
             prevBtn.addEventListener('click', () => this.prevSlide());
@@ -465,62 +599,6 @@ class Slider {
             // Swipe right - previous slide
             this.prevSlide();
         }
-    }
-}
-
-// Team Slider Class
-class TeamSlider extends Slider {
-    constructor(containerSelector, options = {}) {
-        super(containerSelector, options);
-        
-        this.cards = this.container.querySelectorAll('.team-card');
-        this.cardWidth = 330; // 300px card + 30px gap
-        this.currentPosition = 0;
-        this.maxPosition = 0;
-        
-        this.initTeamSlider();
-    }
-    
-    initTeamSlider() {
-        if (this.cards.length === 0) return;
-        
-        // Calculate max position
-        this.updateMaxPosition();
-        
-        // Update on window resize
-        window.addEventListener('resize', () => this.handleResize());
-    }
-    
-    nextSlide() {
-        this.currentPosition = Math.max(this.currentPosition - this.cardWidth, -this.maxPosition);
-        this.updatePosition();
-    }
-    
-    prevSlide() {
-        this.currentPosition = Math.min(this.currentPosition + this.cardWidth, 0);
-        this.updatePosition();
-    }
-    
-    updatePosition() {
-        if (this.slider) {
-            this.slider.style.transform = `translateX(${this.currentPosition}px)`;
-        }
-    }
-    
-    handleResize() {
-        this.updateMaxPosition();
-        
-        // Adjust current position if needed
-        if (-this.currentPosition > this.maxPosition) {
-            this.currentPosition = -this.maxPosition;
-            this.updatePosition();
-        }
-    }
-    
-    updateMaxPosition() {
-        const containerWidth = this.container.offsetWidth;
-        const totalCardsWidth = this.cards.length * this.cardWidth;
-        this.maxPosition = Math.max(0, totalCardsWidth - containerWidth);
     }
 }
 
@@ -1014,6 +1092,14 @@ function sendReplyToServer(commentId, name, reply) {
 window.addEventListener('load', function() {
     highlightActiveNav();
     initializeMap();
+    
+    // Reinitialize team slider after all resources are loaded
+    const teamSliderContainer = document.querySelector('.team-slider-container');
+    if (teamSliderContainer) {
+        setTimeout(() => {
+            initTeamSlider();
+        }, 100);
+    }
 });
 
 // ==========================================================================
@@ -1048,11 +1134,11 @@ if (typeof module !== 'undefined' && module.exports) {
         initNavigation,
         initForms,
         initSliders,
+        initTeamSlider, // Export the fixed function
         initInteractiveElements,
         initComments,
         initAnimations,
         Slider,
-        TeamSlider,
         validateEmail,
         showFieldError,
         clearFieldError,
