@@ -1,0 +1,261 @@
+/* CSS Variables – Complete & Extended (Girls and Women Foundation – Liberia) */
+:root {
+    /* =========================
+       BRAND COLORS
+       ========================= */
+    --primary-color: #003366;        /* Deep blue */
+    --primary-light: #1a4d80;
+    --primary-dark: #002244;
+
+    --secondary-color: #2E8B57;      /* Green */
+    --secondary-light: #3cb371;
+    --secondary-dark: #276749;
+
+    --accent-color: #B22234;         /* Accent red */
+
+    /* =========================
+       NEUTRALS & TEXT
+       ========================= */
+    --dark-color: #001a33;
+    --light-color: #f8fafc;
+
+    --text-color: #001a33;
+    --text-light: #4a5568;
+    --text-secondary: #2d3748;
+
+    --white: #ffffff;
+    --gray-light: #f1f5f9;
+    --gray: #e2e8f0;
+
+    /* =========================
+       SHADOWS & EFFECTS
+       ========================= */
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
+
+    --transition-fast: 0.2s ease;
+    --transition: all 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* =========================
+       TYPOGRAPHY
+       ========================= */
+    --font-xs: 0.75rem;
+    --font-sm: 0.9rem;
+    --font-base: 1rem;
+    --font-md: 1.2rem;
+    --font-lg: 1.5rem;
+    --font-xl: 1.8rem;
+    --font-xxl: 2.5rem;
+    --font-hero: 3.5rem;
+
+    --line-tight: 1.3;
+    --line-normal: 1.6;
+
+    /* =========================
+       SPACING (MARGIN & PADDING)
+       ========================= */
+    --space-xxs: 4px;
+    --space-xs: 8px;
+    --space-sm: 10px;
+    --space-md: 15px;
+    --space-lg: 20px;
+    --space-xl: 30px;
+    --space-xxl: 50px;
+    --space-section: 100px;
+
+    /* =========================
+       CONTAINERS & LAYOUT
+       ========================= */
+    --container-max: 1200px;
+    --container-wide: 1100px;
+    --container-padding: 20px;
+
+    /* =========================
+       BORDER RADIUS
+       ========================= */
+    --radius-sm: 5px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 20px;
+    --radius-pill: 30px;
+    --radius-round: 50%;
+
+    /* =========================
+       NAVIGATION
+       ========================= */
+    --navbar-height: 70px;
+    --nav-gap: 25px;
+    --nav-link-padding: 5px;
+
+    /* =========================
+       BUTTONS
+       ========================= */
+    --btn-padding-y: 12px;
+    --btn-padding-x: 30px;
+    --btn-padding-lg: 15px;
+    --btn-font-size: 0.9rem;
+    --btn-font-lg: 1.1rem;
+
+    /* =========================
+       DROPDOWN
+       ========================= */
+    --dropdown-width: 220px;
+    --dropdown-offset: 25px;
+    --dropdown-padding-y: 10px;
+    --dropdown-link-padding: 12px 20px;
+
+    /* =========================
+       ICONS & MEDIA
+       ========================= */
+    --icon-sm: 15px;
+    --icon-md: 40px;
+    --icon-lg: 50px;
+
+    /* =========================
+       SLIDER
+       ========================= */
+    --slider-btn-size: 50px;
+
+    /* =========================
+       CARDS & GRIDS
+       ========================= */
+    --card-gap: 30px;
+    --card-padding: 25px;
+    --card-radius: 10px;
+
+    --image-height-sm: 200px;
+    --image-height-md: 250px;
+
+    /* =========================
+       TEAM SLIDER
+       ========================= */
+    --team-card-width: calc(33.333% - 20px);
+    --team-card-gap: 10px;
+
+    /* =========================
+       FORMS
+       ========================= */
+    --input-padding: 12px 15px;
+    --textarea-min-height: 150px;
+
+    /* =========================
+       Z-INDEX
+       ========================= */
+    --z-navbar: 1000;
+    --z-dropdown: 1000;
+    --z-slider-controls: 10;
+
+    /* =========================
+       TRANSFORMS & HOVER EFFECTS
+       ========================= */
+    --hover-translate-sm: -2px;
+    --hover-translate-md: -3px;
+    --hover-translate-lg: -10px;
+
+    --scale-hover: 1.05;
+    --scale-image-hover: 1.1;
+
+    /* =========================
+       ADMIN SPECIFIC COLORS
+       ========================= */
+    --admin-purple: #8a4fff;
+    --admin-purple-light: #a67cff;
+    --admin-pink: #ff6b8b;
+    --admin-pink-light: #ff8fab;
+    --admin-blue: #4fc3f7;
+    --admin-blue-light: #81d4fa;
+    --admin-green: #66bb6a;
+    --admin-green-light: #81c784;
+    
+    /* =========================
+       STATUS COLORS
+       ========================= */
+    --status-success: #4CAF50;
+    --status-success-light: #c8e6c9;
+    --status-success-dark: #2e7d32;
+    --status-warning: #FF9800;
+    --status-warning-light: #fff9c4;
+    --status-warning-dark: #f57f17;
+    --status-info: #2196F3;
+    --status-info-light: #e3f2fd;
+    --status-error: #F44336;
+    --status-error-light: #ffebee;
+    --status-error-dark: #d32f2f;
+    --status-neutral: #9E9E9E;
+    --status-neutral-light: #e0e0e0;
+    --status-neutral-dark: #616161;
+    
+    /* =========================
+       SOCIAL MEDIA COLORS
+       ========================= */
+    --social-facebook: #1877f2;
+    --social-twitter: #1da1f2;
+    --social-instagram: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+    --social-linkedin: #0077b5;
+    --social-youtube: #ff0000;
+    --social-whatsapp: #25d366;
+    --social-tiktok: #000000;
+    --social-github: #333333;
+    
+    /* =========================
+       PARTNER LEVEL COLORS
+       ========================= */
+    --partner-platinum: #e5e4e2;
+    --partner-platinum-dark: #c0c0c0;
+    --partner-gold: #ffd700;
+    --partner-gold-dark: #daa520;
+    --partner-silver: #c0c0c0;
+    --partner-silver-dark: #a8a8a8;
+    --partner-bronze: #cd7f32;
+    --partner-bronze-dark: #8b4513;
+    
+    /* =========================
+       ADMIN MEASUREMENTS
+       ========================= */
+    --admin-sidebar-width: 250px;
+    --admin-stats-icon: 50px;
+    --admin-profile-img: 40px;
+    --admin-thumb-width: 60px;
+    --admin-thumb-height: 40px;
+    --admin-project-image: 180px;
+    --admin-team-image: 200px;
+    --admin-slide-preview: 180px;
+    --admin-slide-full: 300px;
+    --admin-avatar-size: 50px;
+    --admin-small-avatar: 35px;
+    
+    /* =========================
+       ADMIN SPACING
+       ========================= */
+    --admin-modal-max: 600px;
+    --admin-modal-wide: 800px;
+    --admin-search-width: 300px;
+    --admin-search-large: 600px;
+    
+    /* =========================
+       ADMIN Z-INDEX
+       ========================= */
+    --z-modal: 2000;
+    --z-dropdown-menu: 100;
+    --z-settings-actions: 100;
+    
+    /* =========================
+       ADMIN OPACITIES
+       ========================= */
+    --opacity-light: 0.1;
+    --opacity-medium: 0.2;
+    --opacity-heavy: 0.5;
+    --opacity-very-heavy: 0.8;
+    
+    /* =========================
+       ADMIN GRADIENTS
+       ========================= */
+    --gradient-purple: linear-gradient(135deg, var(--admin-purple), var(--admin-purple-light));
+    --gradient-pink: linear-gradient(135deg, var(--admin-pink), var(--admin-pink-light));
+    --gradient-blue: linear-gradient(135deg, var(--admin-blue), var(--admin-blue-light));
+    --gradient-green: linear-gradient(135deg, var(--admin-green), var(--admin-green-light));
+    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    --gradient-dark: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    --gradient-light-gray: linear-gradient(135deg, var(--light-color), var(--gray));
+}

@@ -34,24 +34,13 @@ function initNavigation() {
 function initMobileNavigation() {
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.querySelector('.nav-menu');
-    const body = document.body;
     
     if (navToggle && navMenu) {
-        navToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
+        navToggle.addEventListener('click', function() {
             navMenu.classList.toggle('active');
             const icon = this.querySelector('i');
             icon.classList.toggle('fa-bars');
             icon.classList.toggle('fa-times');
-            
-            // Toggle body overflow to prevent scrolling when menu is open
-            if (navMenu.classList.contains('active')) {
-                body.style.overflow = 'hidden';
-            } else {
-                body.style.overflow = '';
-            }
         });
         
         // Close mobile menu when clicking on a link
@@ -61,33 +50,16 @@ function initMobileNavigation() {
                 const icon = navToggle.querySelector('i');
                 icon.classList.remove('fa-times');
                 icon.classList.add('fa-bars');
-                body.style.overflow = ''; // Restore scrolling
             });
         });
         
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 992) { // Only on mobile
-                if (!navToggle.contains(event.target) && 
-                    !navMenu.contains(event.target) && 
-                    navMenu.classList.contains('active')) {
-                    navMenu.classList.remove('active');
-                    const icon = navToggle.querySelector('i');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    body.style.overflow = ''; // Restore scrolling
-                }
-            }
-        });
-        
-        // Also close on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            if (!navToggle.contains(event.target) && !navMenu.contains(event.target) && navMenu.classList.contains('active')) {
                 navMenu.classList.remove('active');
                 const icon = navToggle.querySelector('i');
                 icon.classList.remove('fa-times');
                 icon.classList.add('fa-bars');
-                body.style.overflow = '';
             }
         });
     }
@@ -142,94 +114,19 @@ function initStickyNavigation() {
 }
 
 function highlightActiveNav() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-menu > li > a:not(.dropdown-menu a)');
+    const currentPage = window.location.pathname.split('/').pop() || '';
+    const navLinks = document.querySelectorAll('.nav-menu a');
     
-    // First, remove all active classes
     navLinks.forEach(link => {
-        link.classList.remove('active');
-        // Also remove active from parent dropdown if exists
-        const parentDropdown = link.parentElement;
-        if (parentDropdown.classList.contains('dropdown')) {
-            parentDropdown.classList.remove('active');
+        const linkPage = link.getAttribute('href');
+        if ((linkPage === currentPage) || 
+            (currentPage === '' && linkPage === 'index.html') ||
+            (currentPage.includes(linkPage.replace('.html', '')) && linkPage !== 'index.html')) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
         }
     });
-    
-    // Now find and mark the correct active link
-    navLinks.forEach(link => {
-        const linkHref = link.getAttribute('href');
-        
-        // Skip hash links
-        if (linkHref.startsWith('#')) return;
-        
-        // Handle exact matches first
-        if (linkHref === currentPath || 
-            (currentPath === '/' && linkHref === '/index.html') ||
-            (currentPath.endsWith('/') && linkHref === 'index.html')) {
-            link.classList.add('active');
-            return;
-        }
-        
-        // Handle project pages specially
-        if (linkHref === '#projects.html' && currentPath.includes('projects')) {
-            // Find the closest dropdown parent
-            const dropdown = link.closest('.dropdown');
-            if (dropdown) {
-                link.classList.add('active');
-                dropdown.classList.add('active');
-            }
-            return;
-        }
-        
-        // Handle partner pages specially
-        if (linkHref === '#partners.html' && 
-            (currentPath.includes('partners') || 
-             currentPath.includes('report') || 
-             currentPath.includes('become-partner'))) {
-            const dropdown = link.closest('.dropdown');
-            if (dropdown) {
-                link.classList.add('active');
-                dropdown.classList.add('active');
-            }
-            return;
-        }
-        
-        // Handle about pages specially
-        if (linkHref === '#about.html' && 
-            (currentPath.includes('about') || 
-             currentPath.includes('team') || 
-             currentPath.includes('board') || 
-             currentPath.includes('impact'))) {
-            const dropdown = link.closest('.dropdown');
-            if (dropdown) {
-                link.classList.add('active');
-                dropdown.classList.add('active');
-            }
-            return;
-        }
-        
-        // Handle blog page
-        if (linkHref === '/admin/posts-feed.html' && currentPath.includes('posts-feed')) {
-            link.classList.add('active');
-            return;
-        }
-        
-        // Handle contact page
-        if (linkHref === '/contact.html' && currentPath.includes('contact')) {
-            link.classList.add('active');
-            return;
-        }
-        
-        // Handle index/home page
-        if ((linkHref === '/index.html' || linkHref === '/') && 
-            (currentPath === '/' || currentPath === '' || currentPath.endsWith('index.html'))) {
-            link.classList.add('active');
-            return;
-        }
-    });
-    
-    // Also highlight dropdown menu items
-    highlightDropdownActiveItems();
 }
 
 // ==========================================================================
@@ -614,253 +511,61 @@ function initDropdownAccessibility() {
 }
 
 function highlightDropdownActiveItems() {
-    const currentPath = window.location.pathname;
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const dropdownItems = document.querySelectorAll('.dropdown-menu a');
     
-    // First remove all active classes from dropdown items
-    dropdownItems.forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Find and mark active dropdown items
     dropdownItems.forEach(item => {
         const itemHref = item.getAttribute('href');
         
-        // Skip anchor links within the same page
-        if (itemHref.startsWith('#')) return;
-        
-        // Check for exact matches
-        if (itemHref === currentPath) {
+        // Check if current page matches dropdown item
+        if (itemHref === currentPage || 
+           (currentPage.includes(itemHref.replace('.html', '')) && itemHref !== 'index.html') ||
+           (currentPage === '' && itemHref === 'index.html')) {
+            
             item.classList.add('active');
             
-            // Also highlight the parent dropdown main link
+            // Also highlight parent dropdown link
             const parentDropdown = item.closest('.dropdown');
             if (parentDropdown) {
                 const parentLink = parentDropdown.querySelector('> a');
-                if (parentLink) {
-                    parentLink.classList.add('active');
-                    parentDropdown.classList.add('active');
-                }
-            }
-            return;
-        }
-        
-        // Handle about page anchors (like /about.html#mission)
-        if (currentPath.includes('about.html') && itemHref.includes('about.html#')) {
-            const hash = window.location.hash;
-            if (itemHref.endsWith(hash) || (!hash && itemHref.includes('#who-we-are'))) {
-                item.classList.add('active');
-                
-                const parentDropdown = item.closest('.dropdown');
-                if (parentDropdown) {
-                    const parentLink = parentDropdown.querySelector('> a');
-                    if (parentLink) {
-                        parentLink.classList.add('active');
-                        parentDropdown.classList.add('active');
-                    }
-                }
-                return;
+                parentLink.classList.add('active');
             }
         }
     });
 }
 
+
 function initPartnersSlider() {
-    const partnersSliderContainer = document.querySelector('.partners-slider-container');
     const partnersSlider = document.querySelector('.partners-slider');
     const prevBtn = document.querySelector('.partners-slider-prev');
     const nextBtn = document.querySelector('.partners-slider-next');
     
-    if (!partnersSliderContainer || !partnersSlider || !prevBtn || !nextBtn) return;
+    if (!partnersSlider || !prevBtn || !nextBtn) return;
     
-    // Clone slides for infinite loop effect
-    const slides = Array.from(partnersSlider.querySelectorAll('.partner-logo'));
+    let currentPosition = 0;
+    const cardWidth = 240; // 200px + 40px gap
     
-    // Only clone if we have slides
-    if (slides.length === 0) return;
-    
-    // Calculate how many clones we need to fill the container
-    const containerWidth = partnersSliderContainer.offsetWidth;
-    const slideWidth = slides[0].offsetWidth + 40; // Include gap
-    
-    // Clear existing content and add slides with clones
-    partnersSlider.innerHTML = '';
-    
-    // Add slides three times: clones at end, original, clones at beginning
-    const allSlides = [];
-    
-    // 1. Add clones at the end (for seamless looping forward)
-    slides.forEach(slide => {
-        const clone = slide.cloneNode(true);
-        clone.classList.add('clone');
-        allSlides.push(clone);
-    });
-    
-    // 2. Add original slides
-    slides.forEach(slide => {
-        allSlides.push(slide);
-    });
-    
-    // 3. Add clones at the beginning (for seamless looping backward)
-    slides.forEach(slide => {
-        const clone = slide.cloneNode(true);
-        clone.classList.add('clone');
-        allSlides.push(clone);
-    });
-    
-    // Append all slides to slider
-    allSlides.forEach(slide => {
-        partnersSlider.appendChild(slide);
-    });
-    
-    // Update slides array
-    const allSlideElements = partnersSlider.querySelectorAll('.partner-logo');
-    
-    // Calculate total width
-    const totalWidth = allSlideElements.length * slideWidth;
-    partnersSlider.style.width = totalWidth + 'px';
-    
-    // Set initial position to start at the "original" slides
-    const startPosition = slides.length * slideWidth;
-    let currentPosition = -startPosition;
-    partnersSlider.style.transform = `translateX(${currentPosition}px)`;
-    
-    // Variables for auto-slide
-    let autoSlideInterval;
-    const slideSpeed = 300; // pixels per step
-    const autoSlideDelay = 5000; // 5 seconds
-    
-    // Function to move slider
-    function moveSlider(direction) {
-        const increment = direction === 'next' ? -slideSpeed : slideSpeed;
-        currentPosition += increment;
-        
-        // Apply transition
-        partnersSlider.style.transition = 'transform 0.5s ease';
-        partnersSlider.style.transform = `translateX(${currentPosition}px)`;
-        
-        // Check if we need to reset position for infinite loop
-        const totalSlidesWidth = allSlideElements.length * slideWidth;
-        const middleStart = slides.length * slideWidth;
-        const middleEnd = middleStart + (slides.length * slideWidth);
-        
-        // If we've scrolled past the middle section (original slides + clones at end)
-        // Reset to middle section without animation for seamless loop
-        setTimeout(() => {
-            if (currentPosition <= -middleEnd) {
-                // If we've scrolled past the end clones, jump to start of middle section
-                currentPosition = -middleStart;
-                partnersSlider.style.transition = 'none';
-                partnersSlider.style.transform = `translateX(${currentPosition}px)`;
-            } else if (currentPosition >= -middleStart + slideSpeed) {
-                // If we've scrolled past the beginning clones, jump to end of middle section
-                currentPosition = -middleEnd + slideSpeed;
-                partnersSlider.style.transition = 'none';
-                partnersSlider.style.transform = `translateX(${currentPosition}px)`;
-            }
-        }, 500); // Match transition duration
-    }
-    
-    // Next button click
     nextBtn.addEventListener('click', () => {
-        moveSlider('next');
-        resetAutoSlide();
+        const maxPosition = -(partnersSlider.scrollWidth - partnersSlider.parentElement.offsetWidth);
+        currentPosition = Math.max(currentPosition - cardWidth, maxPosition);
+        partnersSlider.style.transform = `translateX(${currentPosition}px)`;
     });
     
-    // Previous button click
     prevBtn.addEventListener('click', () => {
-        moveSlider('prev');
-        resetAutoSlide();
+        currentPosition = Math.min(currentPosition + cardWidth, 0);
+        partnersSlider.style.transform = `translateX(${currentPosition}px)`;
     });
     
-    // Auto-slide functionality
-    function startAutoSlide() {
-        autoSlideInterval = setInterval(() => {
-            moveSlider('next');
-        }, autoSlideDelay);
-    }
-    
-    function stopAutoSlide() {
-        clearInterval(autoSlideInterval);
-    }
-    
-    function resetAutoSlide() {
-        stopAutoSlide();
-        startAutoSlide();
-    }
-    
-    // Start auto-slide
-    startAutoSlide();
-    
-    // Pause on hover
-    partnersSliderContainer.addEventListener('mouseenter', stopAutoSlide);
-    partnersSliderContainer.addEventListener('mouseleave', startAutoSlide);
-    
-    // Touch/swipe support for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const minSwipeDistance = 50;
-    
-    partnersSliderContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-        stopAutoSlide();
-    }, { passive: true });
-    
-    partnersSliderContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].clientX;
-        const distance = touchStartX - touchEndX;
-        
-        if (Math.abs(distance) >= minSwipeDistance) {
-            if (distance > 0) {
-                // Swipe left - next
-                moveSlider('next');
-            } else {
-                // Swipe right - previous
-                moveSlider('prev');
-            }
+    // Auto-slide every 5 seconds
+    setInterval(() => {
+        const maxPosition = -(partnersSlider.scrollWidth - partnersSlider.parentElement.offsetWidth);
+        if (currentPosition <= maxPosition) {
+            currentPosition = 0;
+        } else {
+            currentPosition = Math.max(currentPosition - cardWidth, maxPosition);
         }
-        
-        startAutoSlide();
-    }, { passive: true });
-    
-    // Handle window resize
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            // Recalculate based on new container size
-            const newContainerWidth = partnersSliderContainer.offsetWidth;
-            const newSlideWidth = allSlideElements[0].offsetWidth + 40;
-            
-            // Adjust current position proportionally
-            const scaleFactor = newContainerWidth / containerWidth;
-            currentPosition *= scaleFactor;
-            
-            // Update slider position
-            partnersSlider.style.transition = 'none';
-            partnersSlider.style.transform = `translateX(${currentPosition}px)`;
-            
-            // Update container width reference
-            containerWidth = newContainerWidth;
-        }, 250);
-    });
-    
-    // Keyboard navigation
-    partnersSliderContainer.setAttribute('tabindex', '0');
-    partnersSliderContainer.addEventListener('keydown', (e) => {
-        switch(e.key) {
-            case 'ArrowLeft':
-                moveSlider('prev');
-                resetAutoSlide();
-                e.preventDefault();
-                break;
-            case 'ArrowRight':
-                moveSlider('next');
-                resetAutoSlide();
-                e.preventDefault();
-                break;
-        }
-    });
+        partnersSlider.style.transform = `translateX(${currentPosition}px)`;
+    }, 5000);
 }
 
 // Slider Class for Hero Slider
@@ -2112,9 +1817,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentStory = 0;
         
         function showStory(index) {
-            // Remove active class from all items
             storyItems.forEach(item => item.classList.remove('active'));
-            // Add active class to current item
             storyItems[index].classList.add('active');
             currentStory = index;
         }
@@ -2138,9 +1841,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showStory(newIndex);
             }, 10000);
         }
-        
-        // Initialize first story as active
-        showStory(0);
     }
     
     // Location Map Interaction (Education Programs)

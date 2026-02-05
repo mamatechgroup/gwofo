@@ -161,152 +161,148 @@
             </div>
         </div>
 
-        <!-- Recent Content -->
-        <div class="content-grid">
-            <!-- Recent Posts -->
+        <div class="dashboard-content">
+            <!-- Recent Content -->
+            <div class="content-grid">
+                <!-- Recent Posts -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Recent Posts</h2>
+                        <button class="btn-add" data-modal="postModal">
+                            <i class="fas fa-plus"></i> Add New
+                        </button>
+                    </div>
+                    
+                    <table class="data-table" id="recentPostsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Projects -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>Recent Projects</h2>
+                        <button class="btn-add" data-modal="projectModal">
+                            <i class="fas fa-plus"></i> Add New
+                        </button>
+                    </div>
+                    
+                    <table class="data-table" id="recentProjectsTable">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Comments -->
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Recent Posts</h2>
-                    <button class="btn-add" data-modal="postModal">
-                        <i class="fas fa-plus"></i> Add New
-                    </button>
+                    <h2>Recent Comments</h2>
                 </div>
                 
-                <table class="data-table" id="recentPostsTable">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be populated by JavaScript -->
-                    </tbody>
-                </table>
+                <div class="comments-list">
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <strong>Sarah M. Johnson</strong>
+                                <span>on "Girls Education Program"</span>
+                            </div>
+                            <div class="comment-date">2 hours ago</div>
+                        </div>
+                        <div class="comment-content">
+                            <p>This is an amazing initiative! As a former beneficiary of similar programs, I can attest to the life-changing impact education has on girls.</p>
+                        </div>
+                        <div class="comment-actions">
+                            <button class="btn-delete">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button class="btn-view">
+                                <i class="fas fa-reply"></i> Reply
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <strong>James Kollie</strong>
+                                <span>on "Women Entrepreneurship"</span>
+                            </div>
+                            <div class="comment-date">1 day ago</div>
+                        </div>
+                        <div class="comment-content">
+                            <p>How can I volunteer for this program? I'm a retired teacher with experience working with girls in rural communities.</p>
+                        </div>
+                        <div class="comment-actions">
+                            <button class="btn-delete">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            <button class="btn-view">
+                                <i class="fas fa-reply"></i> Reply
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Recent Projects -->
+            <!-- Activity Log -->
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Recent Projects</h2>
-                    <button class="btn-add" data-modal="projectModal">
-                        <i class="fas fa-plus"></i> Add New
-                    </button>
+                    <h2>Recent Activity</h2>
                 </div>
                 
-                <table class="data-table" id="recentProjectsTable">
-                    <thead>
-                        <tr>
-                            <th>Project Name</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Recent Comments -->
-        <div class="content-section">
-            <div class="section-header">
-                <h2>Recent Comments</h2>
-            </div>
-            
-            <div class="comments-list">
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <div class="comment-author">
-                            <strong>Sarah M. Johnson</strong>
-                            <span>on "Girls Education Program"</span>
+                <div class="activity-timeline">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-plus"></i>
                         </div>
-                        <div class="comment-date">2 hours ago</div>
-                    </div>
-                    <div class="comment-content">
-                        <p>This is an amazing initiative! As a former beneficiary of similar programs, I can attest to the life-changing impact education has on girls.</p>
-                    </div>
-                    <div class="comment-actions">
-                        <button class="btn-edit">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-                        <button class="btn-delete">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                        <button class="btn-view">
-                            <i class="fas fa-reply"></i> Reply
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <div class="comment-author">
-                            <strong>James Kollie</strong>
-                            <span>on "Women Entrepreneurship"</span>
+                        <div class="activity-content">
+                            <div class="activity-title">New team member added</div>
+                            <div class="activity-desc">Mary Kamara was added to the team</div>
+                            <div class="activity-time">Just now</div>
                         </div>
-                        <div class="comment-date">1 day ago</div>
                     </div>
-                    <div class="comment-content">
-                        <p>How can I volunteer for this program? I'm a retired teacher with experience working with girls in rural communities.</p>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Project updated</div>
+                            <div class="activity-desc">Girls Education Program progress updated to 75%</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
                     </div>
-                    <div class="comment-actions">
-                        <button class="btn-edit">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-                        <button class="btn-delete">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                        <button class="btn-view">
-                            <i class="fas fa-reply"></i> Reply
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Activity Log -->
-        <div class="content-section">
-            <div class="section-header">
-                <h2>Recent Activity</h2>
-            </div>
-            
-            <div class="activity-timeline">
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">New team member added</div>
-                        <div class="activity-desc">Mary Kamara was added to the team</div>
-                        <div class="activity-time">Just now</div>
-                    </div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Project updated</div>
-                        <div class="activity-desc">Girls Education Program progress updated to 75%</div>
-                        <div class="activity-time">2 hours ago</div>
-                    </div>
-                </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-comment"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">New comment</div>
-                        <div class="activity-desc">Sarah Johnson commented on Girls Education Program</div>
-                        <div class="activity-time">4 hours ago</div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New comment</div>
+                            <div class="activity-desc">Sarah Johnson commented on Girls Education Program</div>
+                            <div class="activity-time">4 hours ago</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -434,6 +430,7 @@
             </form>
         </div>
     </div>
+    
     <script src="../js/admin.js"></script>
 </body>
 </html>

@@ -47,13 +47,8 @@ class AdminDashboard {
     }
     
     setupEventListeners() {
-        // Logout button
         this.setupLogoutListener();
-        
-        // Mobile menu toggle
         this.setupMobileMenu();
-        
-        // Form submissions
         this.setupFormSubmissions();
     }
     
@@ -80,7 +75,6 @@ class AdminDashboard {
             sidebar.classList.toggle('active');
         });
         
-        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 992 && sidebar.classList.contains('active')) {
                 if (!e.target.closest('.admin-sidebar') && !e.target.closest('.mobile-toggle')) {
@@ -100,7 +94,6 @@ class AdminDashboard {
     }
     
     setupCRUDOperations() {
-        // Add buttons for modals
         document.querySelectorAll('.btn-add').forEach(btn => {
             btn.addEventListener('click', () => {
                 const modalId = btn.dataset.modal;
@@ -108,10 +101,7 @@ class AdminDashboard {
             });
         });
         
-        // Setup progress range display
         this.setupProgressRange();
-        
-        // Setup form validation
         this.setupFormValidation();
     }
     
@@ -127,26 +117,23 @@ class AdminDashboard {
     }
     
     setupFormValidation() {
-        // This is handled in validateForm method
+        // Validation logic handled in validateForm method
     }
     
     setupSearchEnhancements() {
         const searchInput = document.querySelector('.search-input');
         if (!searchInput) return;
         
-        // Real-time search
         searchInput.addEventListener('input', (e) => {
             this.filterTable(e.target.value.toLowerCase());
         });
         
-        // Enter key search
         searchInput.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') {
                 this.enhancedSearch(e.target.value.toLowerCase());
             }
         });
         
-        // Search icon click
         const searchIcon = searchInput.nextElementSibling;
         if (searchIcon) {
             searchIcon.addEventListener('click', () => {
@@ -184,7 +171,6 @@ class AdminDashboard {
     highlightText(element, searchTerm) {
         if (searchTerm.trim() === '') return;
         
-        // Remove previous highlights
         const highlights = element.querySelectorAll('.search-highlight');
         highlights.forEach(highlight => {
             const parent = highlight.parentNode;
@@ -192,7 +178,6 @@ class AdminDashboard {
             parent.normalize();
         });
         
-        // Highlight new matches
         const walker = document.createTreeWalker(
             element,
             NodeFilter.SHOW_TEXT,
@@ -222,9 +207,6 @@ class AdminDashboard {
             
             const span = document.createElement('span');
             span.className = 'search-highlight';
-            span.style.backgroundColor = '#fff3cd';
-            span.style.padding = '2px 4px';
-            span.style.borderRadius = '3px';
             span.textContent = match;
             fragment.appendChild(span);
             
@@ -246,9 +228,7 @@ class AdminDashboard {
                 noResults = document.createElement('tr');
                 noResults.className = 'no-results';
                 noResults.innerHTML = `
-                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-light);">
-                        No matching results found
-                    </td>
+                    <td colspan="5">No matching results found</td>
                 `;
                 tbody.appendChild(noResults);
             }
@@ -265,23 +245,18 @@ class AdminDashboard {
                 if (file) {
                     this.handleFileUpload(file);
                 }
-            });
+            }.bind(this));
         });
     }
     
     handleFileUpload(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            // In a real app, display preview or upload to server
             console.log('File selected:', file.name, file.type, Math.round(file.size / 1024) + 'KB');
             
-            // Example: Show file info
             const fileInfo = document.createElement('div');
             fileInfo.className = 'file-info';
             fileInfo.textContent = `${file.name} (${Math.round(file.size / 1024)}KB)`;
-            fileInfo.style.marginTop = '10px';
-            fileInfo.style.fontSize = '0.9rem';
-            fileInfo.style.color = 'var(--text-light)';
             
             const fileInput = document.querySelector('input[type="file"]:focus');
             if (fileInput) {
@@ -294,38 +269,25 @@ class AdminDashboard {
     setupActivityAnimations() {
         const activityItems = document.querySelectorAll('.activity-item');
         activityItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateX(-20px)';
-            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            
             setTimeout(() => {
-                item.style.opacity = '1';
-                item.style.transform = 'translateX(0)';
+                item.classList.add('animated');
             }, index * 100);
         });
     }
     
     setupModals() {
-        // Close buttons
         document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
             btn.addEventListener('click', () => this.closeAllModals());
         });
         
-        // Close modal on outside click
         document.querySelectorAll('.form-modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) this.closeAllModals();
             });
         });
         
-        // Close on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.closeAllModals();
-        });
-        
-        // Add smooth transitions
-        document.querySelectorAll('.form-modal').forEach(modal => {
-            modal.style.transition = 'opacity 0.3s ease';
         });
     }
     
@@ -337,7 +299,6 @@ class AdminDashboard {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        // Focus first input
         const firstInput = modal.querySelector('input, textarea, select');
         if (firstInput) setTimeout(() => firstInput.focus(), 100);
     }
@@ -445,12 +406,10 @@ class AdminDashboard {
             tbody.appendChild(row);
         });
         
-        // Attach event listeners to new buttons
         this.attachRowEventListeners();
     }
     
     attachRowEventListeners() {
-        // Edit buttons
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
@@ -459,7 +418,6 @@ class AdminDashboard {
             });
         });
         
-        // Delete buttons
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
@@ -481,20 +439,16 @@ class AdminDashboard {
         
         if (!this.validateForm(form, data)) return;
         
-        // Simulate API call
         console.log(`Submitting ${formType}:`, data);
         
-        // Show success message
         this.showNotification(
             `${formType.charAt(0).toUpperCase() + formType.slice(1)} saved successfully!`,
             'success'
         );
         
-        // Close modal and reset form
         this.closeAllModals();
         form.reset();
         
-        // Reload data
         setTimeout(() => this.loadDashboardData(), 500);
     }
     
@@ -511,7 +465,6 @@ class AdminDashboard {
             }
         });
         
-        // Email validation
         const emailField = form.querySelector('input[type="email"]');
         if (emailField && data[emailField.name]) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -525,34 +478,30 @@ class AdminDashboard {
     }
     
     showFieldError(field, message) {
-        field.style.borderColor = 'var(--secondary-color)';
+        field.classList.add('error');
         
         let errorElement = field.parentElement.querySelector('.field-error');
         if (!errorElement) {
             errorElement = document.createElement('div');
             errorElement.className = 'field-error';
-            errorElement.style.color = 'var(--secondary-color)';
-            errorElement.style.fontSize = '0.85rem';
-            errorElement.style.marginTop = '5px';
+            errorElement.textContent = message;
             field.parentElement.appendChild(errorElement);
+        } else {
+            errorElement.textContent = message;
         }
-        
-        errorElement.textContent = message;
     }
     
     clearFieldError(field) {
-        field.style.borderColor = '';
+        field.classList.remove('error');
         
         const errorElement = field.parentElement.querySelector('.field-error');
         if (errorElement) errorElement.remove();
     }
     
     showNotification(message, type = 'info') {
-        // Remove existing notification
         const existingNotification = document.querySelector('.notification');
         if (existingNotification) existingNotification.remove();
         
-        // Create notification
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
@@ -565,45 +514,18 @@ class AdminDashboard {
             </button>
         `;
         
-        // Add styles
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#66bb6a' : 
-                        type === 'error' ? '#ff6b8b' : 
-                        type === 'warning' ? '#ffb74d' : 'var(--primary-color)'};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            z-index: 3000;
-            min-width: 300px;
-            max-width: 400px;
-        `;
-        
-        // Close button
         notification.querySelector('.notification-close').addEventListener('click', () => {
             notification.remove();
         });
         
-        // Add to document
         document.body.appendChild(notification);
         
-        // Auto-remove after 5 seconds
         setTimeout(() => notification.remove(), 5000);
     }
     
     editItem(type, id) {
         console.log(`Editing ${type} with ID: ${id}`);
         this.openModal(`${type}Modal`);
-        
-        // In a real app, fetch data and populate form
-        // this.populateFormWithData(type, id);
     }
     
     deleteItem(type, id) {
@@ -615,7 +537,6 @@ class AdminDashboard {
                 'success'
             );
             
-            // Reload data
             setTimeout(() => this.loadDashboardData(), 500);
         }
     }
@@ -633,9 +554,17 @@ class AdminDashboard {
             togglePassword.addEventListener('click', function() {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
-                this.innerHTML = type === 'password' ? 
-                    '<i class="fas fa-eye"></i>' : 
-                    '<i class="fas fa-eye-slash"></i>';
+                
+                const eyeIcon = this.querySelector('.fa-eye');
+                const eyeSlashIcon = this.querySelector('.fa-eye-slash');
+                
+                if (type === 'password') {
+                    eyeIcon.style.display = 'inline';
+                    eyeSlashIcon.style.display = 'none';
+                } else {
+                    eyeIcon.style.display = 'none';
+                    eyeSlashIcon.style.display = 'inline';
+                }
             });
         }
     }
@@ -644,90 +573,78 @@ class AdminDashboard {
         const loginForm = document.getElementById('adminLoginForm');
         if (!loginForm) return;
         
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const username = loginForm.querySelector('#username').value.trim();
             const password = loginForm.querySelector('#password').value.trim();
+            const loginButton = loginForm.querySelector('.btn-login');
             
             if (!username || !password) {
                 this.showLoginError('Please enter both username and password');
                 return;
             }
             
-            // Mock authentication (replace with real API call)
-            if (this.authenticateUser(username, password)) {
-                localStorage.setItem('adminAuthenticated', 'true');
-                localStorage.setItem('adminUsername', username);
-                window.location.href = 'dashboard.html';
-            } else {
-                this.showLoginError('Invalid username or password');
+            this.showLoadingState(loginButton, true);
+            
+            try {
+                const isAuthenticated = await this.authenticateUser(username, password);
+                
+                if (isAuthenticated) {
+                    localStorage.setItem('adminAuthenticated', 'true');
+                    localStorage.setItem('adminUsername', username);
+                    
+                    this.showNotification('Login successful! Redirecting...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    this.showLoadingState(loginButton, false);
+                    this.showLoginError('Invalid username or password');
+                }
+            } catch (error) {
+                this.showLoadingState(loginButton, false);
+                this.showLoginError('Login failed. Please try again.');
+                console.error('Login error:', error);
             }
         });
     }
     
     authenticateUser(username, password) {
-        // Mock authentication - in production, make API call
-        return username === 'admin' && password === 'password';
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const isValid = username === 'admin' && password === 'password';
+                resolve(isValid);
+            }, 1500);
+        });
+    }
+    
+    showLoadingState(button, isLoading) {
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
     }
     
     showLoginError(message) {
-        // Remove existing error
         const existingError = document.querySelector('.login-error');
         if (existingError) existingError.remove();
         
-        // Create error element
         const errorElement = document.createElement('div');
         errorElement.className = 'login-error';
         errorElement.innerHTML = `
             <i class="fas fa-exclamation-circle"></i>
             <span>${message}</span>
         `;
-        errorElement.style.cssText = `
-            color: var(--secondary-color);
-            background: rgba(255, 107, 139, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        `;
         
-        // Insert error after form header
         const loginForm = document.querySelector('.login-form');
         if (loginForm) {
             loginForm.insertBefore(errorElement, loginForm.firstChild);
         }
-    }
-    
-    // Utility method to add notification styles
-    static addNotificationStyles() {
-        if (document.querySelector('#notification-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-            .notification-close {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                opacity: 0.8;
-                transition: opacity 0.3s ease;
-            }
-            
-            .notification-close:hover {
-                opacity: 1;
-            }
-            
-            .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-        `;
-        document.head.appendChild(style);
     }
 }
 
@@ -735,17 +652,10 @@ class AdminDashboard {
 let admin = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Add notification styles
-    AdminDashboard.addNotificationStyles();
-    
-    // Initialize admin dashboard
     admin = new AdminDashboard();
-    
-    // Make admin globally accessible for debugging
     window.admin = admin;
 });
 
-// Export for module use (if needed)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AdminDashboard;
 }
