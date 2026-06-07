@@ -14,4 +14,4 @@ services:
         scope: run
         sync: false
     domains:
-      - gwofo-backend.onrender.com
+      - gwofo.onrender.com

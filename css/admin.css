@@ -1103,9 +1103,17 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
 }
 
-/* ==========================================================================
-   ENHANCED ADMIN DASHBOARD STYLES
-   ========================================================================== */
+.department-fill {
+    height: 100%;
+    border-radius: 4px;
+    width: var(--fill-width, 0%);
+}
+
+.level-fill {
+    height: 100%;
+    border-radius: 4px;
+    width: var(--fill-width, 0%);
+}
 
 /* Additional Components for All Pages */
 .filters {
@@ -3549,6 +3557,106 @@ input[type="range"]::-webkit-slider-thumb {
     gap: 40px;
     padding: 50px 0;
     margin-top: var(--navbar-height);
+}
+
+/* Form Input with Icon Wrapper */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    padding-left: 35px;
+    width: 100%;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+/* Form Styles */
+.crud-form {
+    max-width: 600px;
+    margin-top: 20px;
+}
+
+.form-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+}
+
+.form-actions .btn-primary {
+    width: auto;
+}
+
+/* Empty State Styles */
+.empty-state {
+    display: none;
+    padding: 36px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.empty-state.hidden {
+    display: none;
+}
+
+.empty-state i {
+    font-size: 2.5em;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
+.empty-state p:first-of-type {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.empty-state p:last-of-type {
+    font-size: 0.88em;
+}
+
+/* Image Preview Styles */
+.image-preview {
+    display: none;
+    margin-top: 15px;
+    position: relative;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f3f4f6;
+}
+
+.image-preview.hidden {
+    display: none;
+}
+
+.image-preview img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Loading State Styles */
+.loading-state {
+    padding: 16px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.loading-state i {
+    font-size: 1.2em;
+}
+
+.loading-state p {
+    margin-top: 6px;
+    font-size: 0.85em;
 }
 
 @media (max-width: 992px) {

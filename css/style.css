@@ -374,11 +374,18 @@ a:hover { color: var(--secondary-dark); }
     background-color: #333;
 }
 
+.slide-1 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/Petition%20Session%20Group%20Photo%20(1).jpg');
+    background-color: #333;
+}
+
 .slide-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/Advocacy%20Project%20Inception%20Meeting-Dec-7-2022%20(1).jpg');
     background-color: #333;
 }
 
 .slide-3 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/TOE%20TOWN%201%20%26%202%20COMMUNITY%20ENTRY%20MEETING%20-Dec-1-2022%20(1).png');
     background-color: #333;
 }
 
@@ -812,6 +819,35 @@ a:hover { color: var(--secondary-dark); }
 
 .newsletter-form button:hover { 
     background: var(--secondary-dark); 
+}
+
+/* Form message feedback styles */
+.form-message {
+    margin-top: var(--space-md);
+    padding: var(--input-padding);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-size: var(--font-sm);
+    display: block;
+}
+
+.form-message.hidden {
+    display: none;
+}
+
+.form-message.loading {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.form-message.success {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.form-message.error {
+    background: #ffcdd2;
+    color: #c62828;
 }
 
 .footer-bottom {

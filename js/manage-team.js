@@ -324,7 +324,7 @@ class ManageTeam {
 
             const fill    = item.querySelector('.department-fill');
             const countEl = item.querySelector('.department-count');
-            if (fill)    { fill.className = 'department-fill'; fill.style.width = pct + '%'; }
+            if (fill)    { fill.className = 'department-fill'; fill.style.setProperty('--fill-width', pct + '%'); }
             if (countEl) countEl.textContent = `${count} member${count !== 1 ? 's' : ''}`;
         });
     }

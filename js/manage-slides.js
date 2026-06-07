@@ -413,7 +413,7 @@ class ManageSlides {
         const activeEl    = document.getElementById('perfActiveSlides');
 
         try {
-            const res    = await fetch('http://localhost:3000/api/dashboard/slides-stats');
+            const res    = await fetch(`${API_BASE_URL}/dashboard/slides-stats`);
             const result = await res.json();
 
             if (result.success && result.data) {

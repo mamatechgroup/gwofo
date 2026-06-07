@@ -14,12 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 submitBtn.disabled = true;
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#e3f2fd';
-                messageDiv.style.color = '#1976d2';
+                messageDiv.classList.remove('hidden');
+                messageDiv.classList.add('loading');
                 messageDiv.textContent = 'Posting comment...';
                 
-                const response = await fetch('http://localhost:3000/api/projects/1/comments', {
+                const apiBase = window.location.hostname.includes('netlify.app')
+                    ? 'https://gwofo.onrender.com/api'
+                    : 'http://localhost:3000/api';
+                const response = await fetch(`${apiBase}/projects/1/comments`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -34,25 +36,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    messageDiv.style.background = '#c8e6c9';
-                    messageDiv.style.color = '#2e7d32';
+                    messageDiv.classList.remove('loading');
+                    messageDiv.classList.add('success');
                     messageDiv.textContent = 'Thank you! Your comment is pending moderation.';
                     project1Form.reset();
                     
                     setTimeout(() => {
-                        messageDiv.style.display = 'none';
+                        messageDiv.classList.add('hidden');
                         submitBtn.disabled = false;
                     }, 5000);
                 } else {
-                    messageDiv.style.background = '#ffcdd2';
-                    messageDiv.style.color = '#c62828';
+                    messageDiv.classList.remove('loading');
+                    messageDiv.classList.add('error');
                     messageDiv.textContent = result.message || 'Error posting comment. Please try again.';
                     submitBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error posting comment:', error);
-                messageDiv.style.background = '#ffcdd2';
-                messageDiv.style.color = '#c62828';
+                messageDiv.classList.add('error');
                 messageDiv.textContent = 'Error posting comment. Please try again.';
                 submitBtn.disabled = false;
             }

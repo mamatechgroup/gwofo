@@ -21,7 +21,7 @@ class ManageBackups {
     }
 
     async apiFetch(path, options = {}) {
-        const res = await fetch(`http://localhost:3000/api/backups${path}`, {
+        const res = await fetch(`${API_BASE_URL}/backups${path}`, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ class ManageBackups {
 
     downloadBackup(filename) {
         const token = localStorage.getItem('adminToken');
-        const url = `http://localhost:3000/api/backups/download/${encodeURIComponent(filename)}`;
+        const url = `${API_BASE_URL}/backups/download/${encodeURIComponent(filename)}`;
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;

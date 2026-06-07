@@ -309,7 +309,7 @@ class ManagePartners {
             const fill = item.querySelector('.level-fill');
             const countEl = item.querySelector('.level-count');
             if (fill) {
-                fill.style.width = pct + '%';
+                fill.style.setProperty('--fill-width', pct + '%');
             }
             if (countEl) {
                 countEl.textContent = `${count} partner${count !== 1 ? 's' : ''}`;
@@ -322,7 +322,7 @@ class ManagePartners {
         if (!timeline) return;
         
         try {
-            const response = await fetch('http://localhost:3000/api/dashboard/recent-activity?type=partner');
+            const response = await fetch(`${API_BASE_URL}/dashboard/recent-activity?type=partner`);
             const result = await response.json();
             
             if (result.success && Array.isArray(result.data)) {

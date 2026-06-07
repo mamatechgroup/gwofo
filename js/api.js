@@ -7,12 +7,12 @@ const API_BASE_URL = (() => {
     
     // Production (Netlify + Render)
     if (hostname.includes('netlify.app')) {
-        return 'https://gwofo-backend.onrender.com/api';
+        return 'https://gwofo.onrender.com/api';
     }
     
     // Staging/Preview
     if (hostname.includes('netlify-preview')) {
-        return 'https://gwofo-backend.onrender.com/api';
+        return 'https://gwofo.onrender.com/api';
     }
     
     // Local development

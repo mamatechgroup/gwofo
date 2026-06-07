@@ -49,7 +49,7 @@
                         <i class="fas fa-paper-plane"></i> Subscribe
                     </button>
                 </form>
-                <div id="newsletterMessage" class="form-message" style="display: none; margin-top: 10px; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px;"></div>
+                <div id="newsletterMessage" class="form-message hidden"></div>
             </div>
 
         </div>
@@ -86,7 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageDiv.style.color = '#1976d2';
                 messageDiv.textContent = 'Subscribing...';
                 
-                const response = await fetch('http://localhost:3000/api/newsletter/subscribe', {
+                const apiBase = window.location.hostname.includes('netlify.app')
+                    ? 'https://gwofo.onrender.com/api'
+                    : 'http://localhost:3000/api';
+                const response = await fetch(`${apiBase}/newsletter/subscribe`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

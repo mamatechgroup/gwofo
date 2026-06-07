@@ -56,7 +56,10 @@ async function loadAndDisplay() {
     if (navSection)    navSection.style.display = 'none';
 
     try {
-        const response = await fetch('http://localhost:3000/api/posts');
+        const apiBase = window.location.hostname.includes('netlify.app')
+            ? 'https://gwofo.onrender.com/api'
+            : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/posts`);
         const result   = await response.json();
 
         if (result.success && Array.isArray(result.data)) {
@@ -449,7 +452,10 @@ async function loadSidebarActivities() {
     if (!list) return;
 
     try {
-        const response = await fetch('http://localhost:3000/api/dashboard/recent-activity');
+        const apiBase = window.location.hostname.includes('netlify.app')
+            ? 'https://gwofo.onrender.com/api'
+            : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/dashboard/recent-activity`);
         const result   = await response.json();
 
         if (result.success && Array.isArray(result.data) && result.data.length > 0) {

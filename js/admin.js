@@ -347,7 +347,7 @@ class AdminDashboard {
     
     loadDashboardData() {
         // Fetch real data from API instead of using mockData
-        fetch('http://localhost:3000/api/dashboard/summary')
+        fetch(`${API_BASE_URL}/dashboard/summary`)
             .then(response => response.json())
             .then(result => {
                 if (result.success && result.data) {
@@ -599,7 +599,7 @@ class AdminDashboard {
     
     async updateSidebarBadges() {
         try {
-            const response = await fetch('http://localhost:3000/api/dashboard/stats');
+            const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
             const result = await response.json();
             if (result.success && result.data) {
                 const stats = result.data;
@@ -630,7 +630,7 @@ class AdminDashboard {
         const timeline = document.querySelector('.activity-timeline');
         if (!timeline) return;
         
-        fetch('http://localhost:3000/api/dashboard/recent-activity')
+        fetch(`${API_BASE_URL}/dashboard/recent-activity`)
             .then(res => res.json())
             .then(result => {
                 if (result.success && Array.isArray(result.data)) {
