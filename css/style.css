@@ -371,8 +371,6 @@ a:hover { color: var(--secondary-dark); }
 .slide.active {
     opacity: 1;
 }
-    background-color: #333;
-}
 
 .slide-1 {
     background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('assets/images/Petition%20Session%20Group%20Photo%20(1).jpg');

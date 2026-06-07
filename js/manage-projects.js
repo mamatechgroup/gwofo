@@ -232,7 +232,7 @@ class ManageProjects {
 
         return `
             <div class="project-card">
-                ${p.image_url ? `<div class="project-card-image"><img src="${p.image_url}" alt="${this.esc(p.name)}"></div>` : ''}
+                ${p.image_url && this.isValidImageUrl(p.image_url) ? `<div class="project-card-image"><img src="${p.image_url}" alt="${this.esc(p.name)}"></div>` : ''}
                 <div class="project-card-body">
                     <div class="project-card-header">
                         <span class="category-badge ${p.category}">${cat}</span>
@@ -446,6 +446,12 @@ class ManageProjects {
             background:${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
+    }
+
+    isValidImageUrl(url) {
+        if (!url) return false;
+        const clean = url.trim();
+        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/');
     }
 
     esc(str) {

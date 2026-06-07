@@ -135,7 +135,7 @@ class ManageSlides {
             `<option value="${n}"${n === (s.position || 1) ? ' selected' : ''}>${n}</option>`
         ).join('');
 
-        const thumb = s.image_url
+        const thumb = s.image_url && this.isValidImageUrl(s.image_url)
             ? `<img src="${s.image_url}" alt="${this.esc(s.title)}" class="slide-card-image">`
             : `<div class="slide-card-placeholder"><i class="fas fa-image"></i></div>`;
 
@@ -193,7 +193,7 @@ class ManageSlides {
             if (f('slideTextColor'))   f('slideTextColor').value   = slide.text_color        || '#ffffff';
 
             // Show existing image
-            if (slide.image_url) {
+            if (slide.image_url && this.isValidImageUrl(slide.image_url)) {
                 const preview = document.getElementById('slideImagePreview');
                 const img     = document.getElementById('slidePreviewImage');
                 if (preview && img) { img.src = slide.image_url; preview.style.display = 'block'; }
@@ -475,6 +475,12 @@ class ManageSlides {
             background:${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
+    }
+
+    isValidImageUrl(url) {
+        if (!url) return false;
+        const clean = url.trim();
+        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/');
     }
 
     esc(str) {

@@ -187,8 +187,9 @@ class ManagePosts {
         const catLabels = { news: 'News', updates: 'Updates', stories: 'Success Stories', events: 'Events' };
         const catLabel  = catLabels[post.category] || post.category;
 
-        const thumb = post.featured_image || post.image_url
-            ? `<img src="${post.featured_image || post.image_url}" alt="" class="post-thumb">`
+        const imgUrl = post.featured_image || post.image_url;
+        const thumb = this.isValidImageUrl(imgUrl)
+            ? `<img src="${imgUrl}" alt="" class="post-thumb">`
             : `<div class="post-thumb-placeholder"><i class="fas fa-image"></i></div>`;
 
         return `
@@ -260,7 +261,7 @@ class ManagePosts {
                 dateInput.value = post.published_date.slice(0, 16);
             }
             // Preload featured image
-            if (post.featured_image) {
+            if (post.featured_image && this.isValidImageUrl(post.featured_image)) {
                 const preview = document.getElementById('imagePreview');
                 const img     = document.getElementById('previewImage');
                 if (preview && img) {
@@ -270,7 +271,7 @@ class ManagePosts {
                 this._featuredImageB64 = post.featured_image;
             }
             // Preload author avatar
-            if (post.author_image) {
+            if (post.author_image && this.isValidImageUrl(post.author_image)) {
                 const preview = document.getElementById('authorImagePreview');
                 const img     = document.getElementById('previewAuthorImage');
                 if (preview && img) {
@@ -447,7 +448,7 @@ class ManagePosts {
     // ─── Image Helpers ────────────────────────────────────────────────────────
 
     previewFeaturedImage(e) {
-        const file = e.target.files[0];
+        const file = e.target.files && e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = ev => {
@@ -463,7 +464,7 @@ class ManagePosts {
     }
 
     previewAuthorImage(e) {
-        const file = e.target.files[0];
+        const file = e.target.files && e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = ev => {
@@ -554,6 +555,12 @@ class ManagePosts {
             background:${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
+    }
+
+    isValidImageUrl(url) {
+        if (!url) return false;
+        const clean = url.trim();
+        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/');
     }
 
     esc(str) {

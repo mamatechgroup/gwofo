@@ -36,6 +36,8 @@ function initMobileNavigation() {
     const body = document.body;
     
     if (navToggle && navMenu) {
+        if (navToggle.dataset.navInitialized) return;
+        navToggle.dataset.navInitialized = 'true';
         navToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -94,6 +96,8 @@ function initMobileNavigation() {
 
 function initSmoothScrolling() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        if (anchor.dataset.scrollInitialized) return;
+        anchor.dataset.scrollInitialized = 'true';
         anchor.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
@@ -116,6 +120,8 @@ function initSmoothScrolling() {
 function initStickyNavigation() {
     const navbar = document.querySelector('.navbar');
     if (!navbar) return;
+    if (navbar.dataset.stickyInitialized) return;
+    navbar.dataset.stickyInitialized = 'true';
     
     let lastScrollTop = 0;
     
@@ -244,6 +250,8 @@ function initForms() {
 function initContactForm() {
     const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
+    if (contactForm.dataset.formInitialized) return;
+    contactForm.dataset.formInitialized = 'true';
     
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -297,6 +305,8 @@ function validateContactForm(form) {
 }
 
 function initNewsletterForms() {
+    if (window.newsletterInitialized) return;
+    window.newsletterInitialized = true;
     // Use event delegation to handle all newsletter form submissions dynamically (including header/footer)
     document.addEventListener('submit', async function(e) {
         const form = e.target.closest('.newsletter-form');
@@ -512,6 +522,8 @@ function showThankYouPopup(email) {
 function initFormFieldEffects() {
     const formInputs = document.querySelectorAll('input, textarea, select');
     formInputs.forEach(input => {
+        if (input.dataset.effectsInitialized) return;
+        input.dataset.effectsInitialized = 'true';
         input.addEventListener('focus', function() {
             this.parentElement.style.transform = 'translateY(-2px)';
         });
@@ -586,21 +598,35 @@ function clearFieldError(field) {
 function initSliders() {
     // Initialize hero slider if exists
     if (document.querySelector('.hero-slider')) {
-        const heroSlider = new Slider('.hero-slider', {
-            autoPlay: true,
-            interval: 6000,
-            transitionSpeed: 500
-        });
-        console.log('✓ Hero slider initialized', heroSlider);
+        const container = document.querySelector('.hero-slider');
+        if (!container.dataset.sliderInitialized) {
+            container.dataset.sliderInitialized = 'true';
+            const heroSlider = new Slider('.hero-slider', {
+                autoPlay: true,
+                interval: 6000,
+                transitionSpeed: 500
+            });
+            console.log('✓ Hero slider initialized', heroSlider);
+        }
     }
     
     // Initialize team slider if exists
     const teamSliderContainer = document.querySelector('.team-slider-container');
     if (teamSliderContainer) {
-        initTeamSlider();
+        if (!teamSliderContainer.dataset.sliderInitialized) {
+            teamSliderContainer.dataset.sliderInitialized = 'true';
+            initTeamSlider();
+        }
     }
     
-    initPartnersSlider();
+    // Initialize partners slider if exists
+    const partnersSliderContainer = document.querySelector('.partners-slider-container');
+    if (partnersSliderContainer) {
+        if (!partnersSliderContainer.dataset.sliderInitialized) {
+            partnersSliderContainer.dataset.sliderInitialized = 'true';
+            initPartnersSlider();
+        }
+    }
 }
 
 // Team Slider Implementation - Fixed
@@ -747,6 +773,8 @@ function initMobileDropdowns() {
     const dropdownLinks = document.querySelectorAll('.dropdown > a');
     
     dropdownLinks.forEach(link => {
+        if (link.dataset.dropdownInitialized) return;
+        link.dataset.dropdownInitialized = 'true';
         link.addEventListener('click', function(e) {
             if (window.innerWidth <= 992) {
                 e.preventDefault();
@@ -764,13 +792,16 @@ function initMobileDropdowns() {
     });
     
     // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.dropdown') && window.innerWidth <= 992) {
-            dropdownLinks.forEach(link => {
-                link.parentElement.classList.remove('active');
-            });
-        }
-    });
+    if (!window.mobileDropdownClickGuard) {
+        window.mobileDropdownClickGuard = true;
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown') && window.innerWidth <= 992) {
+                dropdownLinks.forEach(link => {
+                    link.parentElement.classList.remove('active');
+                });
+            }
+        });
+    }
 }
 
 function initDropdownAccessibility() {
@@ -864,6 +895,8 @@ function initPartnersSlider() {
     const nextBtn = document.querySelector('.partners-slider-next');
     
     if (!partnersSliderContainer || !partnersSlider || !prevBtn || !nextBtn) return;
+    if (partnersSliderContainer.dataset.sliderInitialized) return;
+    partnersSliderContainer.dataset.sliderInitialized = 'true';
     
     // Clone slides for infinite loop effect
     const slides = Array.from(partnersSlider.querySelectorAll('.partner-logo'));
@@ -1194,6 +1227,8 @@ class Slider {
 // ==========================================================================
 
 function initInteractiveElements() {
+    if (window.interactiveElementsInitialized) return;
+    window.interactiveElementsInitialized = true;
     initProjects();
     initFAQ();
     initEmergencyContact();
@@ -1348,6 +1383,8 @@ function initMapPlaceholder() {
 // ==========================================================================
 
 function initAnimations() {
+    if (window.animationsInitialized) return;
+    window.animationsInitialized = true;
     initScrollAnimations();
     initActivityAnimations();
 }
@@ -1400,6 +1437,8 @@ function initActivityAnimations() {
 // ==========================================================================
 
 function setupEventListeners() {
+    if (window.eventListenersInitialized) return;
+    window.eventListenersInitialized = true;
     // Add click to focus for accessibility
     document.querySelectorAll('.team-card, .project-card').forEach(card => {
         card.addEventListener('click', function() {

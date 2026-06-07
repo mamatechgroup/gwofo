@@ -46,6 +46,12 @@ function esc(str) {
     return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+function isValidImageUrl(url) {
+    if (!url) return false;
+    const cleanUrl = url.trim();
+    return cleanUrl.startsWith('data:') || cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') || cleanUrl.startsWith('/');
+}
+
 // ─── Main Load ────────────────────────────────────────────────────────────────
 
 async function loadAndDisplay() {
@@ -260,7 +266,7 @@ function buildPostHTML(post) {
 
     // Author avatar: use stored author_image, else render a gradient initials badge
     const initials = (post.author_name || 'A').charAt(0).toUpperCase();
-    const avatarHtml = post.author_image
+    const avatarHtml = post.author_image && isValidImageUrl(post.author_image)
         ? `<img src="${post.author_image}" alt="${esc(post.author_name || 'Author')}" class="author-avatar-img">`
         : `<div class="author-avatar-placeholder">${initials}</div>`;
 
@@ -320,7 +326,7 @@ function buildPostHTML(post) {
 
             <div class="article-main-content">
                 ${post.title ? `<h1 class="article-title">${esc(post.title)}</h1>` : ''}
-                ${post.featured_image || post.image_url ? `
+                ${(post.featured_image || post.image_url) && isValidImageUrl(post.featured_image || post.image_url) ? `
                     <div class="article-featured-image">
                         <img src="${post.featured_image || post.image_url}" alt="${esc(post.title || 'Post image')}" loading="lazy">
                     </div>` : ''}

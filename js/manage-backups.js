@@ -140,7 +140,7 @@ class ManageBackups {
             input.type = 'file';
             input.accept = '.json';
             input.onchange = e => {
-                const file = e.target.files[0];
+                const file = e.target.files && e.target.files[0];
                 if (file) this.uploadBackup(file);
             };
             input.click();
