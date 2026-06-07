@@ -355,24 +355,27 @@ a:hover { color: var(--secondary-dark); }
     height: 100%;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     opacity: 0;
     transition: opacity var(--transition-slow);
+    background-color: #333;
 }
 
 .slide-1 {
-    background-image: url('assets/images/Petition\ Session\ Group\ Photo\ \(1\).jpg');
+    background-color: #333;
 }
 
 .slide-2 {
-    background-image: url('assets/images/Advocacy\ Project\ Inception\ Meeting-Dec-7-2022\ \(1\).jpg');
+    background-color: #333;
 }
 
 .slide-3 {
-    background-image: url('assets/images/TOE\ TOWN\ 1\ &\ 2\ COMMUNITY\ ENTRY\ MEETING\ -Dec-1-2022\ \(1\).png');
+    background-color: #333;
 }
 
 .slide.active { opacity: 1; }
