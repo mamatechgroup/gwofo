@@ -11,8 +11,13 @@ dotenv.config();
 const app = express();
 
 // Middleware - CORS Configuration
+let allowedOrigin = process.env.CORS_ORIGIN || '*';
+if (typeof allowedOrigin === 'string' && allowedOrigin !== '*') {
+    allowedOrigin = allowedOrigin.replace(/\/$/, '');
+}
+
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: allowedOrigin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
