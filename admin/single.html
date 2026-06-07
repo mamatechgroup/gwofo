@@ -18,22 +18,35 @@
     <!-- Main Content -->
     <main class="container">
         <div class="posts-layout">
-            <!-- Posts Feed -->
+            <!-- Single Post Display -->
             <div class="posts-feed">
-                <!-- Post Cards will be loaded here by JavaScript -->
-                <div id="postsContainer"></div>
+                <!-- Single Post Container -->
+                <div id="singlePostContainer"></div>
+
+                <!-- Navigation Controls -->
+                <div class="post-navigation">
+                    <button id="prevBtn" class="nav-btn prev-btn" title="Previous Post">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div class="post-counter">
+                        <span id="currentPostNumber">1</span> / <span id="totalPostsNumber">4</span>
+                    </div>
+                    <button id="nextBtn" class="nav-btn next-btn" title="Next Post">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
 
                 <!-- Loading Spinner -->
-                <div class="loading-spinner" id="loadingSpinner">
+                <div id="loadingSpinner" class="loading-spinner hidden">
                     <div class="spinner"></div>
-                    <p>Loading more posts...</p>
+                    <p>Loading post...</p>
                 </div>
 
                 <!-- No Posts Message -->
-                <div class="no-posts" id="noPostsMessage" style="display: none;">
+                <div id="noPostsMessage" class="no-posts hidden">
                     <i class="fas fa-newspaper"></i>
-                    <h3>No posts yet</h3>
-                    <p>Be the first to share something with the community!</p>
+                    <h3>No posts available</h3>
+                    <p>Check back later for new posts!</p>
                 </div>
             </div>
 
@@ -67,33 +80,11 @@
                 <!-- Recent Activities -->
                 <div class="sidebar-widget">
                     <h3>Recent Activities</h3>
-                    <div class="activities-list">
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <p><strong>Mary Kamara</strong> joined the foundation</p>
-                                <span class="activity-time">2 hours ago</span>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-donate"></i>
-                            </div>
-                            <div class="activity-content">
-                                <p><strong>Liberia Bank</strong> donated $10,000</p>
-                                <span class="activity-time">1 day ago</span>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="activity-content">
-                                <p>New event: <strong>Women's Health Workshop</strong></p>
-                                <span class="activity-time">2 days ago</span>
-                            </div>
+                    <div class="activities-list" id="sidebarActivities">
+                        <!-- Dynamically loaded by single-post.js -->
+                        <div style="padding:16px;text-align:center;color:#6b7280;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:1.2em;"></i>
+                            <p style="margin-top:6px;font-size:.85em;">Loading activities…</p>
                         </div>
                     </div>
                 </div>
@@ -115,24 +106,10 @@
 
     <!-- Footer -->
     <div id="footer-placeholder"></div>
-   
-
-    <!-- Post Detail Modal -->
-    <div class="modal" id="postDetailModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeModal">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="modal-body" id="modalBody">
-                <!-- Post content will be loaded here -->
-            </div>
-        </div>
-    </div>
 
     <!-- JavaScript -->
-  
     <script src="../js/main.js"></script>
     <script src="../js/load.js"></script>
-    <script src="../js/posts-feed.js"></script>
+    <script src="../js/single-post.js"></script>
 </body>
 </html>

@@ -47,10 +47,9 @@
                 <span>Homepage Slides</span>
             </a>
             
-            <a href="manage-comments.html" class="menu-item">
-                <i class="fas fa-comments"></i>
-                <span>Comments</span>
-                <span class="badge">24</span>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
             </a>
             
             <a href="settings.html" class="menu-item">
@@ -59,7 +58,7 @@
             </a>
         </nav>
         
-        <button class="logout-btn">
+        <button class="logout-btn" title="Logout from Admin Dashboard">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
         </button>
@@ -70,7 +69,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="topbar-left">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1>Dashboard Overview</h1>
@@ -99,7 +98,7 @@
             <div class="stat-card" data-stat="totalPosts">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-number">45</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Total Posts</div>
                     </div>
                     <div class="stat-icon posts">
@@ -115,7 +114,7 @@
             <div class="stat-card" data-stat="totalProjects">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-number">18</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Active Projects</div>
                     </div>
                     <div class="stat-icon projects">
@@ -128,26 +127,10 @@
                 </div>
             </div>
             
-            <div class="stat-card" data-stat="totalComments">
-                <div class="stat-header">
-                    <div>
-                        <div class="stat-number">236</div>
-                        <div class="stat-label">Comments</div>
-                    </div>
-                    <div class="stat-icon comments">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                </div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>5 new today</span>
-                </div>
-            </div>
-            
             <div class="stat-card" data-stat="totalUsers">
                 <div class="stat-header">
                     <div>
-                        <div class="stat-number">1,250</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Newsletter Subscribers</div>
                     </div>
                     <div class="stat-icon users">
@@ -168,7 +151,7 @@
                 <div class="content-section">
                     <div class="section-header">
                         <h2>Recent Posts</h2>
-                        <button class="btn-add" data-modal="postModal">
+                        <button class="btn-add" data-modal="postModal" title="Add New Post">
                             <i class="fas fa-plus"></i> Add New
                         </button>
                     </div>
@@ -193,7 +176,7 @@
                 <div class="content-section">
                     <div class="section-header">
                         <h2>Recent Projects</h2>
-                        <button class="btn-add" data-modal="projectModal">
+                        <button class="btn-add" data-modal="projectModal" title="Add New Project">
                             <i class="fas fa-plus"></i> Add New
                         </button>
                     </div>
@@ -211,57 +194,6 @@
                             <!-- Data will be populated by JavaScript -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Recent Comments -->
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Recent Comments</h2>
-                </div>
-                
-                <div class="comments-list">
-                    <div class="comment-item">
-                        <div class="comment-header">
-                            <div class="comment-author">
-                                <strong>Sarah M. Johnson</strong>
-                                <span>on "Girls Education Program"</span>
-                            </div>
-                            <div class="comment-date">2 hours ago</div>
-                        </div>
-                        <div class="comment-content">
-                            <p>This is an amazing initiative! As a former beneficiary of similar programs, I can attest to the life-changing impact education has on girls.</p>
-                        </div>
-                        <div class="comment-actions">
-                            <button class="btn-delete">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                            <button class="btn-view">
-                                <i class="fas fa-reply"></i> Reply
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="comment-item">
-                        <div class="comment-header">
-                            <div class="comment-author">
-                                <strong>James Kollie</strong>
-                                <span>on "Women Entrepreneurship"</span>
-                            </div>
-                            <div class="comment-date">1 day ago</div>
-                        </div>
-                        <div class="comment-content">
-                            <p>How can I volunteer for this program? I'm a retired teacher with experience working with girls in rural communities.</p>
-                        </div>
-                        <div class="comment-actions">
-                            <button class="btn-delete">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                            <button class="btn-view">
-                                <i class="fas fa-reply"></i> Reply
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -294,16 +226,6 @@
                         </div>
                     </div>
                     
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-comment"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">New comment</div>
-                            <div class="activity-desc">Sarah Johnson commented on Girls Education Program</div>
-                            <div class="activity-time">4 hours ago</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -314,7 +236,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Post</h2>
-                <button class="close-modal">
+                <button class="close-modal" title="Close Modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -368,7 +290,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Project</h2>
-                <button class="close-modal">
+                <button class="close-modal" title="Close Modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -431,6 +353,7 @@
         </div>
     </div>
     
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
 </body>
 </html>

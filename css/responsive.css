@@ -103,7 +103,7 @@
         background: none;
         border: none;
         font-size: var(--font-lg);
-        color: var(--primary-color);
+        color: var(--white);
         cursor: pointer;
         margin-left: auto;
         z-index: 1001;
@@ -111,14 +111,14 @@
     
     .nav-menu {
         position: fixed;
-        top: 0;
+        top: var(--navbar-height);
         right: -100%;
         width: 300px; /* Fixed width instead of 100% */
-        height: 100vh;
-        background: var(--white);
+        height: calc(100vh - var(--navbar-height));
+        background: var(--primary-light);
         flex-direction: column;
         align-items: flex-start;
-        padding: var(--navbar-height) var(--space-lg) var(--space-xl);
+        padding: 0 var(--space-lg) var(--space-xl);
         transition: right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         overflow-y: auto;
         box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
@@ -155,16 +155,21 @@
         margin-bottom: 0;
     }
     
+    .nav-menu > li:first-child a {
+        padding-top: 0;
+    }
+    
     .nav-menu a {
         padding: var(--space-md) 0;
         width: 100%;
-        border-bottom: 1px solid var(--gray-light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         font-size: var(--font-base);
         transition: color 0.2s ease, padding-left 0.2s ease;
+        color: var(--white);
     }
     
     .nav-menu a:hover {
-        color: var(--primary-color);
+        color: var(--secondary-color);
         padding-left: var(--space-sm);
     }
     
@@ -174,7 +179,7 @@
         border: none;
         padding-left: var(--space-lg);
         display: none;
-        background: var(--light-color);
+        background: rgba(0, 0, 0, 0.2);
         margin-top: var(--space-sm);
         max-width: 100%;
         overflow: hidden;
@@ -562,7 +567,6 @@
     .data-table {
         display: block;
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -703,8 +707,9 @@
     }
     
     .logo-img {
-        width: 35px;
-        height: 35px;
+        width: 91px;
+        height: 91px;
+        border-radius: 50%;
     }
     
     .logo span {
@@ -1086,7 +1091,6 @@
     .partners-slider {
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
         scroll-padding: 0 10px;
     }
     

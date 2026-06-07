@@ -25,7 +25,6 @@
             <a href="manage-posts.html" class="menu-item active">
                 <i class="fas fa-newspaper"></i>
                 <span>Posts</span>
-                <span class="badge">45</span>
             </a>
             
             <a href="manage-projects.html" class="menu-item">
@@ -48,10 +47,9 @@
                 <span>Homepage Slides</span>
             </a>
             
-            <a href="manage-comments.html" class="menu-item">
-                <i class="fas fa-comments"></i>
-                <span>Comments</span>
-                <span class="badge">24</span>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
             </a>
             
             <a href="settings.html" class="menu-item">
@@ -60,7 +58,7 @@
             </a>
         </nav>
         
-        <button class="logout-btn">
+        <button class="logout-btn" title="Logout from Admin Dashboard">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
         </button>
@@ -71,7 +69,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="topbar-left">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1>Manage Posts</h1>
@@ -99,7 +97,7 @@
         <div class="content-section">
             <div class="section-header">
                 <div class="filters">
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Posts by Category">
                         <option value="all">All Categories</option>
                         <option value="news">News</option>
                         <option value="updates">Updates</option>
@@ -107,7 +105,7 @@
                         <option value="events">Events</option>
                     </select>
                     
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Posts by Status">
                         <option value="all">All Status</option>
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
@@ -127,8 +125,8 @@
                 <table class="data-table" id="postsTable">
                     <thead>
                         <tr>
-                            <th style="width: 40px;">
-                                <input type="checkbox" class="select-all">
+                            <th class="select-checkbox-col-40">
+                                <input type="checkbox" class="select-all" aria-label="Select all posts">
                             </th>
                             <th>Title</th>
                             <th>Category</th>
@@ -140,159 +138,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><input type="checkbox" class="select-item"></td>
-                            <td>
-                                <div class="post-preview">
-                                    <img src="../assets/images/post-thumb1.jpg" alt="Post thumbnail" class="post-thumb">
-                                    <div>
-                                        <strong>Girls Education Program Launch</strong>
-                                        <small class="text-muted">Empowering young girls through education...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge news">News</span></td>
-                            <td>Admin User</td>
-                            <td>2024-03-15</td>
-                            <td>1,245</td>
-                            <td><span class="status-badge status-published">Published</span></td>
-                            <td>
-                                <button class="btn-edit" data-id="1">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" data-id="1">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn-view" data-id="1">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td><input type="checkbox" class="select-item"></td>
-                            <td>
-                                <div class="post-preview">
-                                    <img src="../assets/images/post-thumb2.jpg" alt="Post thumbnail" class="post-thumb">
-                                    <div>
-                                        <strong>Women Entrepreneurship Workshop</strong>
-                                        <small class="text-muted">Training women to start their own businesses...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge events">Events</span></td>
-                            <td>Mary Kamara</td>
-                            <td>2024-03-10</td>
-                            <td>892</td>
-                            <td><span class="status-badge status-published">Published</span></td>
-                            <td>
-                                <button class="btn-edit" data-id="2">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" data-id="2">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn-view" data-id="2">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td><input type="checkbox" class="select-item"></td>
-                            <td>
-                                <div class="post-preview">
-                                    <img src="../assets/images/post-thumb3.jpg" alt="Post thumbnail" class="post-thumb">
-                                    <div>
-                                        <strong>Annual Report 2023</strong>
-                                        <small class="text-muted">Our achievements and impact in 2023...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge updates">Updates</span></td>
-                            <td>Admin User</td>
-                            <td>2024-03-05</td>
-                            <td>1,567</td>
-                            <td><span class="status-badge status-published">Published</span></td>
-                            <td>
-                                <button class="btn-edit" data-id="3">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" data-id="3">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn-view" data-id="3">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td><input type="checkbox" class="select-item"></td>
-                            <td>
-                                <div class="post-preview">
-                                    <img src="../assets/images/post-thumb4.jpg" alt="Post thumbnail" class="post-thumb">
-                                    <div>
-                                        <strong>Success Story: Sarah's Journey</strong>
-                                        <small class="text-muted">From student to successful entrepreneur...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge stories">Success Stories</span></td>
-                            <td>John Doe</td>
-                            <td>2024-02-28</td>
-                            <td>2,134</td>
-                            <td><span class="status-badge status-published">Published</span></td>
-                            <td>
-                                <button class="btn-edit" data-id="4">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" data-id="4">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn-view" data-id="4">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                        <tr>
-                            <td><input type="checkbox" class="select-item"></td>
-                            <td>
-                                <div class="post-preview">
-                                    <div class="post-thumb-placeholder">
-                                        <i class="fas fa-image"></i>
-                                    </div>
-                                    <div>
-                                        <strong>Upcoming Health Campaign</strong>
-                                        <small class="text-muted">Free health checkups in rural areas...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="category-badge news">News</span></td>
-                            <td>Admin User</td>
-                            <td>2024-02-20</td>
-                            <td>0</td>
-                            <td><span class="status-badge status-draft">Draft</span></td>
-                            <td>
-                                <button class="btn-edit" data-id="5">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-delete" data-id="5">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn-view" data-id="5">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <!-- Data loaded from API -->
                     </tbody>
                 </table>
             </div>
             
             <!-- Bulk Actions -->
             <div class="bulk-actions">
-                <select class="bulk-action-select">
+                <select class="bulk-action-select" title="Select bulk action">
                     <option value="">Bulk Actions</option>
                     <option value="publish">Publish</option>
                     <option value="draft">Move to Draft</option>
@@ -302,16 +155,12 @@
                 <button class="btn-secondary bulk-apply">Apply</button>
                 
                 <div class="pagination">
-                    <span class="pagination-info">Showing 1-5 of 45 posts</span>
-                    <button class="pagination-btn" disabled>
+                    <span class="pagination-info">Loading posts...</span>
+                    <button class="pagination-btn" disabled aria-label="Previous page">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                     <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn">4</button>
-                    <button class="pagination-btn">5</button>
-                    <button class="pagination-btn">
+                    <button class="pagination-btn" aria-label="Next page">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -324,52 +173,52 @@
                 <h3>Post Statistics</h3>
                 <div class="stats-summary">
                     <div class="stat-item">
-                        <div class="stat-number">45</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Total Posts</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">38</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Published</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">5</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Drafts</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number">2</div>
+                        <div class="stat-number">0</div>
                         <div class="stat-label">Archived</div>
                     </div>
                 </div>
             </div>
             
             <div class="content-section">
-                <h3>Top Categories</h3>
+                <h3>Category Distribution</h3>
                 <div class="categories-list">
                     <div class="category-item">
                         <span class="category-name">News</span>
                         <div class="category-bar">
-                            <div class="category-fill" style="width: 40%; background: #8a4fff;"></div>
+                            <div class="category-fill progress-40 bg-purple"></div>
                         </div>
                         <span class="category-count">18 posts</span>
                     </div>
                     <div class="category-item">
                         <span class="category-name">Success Stories</span>
                         <div class="category-bar">
-                            <div class="category-fill" style="width: 30%; background: #ff6b8b;"></div>
+                            <div class="category-fill progress-30 bg-pink"></div>
                         </div>
                         <span class="category-count">14 posts</span>
                     </div>
                     <div class="category-item">
                         <span class="category-name">Events</span>
                         <div class="category-bar">
-                            <div class="category-fill" style="width: 20%; background: #4fc3f7;"></div>
+                            <div class="category-fill progress-20 bg-cyan"></div>
                         </div>
                         <span class="category-count">9 posts</span>
                     </div>
                     <div class="category-item">
                         <span class="category-name">Updates</span>
                         <div class="category-bar">
-                            <div class="category-fill" style="width: 10%; background: #66bb6a;"></div>
+                            <div class="category-fill progress-10 bg-green"></div>
                         </div>
                         <span class="category-count">4 posts</span>
                     </div>
@@ -383,7 +232,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Post</h2>
-                <button class="close-modal">
+                <button class="close-modal" title="Close Modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -407,11 +256,7 @@
                     
                     <div class="form-group">
                         <label for="postAuthor">Author</label>
-                        <select id="postAuthor" name="author">
-                            <option value="admin">Admin User</option>
-                            <option value="mary">Mary Kamara</option>
-                            <option value="john">John Doe</option>
-                        </select>
+                        <input type="text" id="postAuthor" name="author" value="Admin" placeholder="Author name">
                     </div>
                 </div>
                 
@@ -451,9 +296,9 @@
                             <small>PNG, JPG, GIF up to 5MB</small>
                         </label>
                     </div>
-                    <div class="image-preview" id="imagePreview" style="display: none;">
+                    <div class="image-preview" id="imagePreview" class="hidden">
                         <img id="previewImage" src="" alt="Preview">
-                        <button type="button" class="remove-image">
+                        <button type="button" class="remove-image" title="Remove Image">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -462,6 +307,24 @@
                 <div class="form-group">
                     <label for="postTags">Tags</label>
                     <input type="text" id="postTags" name="tags" placeholder="Add tags separated by commas">
+                </div>
+
+                <div class="form-group">
+                    <label for="postAuthorImage">Author Avatar Image</label>
+                    <div class="file-upload">
+                        <input type="file" id="postAuthorImage" name="author_image" accept="image/*" class="file-input">
+                        <label for="postAuthorImage" class="file-label">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Choose author avatar or drag and drop</span>
+                            <small>PNG, JPG up to 2MB</small>
+                        </label>
+                    </div>
+                    <div class="image-preview" id="authorImagePreview" style="display:none;">
+                        <img id="previewAuthorImage" src="" alt="Author Avatar Preview" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+                        <button type="button" class="remove-image" id="removeAuthorImage" title="Remove Author Image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="form-actions">
@@ -472,6 +335,8 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script src="../js/manage-posts.js"></script>
 </body>
 </html>

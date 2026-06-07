@@ -47,9 +47,9 @@
                 <span>Homepage Slides</span>
             </a>
             
-            <a href="manage-comments.html" class="menu-item">
-                <i class="fas fa-comments"></i>
-                <span>Comments</span>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
             </a>
             
             <a href="settings.html" class="menu-item active">
@@ -69,7 +69,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="topbar-left">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1>Settings</h1>
@@ -94,8 +94,59 @@
 
         <!-- Settings Tabs -->
         <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="profile">Account Settings</button>
             <button class="tab-btn" data-tab="backup">Backup</button>
         </div>
+
+         <!-- Profile Settings -->
+         <div class="content-section tab-content active" id="profileTab">
+             <div class="section-header">
+                 <h2>Account Settings</h2>
+                 <span class="section-subtitle">Update your admin profile details and password</span>
+             </div>
+             
+             <form id="profileForm" class="crud-form" style="max-width: 600px; margin-top: 20px;">
+                 <div class="form-group">
+                     <label for="profileUsername">Username *</label>
+                     <div style="position: relative;">
+                         <input type="text" id="profileUsername" name="username" required placeholder="Enter username" style="padding-left: 35px; width: 100%;">
+                         <i class="fas fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                     </div>
+                 </div>
+                 
+                 <div class="form-group">
+                     <label for="profileEmail">Email Address *</label>
+                     <div style="position: relative;">
+                         <input type="email" id="profileEmail" name="email" required placeholder="admin@gwofo.org" style="padding-left: 35px; width: 100%;">
+                         <i class="fas fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                     </div>
+                 </div>
+                 
+                 <div class="form-row">
+                     <div class="form-group">
+                         <label for="profilePassword">New Password</label>
+                         <div style="position: relative;">
+                             <input type="password" id="profilePassword" name="password" placeholder="Leave blank to keep current" style="padding-left: 35px; width: 100%;">
+                             <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                         </div>
+                     </div>
+                     
+                     <div class="form-group">
+                         <label for="profileConfirmPassword">Confirm New Password</label>
+                         <div style="position: relative;">
+                             <input type="password" id="profileConfirmPassword" name="confirm_password" placeholder="Confirm new password" style="padding-left: 35px; width: 100%;">
+                             <i class="fas fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                         </div>
+                     </div>
+                 </div>
+                 
+                 <div class="form-actions" style="margin-top: 25px; display: flex; gap: 12px;">
+                     <button type="submit" class="btn-primary" style="width: auto;">
+                         <i class="fas fa-save"></i> Save Profile
+                     </button>
+                 </div>
+             </form>
+         </div>
 
          <!-- Backup Settings -->
         <div class="content-section tab-content" id="backupTab">
@@ -176,74 +227,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>backup_2024-03-17_full.zip</td>
-                                <td>2024-03-17 02:00</td>
-                                <td>45.2 MB</td>
-                                <td><span class="backup-type full">Full</span></td>
-                                <td>
-                                    <button class="btn-view">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <button class="btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn-restore">
-                                        <i class="fas fa-history"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>backup_2024-03-10_full.zip</td>
-                                <td>2024-03-10 02:00</td>
-                                <td>44.8 MB</td>
-                                <td><span class="backup-type full">Full</span></td>
-                                <td>
-                                    <button class="btn-view">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <button class="btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn-restore">
-                                        <i class="fas fa-history"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>backup_2024-03-03_full.zip</td>
-                                <td>2024-03-03 02:00</td>
-                                <td>44.5 MB</td>
-                                <td><span class="backup-type full">Full</span></td>
-                                <td>
-                                    <button class="btn-view">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <button class="btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn-restore">
-                                        <i class="fas fa-history"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>backup_2024-02-25_database.zip</td>
-                                <td>2024-02-25 02:00</td>
-                                <td>12.3 MB</td>
-                                <td><span class="backup-type database">Database</span></td>
-                                <td>
-                                    <button class="btn-view">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                    <button class="btn-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn-restore">
-                                        <i class="fas fa-history"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            <!-- Dynamically loaded by manage-backups.js -->
                         </tbody>
                     </table>
                 </div>
@@ -265,7 +249,7 @@
                         </div>
                     </div>
                     <div class="storage-bar">
-                        <div class="storage-fill" style="width: 14.7%;"></div>
+                        <div class="storage-fill storage-fill-15"></div>
                     </div>
                 </div>
             </div>
@@ -295,7 +279,10 @@
         </div>
     </main>
 
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script src="../js/manage-backups.js"></script>
+    <script src="../js/manage-profile.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Tab switching

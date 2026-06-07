@@ -43,12 +43,13 @@
             <div class="footer-col">
                 <h3><i class="fas fa-newspaper"></i> Newsletter</h3>
                 <p>Subscribe to receive updates on our programs and advocacy work.</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Your Email Address" required>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" id="newsletterEmail" placeholder="Your Email Address" required>
                     <button type="submit">
                         <i class="fas fa-paper-plane"></i> Subscribe
                     </button>
                 </form>
+                <div id="newsletterMessage" class="form-message" style="display: none; margin-top: 10px; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px;"></div>
             </div>
 
         </div>
@@ -65,3 +66,63 @@
         </div>
     </div>
 </footer>
+
+<script>
+// Newsletter Form Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('newsletterForm');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('newsletterEmail').value;
+            const messageDiv = document.getElementById('newsletterMessage');
+            const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+            
+            try {
+                submitBtn.disabled = true;
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = '#e3f2fd';
+                messageDiv.style.color = '#1976d2';
+                messageDiv.textContent = 'Subscribing...';
+                
+                const response = await fetch('http://localhost:3000/api/newsletter/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        full_name: ''
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.style.background = '#c8e6c9';
+                    messageDiv.style.color = '#2e7d32';
+                    messageDiv.textContent = 'Thank you for subscribing!';
+                    newsletterForm.reset();
+                    
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                        submitBtn.disabled = false;
+                    }, 5000);
+                } else {
+                    messageDiv.style.background = '#ffcdd2';
+                    messageDiv.style.color = '#c62828';
+                    messageDiv.textContent = result.message || 'This email is already subscribed.';
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error subscribing to newsletter:', error);
+                messageDiv.style.background = '#ffcdd2';
+                messageDiv.style.color = '#c62828';
+                messageDiv.textContent = 'Error subscribing. Please try again.';
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
+</script>

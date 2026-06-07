@@ -15,26 +15,40 @@ class AdminDashboard {
         this.setupActivityAnimations();
         this.setupModals();
         this.setupLoginFunctionality();
+        this.updateSidebarBadges();
+        this.setupDashboardRedirects();
     }
     
-    checkAuthentication() {
-        const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true';
+    async checkAuthentication() {
         const currentPage = window.location.pathname;
+        const token = localStorage.getItem('adminToken');
         
         if (currentPage.includes('login.html')) {
-            this.setupLoginRedirect();
+            if (token && token.startsWith('token-')) {
+                window.location.href = 'dashboard.html';
+            }
             return;
         }
         
-        if (!isAuthenticated) {
+        if (!token) {
             window.location.href = 'login.html';
+            return;
         }
         
-        this.displayCurrentUser();
+        try {
+            await Auth.verifyToken(token);
+            this.displayCurrentUser();
+        } catch (error) {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminAuthenticated');
+            localStorage.removeItem('adminUsername');
+            window.location.href = 'login.html';
+        }
     }
     
     setupLoginRedirect() {
-        if (localStorage.getItem('adminAuthenticated') === 'true') {
+        const token = localStorage.getItem('adminToken');
+        if (token && token.startsWith('token-')) {
             window.location.href = 'dashboard.html';
         }
     }
@@ -49,7 +63,23 @@ class AdminDashboard {
     setupEventListeners() {
         this.setupLogoutListener();
         this.setupMobileMenu();
-        this.setupFormSubmissions();
+        // Form submissions are handled by each page-specific JS file
+    }
+    
+    setupDashboardRedirects() {
+        if (window.location.pathname.includes('dashboard.html')) {
+            document.querySelectorAll('.btn-add').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modalType = btn.dataset.modal;
+                    if (modalType === 'postModal') {
+                        window.location.href = 'manage-posts.html?action=add';
+                    } else if (modalType === 'projectModal') {
+                        window.location.href = 'manage-projects.html?action=add';
+                    }
+                });
+            });
+        }
     }
     
     setupLogoutListener() {
@@ -59,7 +89,13 @@ class AdminDashboard {
         }
     }
     
-    logout() {
+    async logout() {
+        try {
+            await Auth.logout();
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+        }
+        localStorage.removeItem('adminToken');
         localStorage.removeItem('adminAuthenticated');
         localStorage.removeItem('adminUsername');
         window.location.href = 'login.html';
@@ -84,23 +120,11 @@ class AdminDashboard {
         });
     }
     
-    setupFormSubmissions() {
-        document.querySelectorAll('.crud-form').forEach(form => {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleFormSubmit(form);
-            });
-        });
-    }
+    // setupFormSubmissions() removed — each manage-*.js handles its own form submit
     
     setupCRUDOperations() {
-        document.querySelectorAll('.btn-add').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const modalId = btn.dataset.modal;
-                if (modalId) this.openModal(modalId);
-            });
-        });
-        
+        // btn-add modal opening is handled by each page-specific JS file
+        // Only set up shared helpers here
         this.setupProgressRange();
         this.setupFormValidation();
     }
@@ -322,33 +346,44 @@ class AdminDashboard {
     }
     
     loadDashboardData() {
-        const mockData = {
-            totalPosts: 45,
-            totalProjects: 18,
-            totalComments: 236,
-            totalUsers: 1250,
-            recentPosts: [
-                { id: 1, title: 'New Education Initiative', author: 'Sarah Johnson', date: '2024-01-15', status: 'published' },
-                { id: 2, title: 'Annual Report 2023', author: 'Mary Kamara', date: '2024-01-12', status: 'published' },
-                { id: 3, title: 'Upcoming Events', author: 'Sarah Johnson', date: '2024-01-10', status: 'draft' },
-                { id: 4, title: 'Success Stories', author: 'James Cole', date: '2024-01-08', status: 'published' }
-            ],
-            recentProjects: [
-                { id: 1, name: 'Girls Education Program', progress: 75, status: 'active' },
-                { id: 2, name: 'Women Entrepreneurship', progress: 60, status: 'active' },
-                { id: 3, name: 'Healthcare Access', progress: 100, status: 'completed' },
-                { id: 4, name: 'Digital Literacy', progress: 30, status: 'active' }
-            ]
-        };
-        
-        this.updateStats(mockData);
-        this.populateTable('recentPostsTable', mockData.recentPosts, 'posts');
-        this.populateTable('recentProjectsTable', mockData.recentProjects, 'projects');
+        // Fetch real data from API instead of using mockData
+        fetch('http://localhost:3000/api/dashboard/summary')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // Update stats
+                    const statsData = {
+                        totalPosts: data.stats.total_posts || 0,
+                        totalProjects: data.stats.total_projects || 0,
+                        totalUsers: data.stats.total_subscriptions || 0
+                    };
+                    this.updateStats(statsData);
+                    
+                    // Populate tables with real data
+                    this.populateTable('recentPostsTable', data.recentPosts || [], 'posts');
+                    this.populateTable('recentProjectsTable', data.recentProjects || [], 'projects');
+                    
+                    // Load recent activities
+                    this.loadRecentActivity();
+                } else {
+                    console.error('Failed to load dashboard data:', result.error);
+                    this.showNotification('Error loading dashboard data', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching dashboard data:', error);
+                this.showNotification('Error connecting to server', 'error');
+            });
     }
     
     updateStats(data) {
         document.querySelectorAll('.stat-number').forEach(stat => {
-            const statType = stat.closest('.stat-card').dataset.stat;
+            const statCard = stat.closest('.stat-card');
+            if (!statCard) return; // Skip if stat-card parent not found
+            
+            const statType = statCard.dataset.stat;
             if (data[statType] !== undefined) {
                 stat.textContent = data[statType].toLocaleString();
             }
@@ -368,10 +403,13 @@ class AdminDashboard {
             const row = document.createElement('tr');
             
             if (type === 'posts') {
+                const dateObj = new Date(item.published_date || item.date);
+                const dateStr = dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                
                 row.innerHTML = `
-                    <td>${item.title}</td>
-                    <td>${item.author}</td>
-                    <td>${this.formatDate(item.date)}</td>
+                    <td>${item.title || ''}</td>
+                    <td>${item.author_name || item.author || ''}</td>
+                    <td>${dateStr}</td>
                     <td><span class="status-badge status-${item.status}">${item.status}</span></td>
                     <td>
                         <button class="btn-edit" data-id="${item.id}" data-type="post">
@@ -384,12 +422,12 @@ class AdminDashboard {
                 `;
             } else if (type === 'projects') {
                 row.innerHTML = `
-                    <td>${item.name}</td>
+                    <td>${item.name || ''}</td>
                     <td>
                         <div class="progress-bar">
-                            <div class="progress" style="width: ${item.progress}%"></div>
+                            <div class="progress" style="width: ${item.progress_percentage || 0}%"></div>
                         </div>
-                        <small>${item.progress}%</small>
+                        <small>${item.progress_percentage || 0}%</small>
                     </td>
                     <td><span class="status-badge status-${item.status}">${item.status}</span></td>
                     <td>
@@ -525,20 +563,122 @@ class AdminDashboard {
     
     editItem(type, id) {
         console.log(`Editing ${type} with ID: ${id}`);
-        this.openModal(`${type}Modal`);
+        if (type === 'post') {
+            window.location.href = `manage-posts.html?action=edit&id=${id}`;
+        } else if (type === 'project') {
+            window.location.href = `manage-projects.html?action=edit&id=${id}`;
+        }
     }
     
-    deleteItem(type, id) {
+    async deleteItem(type, id) {
         if (confirm(`Are you sure you want to delete this ${type}?`)) {
-            console.log(`Deleting ${type} with ID: ${id}`);
-            
-            this.showNotification(
-                `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`,
-                'success'
-            );
-            
-            setTimeout(() => this.loadDashboardData(), 500);
+            try {
+                let result;
+                if (type === 'post') {
+                    result = await Posts.delete(id);
+                } else if (type === 'project') {
+                    result = await Projects.delete(id);
+                }
+                
+                if (result && result.success) {
+                    this.showNotification(
+                        `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`,
+                        'success'
+                    );
+                    this.loadDashboardData();
+                    this.updateSidebarBadges();
+                } else {
+                    this.showNotification(result?.error || 'Failed to delete item', 'error');
+                }
+            } catch (error) {
+                console.error(`Error deleting ${type}:`, error);
+                this.showNotification('Server error - failed to delete item', 'error');
+            }
         }
+    }
+    
+    async updateSidebarBadges() {
+        try {
+            const response = await fetch('http://localhost:3000/api/dashboard/stats');
+            const result = await response.json();
+            if (result.success && result.data) {
+                const stats = result.data;
+                this.setSidebarBadge('manage-posts.html', stats.totalPosts);
+                this.setSidebarBadge('manage-projects.html', stats.totalProjects);
+                this.setSidebarBadge('manage-team.html', stats.totalTeamMembers);
+                this.setSidebarBadge('manage-partners.html', stats.totalPartners);
+                this.setSidebarBadge('manage-subscriptions.html', stats.totalUsers);
+            }
+        } catch (error) {
+            console.error('Error loading sidebar badges:', error);
+        }
+    }
+
+    setSidebarBadge(href, count) {
+        const link = document.querySelector(`.admin-menu a[href="${href}"]`);
+        if (!link) return;
+        let badge = link.querySelector('.badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'badge';
+            link.appendChild(badge);
+        }
+        badge.textContent = count;
+    }
+
+    loadRecentActivity() {
+        const timeline = document.querySelector('.activity-timeline');
+        if (!timeline) return;
+        
+        fetch('http://localhost:3000/api/dashboard/recent-activity')
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && Array.isArray(result.data)) {
+                    if (result.data.length === 0) {
+                        timeline.innerHTML = '<div style="padding: 20px; text-align: center; color: #6b7280;"><i class="fas fa-history" style="font-size: 1.5em; display: block; margin-bottom: 8px;"></i> No activity logged yet.</div>';
+                        return;
+                    }
+                    
+                    timeline.innerHTML = result.data.map(act => {
+                        let icon = 'fa-info-circle';
+                        if (act.action === 'create') icon = 'fa-plus-circle';
+                        else if (act.action === 'update') icon = 'fa-edit';
+                        else if (act.action === 'delete') icon = 'fa-trash-alt';
+                        
+                        return `
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas ${icon}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">${act.action.charAt(0).toUpperCase() + act.action.slice(1)} ${act.entity_type.replace('_', ' ')}</div>
+                                    <div class="activity-desc">${act.description}</div>
+                                    <div class="activity-time">${this.formatRelativeTime(act.created_at)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            })
+            .catch(err => {
+                console.error('Error loading recent activity:', err);
+            });
+    }
+
+    formatRelativeTime(dateStr) {
+        const date = new Date(dateStr);
+        if (isNaN(date)) return '';
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
     
     setupLoginFunctionality() {
@@ -611,13 +751,19 @@ class AdminDashboard {
         });
     }
     
-    authenticateUser(username, password) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const isValid = username === 'admin' && password === 'password';
-                resolve(isValid);
-            }, 1500);
-        });
+    async authenticateUser(username, password) {
+        try {
+            const response = await Auth.login(username, password);
+            if (response.success && response.token) {
+                localStorage.setItem('adminToken', response.token);
+                localStorage.setItem('adminUsername', response.user.username);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Login authentication error:', error);
+            return false;
+        }
     }
     
     showLoadingState(button, isLoading) {

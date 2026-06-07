@@ -30,7 +30,6 @@
             <a href="manage-projects.html" class="menu-item active">
                 <i class="fas fa-project-diagram"></i>
                 <span>Projects</span>
-                <span class="badge">18</span>
             </a>
             
             <a href="manage-team.html" class="menu-item">
@@ -48,9 +47,9 @@
                 <span>Homepage Slides</span>
             </a>
             
-            <a href="manage-comments.html" class="menu-item">
-                <i class="fas fa-comments"></i>
-                <span>Comments</span>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
             </a>
             
             <a href="settings.html" class="menu-item">
@@ -70,7 +69,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="topbar-left">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1>Manage Projects</h1>
@@ -98,7 +97,7 @@
         <div class="content-section">
             <div class="section-header">
                 <div class="filters">
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Projects by Category">
                         <option value="all">All Categories</option>
                         <option value="education">Education</option>
                         <option value="economic">Economic</option>
@@ -106,14 +105,14 @@
                         <option value="advocacy">Advocacy</option>
                     </select>
                     
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Projects by Status">
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="completed">Completed</option>
                         <option value="planning">Planning</option>
                     </select>
                     
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Projects by Location">
                         <option value="all">All Locations</option>
                         <option value="monrovia">Monrovia</option>
                         <option value="rural">Rural Areas</option>
@@ -138,252 +137,14 @@
             
             <!-- Projects Grid -->
             <div class="projects-grid" id="projectsView">
-                <!-- Project Card 1 -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-image">
-                            <img src="../assets/images/project1.jpg" alt="Girls Education Program">
-                            <div class="project-status active">Active</div>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-category education">Education</span>
-                            <span class="project-location">
-                                <i class="fas fa-map-marker-alt"></i> Monrovia
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="project-content">
-                        <h3>Girls Education Program</h3>
-                        <p class="project-description">Empowering young girls through quality education and mentorship programs in urban areas.</p>
-                        
-                        <div class="project-progress">
-                            <div class="progress-info">
-                                <span class="progress-label">Progress</span>
-                                <span class="progress-percent">75%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 75%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-stats">
-                            <div class="project-stat">
-                                <i class="fas fa-dollar-sign"></i>
-                                <div>
-                                    <span class="stat-value">$45,000</span>
-                                    <span class="stat-label">Raised</span>
-                                </div>
-                            </div>
-                            <div class="project-stat">
-                                <i class="fas fa-users"></i>
-                                <div>
-                                    <span class="stat-value">250</span>
-                                    <span class="stat-label">Beneficiaries</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-actions">
-                            <button class="btn-edit" data-id="1">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="1">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-view" data-id="1">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Data loaded from API -->
                 
-                <!-- Project Card 2 -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-image">
-                            <img src="../assets/images/project2.jpg" alt="Women Entrepreneurship">
-                            <div class="project-status active">Active</div>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-category economic">Economic</span>
-                            <span class="project-location">
-                                <i class="fas fa-map-marker-alt"></i> Nationwide
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="project-content">
-                        <h3>Women Entrepreneurship</h3>
-                        <p class="project-description">Training and funding for women entrepreneurs to start and grow their businesses.</p>
-                        
-                        <div class="project-progress">
-                            <div class="progress-info">
-                                <span class="progress-label">Progress</span>
-                                <span class="progress-percent">60%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 60%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-stats">
-                            <div class="project-stat">
-                                <i class="fas fa-dollar-sign"></i>
-                                <div>
-                                    <span class="stat-value">$85,000</span>
-                                    <span class="stat-label">Raised</span>
-                                </div>
-                            </div>
-                            <div class="project-stat">
-                                <i class="fas fa-users"></i>
-                                <div>
-                                    <span class="stat-value">150</span>
-                                    <span class="stat-label">Beneficiaries</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-actions">
-                            <button class="btn-edit" data-id="2">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-view" data-id="2">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Project Card 3 -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-image">
-                            <img src="../assets/images/project3.jpg" alt="Healthcare Access">
-                            <div class="project-status completed">Completed</div>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-category healthcare">Healthcare</span>
-                            <span class="project-location">
-                                <i class="fas fa-map-marker-alt"></i> Rural Areas
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="project-content">
-                        <h3>Healthcare Access</h3>
-                        <p class="project-description">Providing healthcare services and education to women in rural communities.</p>
-                        
-                        <div class="project-progress">
-                            <div class="progress-info">
-                                <span class="progress-label">Progress</span>
-                                <span class="progress-percent">100%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-stats">
-                            <div class="project-stat">
-                                <i class="fas fa-dollar-sign"></i>
-                                <div>
-                                    <span class="stat-value">$120,000</span>
-                                    <span class="stat-label">Raised</span>
-                                </div>
-                            </div>
-                            <div class="project-stat">
-                                <i class="fas fa-users"></i>
-                                <div>
-                                    <span class="stat-value">500</span>
-                                    <span class="stat-label">Beneficiaries</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-actions">
-                            <button class="btn-edit" data-id="3">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="3">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-view" data-id="3">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Project Card 4 -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-image">
-                            <div class="project-image-placeholder">
-                                <i class="fas fa-project-diagram"></i>
-                            </div>
-                            <div class="project-status planning">Planning</div>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-category advocacy">Advocacy</span>
-                            <span class="project-location">
-                                <i class="fas fa-map-marker-alt"></i> Nationwide
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div class="project-content">
-                        <h3>Women's Rights Advocacy</h3>
-                        <p class="project-description">Advocating for women's rights and gender equality through policy engagement.</p>
-                        
-                        <div class="project-progress">
-                            <div class="progress-info">
-                                <span class="progress-label">Progress</span>
-                                <span class="progress-percent">15%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 15%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-stats">
-                            <div class="project-stat">
-                                <i class="fas fa-dollar-sign"></i>
-                                <div>
-                                    <span class="stat-value">$25,000</span>
-                                    <span class="stat-label">Raised</span>
-                                </div>
-                            </div>
-                            <div class="project-stat">
-                                <i class="fas fa-users"></i>
-                                <div>
-                                    <span class="stat-value">0</span>
-                                    <span class="stat-label">Beneficiaries</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="project-actions">
-                            <button class="btn-edit" data-id="4">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="4">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-view" data-id="4">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
             </div>
             
             <!-- Pagination -->
             <div class="pagination">
-                <button class="pagination-btn" disabled>
+                <button class="pagination-btn" disabled aria-label="Previous page">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 <button class="pagination-btn active">1</button>
@@ -391,7 +152,7 @@
                 <button class="pagination-btn">3</button>
                 <button class="pagination-btn">4</button>
                 <button class="pagination-btn">5</button>
-                <button class="pagination-btn">
+                <button class="pagination-btn" aria-label="Next page">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
@@ -406,7 +167,7 @@
                         <i class="fas fa-project-diagram"></i>
                     </div>
                     <div>
-                        <div class="overview-number">18</div>
+                        <div class="overview-number">-</div>
                         <div class="overview-label">Total Projects</div>
                     </div>
                 </div>
@@ -416,7 +177,7 @@
                         <i class="fas fa-play-circle"></i>
                     </div>
                     <div>
-                        <div class="overview-number">12</div>
+                        <div class="overview-number">-</div>
                         <div class="overview-label">Active Projects</div>
                     </div>
                 </div>
@@ -426,7 +187,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div>
-                        <div class="overview-number">4</div>
+                        <div class="overview-number">-</div>
                         <div class="overview-label">Completed</div>
                     </div>
                 </div>
@@ -436,7 +197,7 @@
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div>
-                        <div class="overview-number">$275K</div>
+                        <div class="overview-number">-</div>
                         <div class="overview-label">Total Funding</div>
                     </div>
                 </div>
@@ -449,7 +210,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Project</h2>
-                <button class="close-modal">
+                <button class="close-modal" title="Close Modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -529,9 +290,9 @@
                             <small>PNG, JPG, GIF up to 5MB</small>
                         </label>
                     </div>
-                    <div class="image-preview" id="projectImagePreview" style="display: none;">
+                    <div class="image-preview" id="projectImagePreview" class="hidden">
                         <img id="projectPreviewImage" src="" alt="Project Preview">
-                        <button type="button" class="remove-image">
+                        <button type="button" class="remove-image" title="Remove Image">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -541,9 +302,6 @@
                     <label for="projectManager">Project Manager</label>
                     <select id="projectManager" name="manager">
                         <option value="">Select Manager</option>
-                        <option value="mary">Mary Kamara</option>
-                        <option value="john">John Doe</option>
-                        <option value="sarah">Sarah Johnson</option>
                     </select>
                 </div>
                 
@@ -555,6 +313,8 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script src="../js/manage-projects.js"></script>
 </body>
 </html>

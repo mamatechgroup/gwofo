@@ -13,7 +13,6 @@ function initializeAllFunctionality() {
     initSliders();
     initInteractiveElements();
     initAnimations();
-    initComments();
     initDropdowns();
     
     // Setup event listeners
@@ -298,24 +297,213 @@ function validateContactForm(form) {
 }
 
 function initNewsletterForms() {
-    document.querySelectorAll('.newsletter-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const emailInput = this.querySelector('input[type="email"]');
-            
-            if (emailInput && emailInput.value.trim()) {
-                if (!validateEmail(emailInput.value.trim())) {
-                    alert('Please enter a valid email address.');
-                    return;
-                }
-                
-                // Here you would typically send the data to a server
-                console.log('Newsletter subscription:', emailInput.value);
-                alert('Thank you for subscribing to our newsletter!');
-                this.reset();
+    // Use event delegation to handle all newsletter form submissions dynamically (including header/footer)
+    document.addEventListener('submit', async function(e) {
+        const form = e.target.closest('.newsletter-form');
+        if (!form) return;
+
+        e.preventDefault();
+        const emailInput = form.querySelector('input[type="email"]');
+        if (!emailInput) return;
+
+        const email = emailInput.value.trim();
+        if (!validateEmail(email)) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/newsletter/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showThankYouPopup(email);
+                form.reset();
+            } else {
+                alert(data.error || 'Failed to subscribe to newsletter. Please try again.');
             }
-        });
+        } catch (error) {
+            console.error('Newsletter subscription error:', error);
+            alert('Error connecting to subscription server. Please try again later.');
+        }
     });
+}
+
+function showThankYouPopup(email) {
+    if (!document.getElementById('sub-thank-styles')) {
+        const style = document.createElement('style');
+        style.id = 'sub-thank-styles';
+        style.textContent = `
+            .sub-thank-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+            .sub-thank-overlay.show {
+                opacity: 1;
+            }
+            .sub-thank-card {
+                background: #ffffff;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 480px;
+                width: 90%;
+                box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+                text-align: center;
+                transform: scale(0.8) translateY(20px);
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                border: 1px solid rgba(99, 102, 241, 0.1);
+            }
+            .sub-thank-overlay.show .sub-thank-card {
+                transform: scale(1) translateY(0);
+            }
+            .sub-thank-icon-container {
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+            }
+            .sub-thank-icon {
+                font-size: 2.2rem;
+                color: #6366f1;
+                animation: sub-icon-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
+            }
+            @keyframes sub-icon-pop {
+                0% { transform: scale(0); rotate: -45deg; }
+                100% { transform: scale(1); rotate: 0deg; }
+            }
+            .sub-thank-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: #1e1b4b;
+                margin-bottom: 12px;
+            }
+            .sub-thank-message {
+                font-family: 'Poppins', sans-serif;
+                font-size: 1rem;
+                color: #4b5563;
+                line-height: 1.6;
+                margin-bottom: 28px;
+            }
+            .sub-thank-btn {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: #ffffff;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 30px;
+                font-family: 'Poppins', sans-serif;
+                font-weight: 600;
+                font-size: 0.95rem;
+                cursor: pointer;
+                box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .sub-thank-btn:hover {
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            }
+            .sub-thank-close-x {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: #9ca3af;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+            .sub-thank-close-x:hover {
+                color: #4b5563;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'sub-thank-overlay';
+    overlay.innerHTML = `
+        <div class="sub-thank-card">
+            <button class="sub-thank-close-x" aria-label="Close dialog">&times;</button>
+            <div class="sub-thank-icon-container">
+                <i class="fas fa-check-circle sub-thank-icon"></i>
+            </div>
+            <h3 class="sub-thank-title">Thank You!</h3>
+            <p class="sub-thank-message">
+                You have successfully subscribed to the GWOFO newsletter with <strong>${(email || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>.<br>
+                Stay tuned for our latest stories, updates, and community impact events!
+            </p>
+            <button class="sub-thank-btn">
+                Awesome <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        overlay.classList.add('show');
+    }, 10);
+
+    function closePopup() {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+            overlay.remove();
+        }, 400);
+    }
+
+    const autoCloseTimer = setTimeout(closePopup, 5000);
+    const closeBtn = overlay.querySelector('.sub-thank-btn');
+    const closeX = overlay.querySelector('.sub-thank-close-x');
+
+    const handleCloseClick = () => {
+        clearTimeout(autoCloseTimer);
+        closePopup();
+    };
+
+    closeBtn.addEventListener('click', handleCloseClick);
+    closeX.addEventListener('click', handleCloseClick);
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            handleCloseClick();
+        }
+    });
+
+    const escListener = function(e) {
+        if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escListener);
+            handleCloseClick();
+        }
+    };
+    document.addEventListener('keydown', escListener);
 }
 
 function initFormFieldEffects() {
@@ -585,7 +773,7 @@ function initDropdownAccessibility() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
     dropdowns.forEach(dropdown => {
-        const link = dropdown.querySelector('> a');
+        const link = dropdown.querySelector(':scope > a');
         const menu = dropdown.querySelector('.dropdown-menu');
         
         // Keyboard navigation
@@ -636,7 +824,7 @@ function highlightDropdownActiveItems() {
             // Also highlight the parent dropdown main link
             const parentDropdown = item.closest('.dropdown');
             if (parentDropdown) {
-                const parentLink = parentDropdown.querySelector('> a');
+                const parentLink = parentDropdown.querySelector(':scope > a');
                 if (parentLink) {
                     parentLink.classList.add('active');
                     parentDropdown.classList.add('active');
@@ -653,7 +841,7 @@ function highlightDropdownActiveItems() {
                 
                 const parentDropdown = item.closest('.dropdown');
                 if (parentDropdown) {
-                    const parentLink = parentDropdown.querySelector('> a');
+                    const parentLink = parentDropdown.querySelector(':scope > a');
                     if (parentLink) {
                         parentLink.classList.add('active');
                         parentDropdown.classList.add('active');
@@ -1060,43 +1248,6 @@ function initProjects() {
             alert('Thank you for your interest in donating! In a full implementation, this would redirect to a secure donation page.');
         });
     }
-    
-    // Share button
-    const shareBtn = document.querySelector('.share-btn');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            const url = window.location.href;
-            const title = document.title;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: title,
-                    url: url
-                });
-            } else {
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('Link copied to clipboard!');
-                });
-            }
-        });
-    }
-    
-    // Comment form submission
-    const commentForm = document.getElementById('project1CommentForm');
-    if (commentForm) {
-        commentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = this.querySelector('#name')?.value.trim();
-            const email = this.querySelector('#email')?.value.trim();
-            const comment = this.querySelector('#comment')?.value.trim();
-            
-            if (name && email && comment) {
-                // In a real app, this would send to server
-                alert('Thank you for your comment! It will appear after moderation.');
-                this.reset();
-            }
-        });
-    }
 }
 
 function initFAQ() {
@@ -1180,194 +1331,6 @@ function initMapPlaceholder() {
             this.style.background = 'linear-gradient(135deg, var(--primary-light), var(--accent-color))';
         }, 300);
     });
-}
-
-// ==========================================================================
-// COMMENTS SYSTEM
-// ==========================================================================
-
-function initComments() {
-    // Like button functionality
-    document.querySelectorAll('.like-btn').forEach(button => {
-        button.addEventListener('click', handleLikeClick);
-    });
-    
-    // Reply button functionality
-    document.querySelectorAll('.reply-btn').forEach(button => {
-        button.addEventListener('click', handleReplyClick);
-    });
-    
-    // Share button functionality
-    document.querySelectorAll('.share-btn').forEach(button => {
-        button.addEventListener('click', handleShareClick);
-    });
-    
-    // Comment form submission
-    const commentForm = document.querySelector('.comment-form form');
-    if (commentForm) {
-        commentForm.addEventListener('submit', handleCommentSubmit);
-    }
-    
-    // Reply form submissions
-    document.querySelectorAll('.reply-form form').forEach(form => {
-        form.addEventListener('submit', handleReplySubmit);
-    });
-}
-
-function handleLikeClick() {
-    const commentId = this.dataset.commentId || 'default';
-    const likeCount = this.querySelector('.like-count');
-    const icon = this.querySelector('i');
-    
-    if (icon.classList.contains('far')) {
-        icon.classList.remove('far');
-        icon.classList.add('fas');
-        if (likeCount) likeCount.textContent = '1';
-        this.innerHTML = '<i class="fas fa-heart"></i> Liked <span class="like-count">1</span>';
-        sendLikeToServer(commentId, 'like');
-    } else {
-        icon.classList.remove('fas');
-        icon.classList.add('far');
-        if (likeCount) likeCount.textContent = '0';
-        this.innerHTML = '<i class="far fa-heart"></i> Like <span class="like-count">0</span>';
-        sendLikeToServer(commentId, 'unlike');
-    }
-}
-
-function handleReplyClick() {
-    const commentId = this.dataset.commentId;
-    const replyForm = document.getElementById(`reply-form-${commentId}`);
-    
-    if (replyForm) {
-        replyForm.classList.toggle('active');
-        if (replyForm.classList.contains('active')) {
-            const textarea = replyForm.querySelector('textarea');
-            if (textarea) textarea.focus();
-        }
-    }
-}
-
-function handleShareClick() {
-    const url = window.location.href;
-    const title = document.title;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: title,
-            url: url
-        });
-    } else {
-        navigator.clipboard.writeText(url).then(() => {
-            alert('Link copied to clipboard!');
-        });
-    }
-}
-
-function handleCommentSubmit(e) {
-    e.preventDefault();
-    const name = this.querySelector('#comment-name')?.value.trim();
-    const comment = this.querySelector('#comment-text')?.value.trim();
-    
-    if (name && comment) {
-        addComment(name, comment);
-        this.reset();
-    }
-}
-
-function handleReplySubmit(e) {
-    e.preventDefault();
-    const commentId = this.dataset.commentId;
-    const name = this.querySelector('#reply-name')?.value.trim();
-    const reply = this.querySelector('#reply-text')?.value.trim();
-    
-    if (name && reply && commentId) {
-        addReply(commentId, name, reply);
-        this.reset();
-        this.classList.remove('active');
-    }
-}
-
-function addComment(name, comment) {
-    const commentsList = document.querySelector('.comments-list');
-    if (!commentsList) return;
-    
-    const commentId = 'comment-' + Date.now();
-    const commentHTML = createCommentHTML(commentId, name, comment);
-    
-    commentsList.insertAdjacentHTML('afterbegin', commentHTML);
-    initComments();
-    sendCommentToServer(name, comment);
-}
-
-function addReply(commentId, name, reply) {
-    const repliesContainer = document.getElementById(`replies-${commentId}`);
-    if (!repliesContainer) return;
-    
-    const replyId = 'reply-' + Date.now();
-    const replyHTML = createReplyHTML(replyId, name, reply);
-    
-    repliesContainer.insertAdjacentHTML('beforeend', replyHTML);
-    initComments();
-    sendReplyToServer(commentId, name, reply);
-}
-
-function createCommentHTML(id, name, comment) {
-    return `
-        <div class="comment" id="${id}">
-            <div class="comment-header">
-                <span class="comment-author">${name}</span>
-                <span class="comment-date">Just now</span>
-            </div>
-            <div class="comment-content">
-                <p>${comment}</p>
-            </div>
-            <div class="comment-actions">
-                <button class="like-btn" data-comment-id="${id}">
-                    <i class="far fa-heart"></i> Like <span class="like-count">0</span>
-                </button>
-                <button class="reply-btn" data-comment-id="${id}">
-                    <i class="fas fa-reply"></i> Reply
-                </button>
-                <button class="share-btn">
-                    <i class="fas fa-share-alt"></i> Share
-                </button>
-            </div>
-            <div class="replies" id="replies-${id}"></div>
-            <div class="reply-form" id="reply-form-${id}">
-                <form data-comment-id="${id}">
-                    <div class="form-group">
-                        <input type="text" id="reply-name" placeholder="Your Name" required>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="reply-text" placeholder="Your Reply" required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary">Post Reply</button>
-                </form>
-            </div>
-        </div>
-    `;
-}
-
-function createReplyHTML(id, name, reply) {
-    return `
-        <div class="comment reply" id="${id}">
-            <div class="comment-header">
-                <span class="comment-author">${name}</span>
-                <span class="comment-date">Just now</span>
-            </div>
-            <div class="comment-content">
-                <p>${reply}</p>
-            </div>
-            <div class="comment-actions">
-                <button class="like-btn" data-comment-id="${id}">
-                    <i class="far fa-heart"></i> Like <span class="like-count">0</span>
-                </button>
-                <button class="share-btn">
-                    <i class="fas fa-share-alt"></i> Share
-                </button>
-            </div>
-        </div>
-    `;
 }
 
 // ==========================================================================
@@ -1456,25 +1419,6 @@ function setupEventListeners() {
 }
 
 // ==========================================================================
-// API FUNCTIONS (mock implementations)
-// ==========================================================================
-
-function sendLikeToServer(commentId, action) {
-    console.log(`${action} comment ${commentId}`);
-    // Example: fetch('/api/like', { method: 'POST', body: JSON.stringify({ commentId, action }) });
-}
-
-function sendCommentToServer(name, comment) {
-    console.log('New comment:', { name, comment });
-    // Example: fetch('/api/comments', { method: 'POST', body: JSON.stringify({ name, comment }) });
-}
-
-function sendReplyToServer(commentId, name, reply) {
-    console.log('New reply to', commentId, ':', { name, reply });
-    // Example: fetch('/api/replies', { method: 'POST', body: JSON.stringify({ commentId, name, reply }) });
-}
-
-// ==========================================================================
 // INITIALIZE ON PAGE LOAD
 // ==========================================================================
 
@@ -1547,19 +1491,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Newsletter form handler
     function handleNewsletterForm(form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            
-            if (validateEmail(email)) {
-                // Extract page-specific message
-                const pageTitle = document.title || 'our';
-                alert(`Thank you for subscribing to ${pageTitle} updates!`);
-                this.reset();
-            } else {
-                alert('Please enter a valid email address.');
-            }
-        });
+        // Handled globally by event delegation in initNewsletterForms()
     }
     
     // Tab functionality

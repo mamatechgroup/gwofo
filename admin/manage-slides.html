@@ -45,12 +45,11 @@
             <a href="manage-slides.html" class="menu-item active">
                 <i class="fas fa-images"></i>
                 <span>Homepage Slides</span>
-                <span class="badge">5</span>
             </a>
             
-            <a href="manage-comments.html" class="menu-item">
-                <i class="fas fa-comments"></i>
-                <span>Comments</span>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
             </a>
             
             <a href="settings.html" class="menu-item">
@@ -70,7 +69,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="topbar-left">
-                <button class="mobile-toggle">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1>Manage Homepage Slides</h1>
@@ -98,13 +97,13 @@
         <div class="content-section">
             <div class="section-header">
                 <div class="filters">
-                    <select class="filter-select">
+                    <select class="filter-select" title="Filter Slides by Status">
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
                     
-                    <select class="filter-select">
+                    <select class="filter-select" title="Sort Slides">
                         <option value="all">Sort By</option>
                         <option value="position">Position</option>
                         <option value="newest">Newest First</option>
@@ -119,135 +118,7 @@
             
             <!-- Slides Grid -->
             <div class="slides-grid">
-                <!-- Slide 1 -->
-                <div class="slide-card active">
-                    <div class="slide-preview">
-                        <img src="../assets/slides/slide1.jpg" alt="Education for Girls">
-                        <div class="slide-overlay">
-                            <h3>Education for Girls</h3>
-                            <p>Empowering young girls through quality education</p>
-                            <button class="btn-view-slide">View Slide</button>
-                        </div>
-                    </div>
-                    <div class="slide-info">
-                        <div class="slide-details">
-                            <h4>Education for Girls</h4>
-                            <div class="slide-meta">
-                                <span class="slide-position">Position: 1</span>
-                                <span class="slide-status active">Active</span>
-                            </div>
-                        </div>
-                        <div class="slide-actions">
-                            <button class="btn-edit" data-id="1">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="1">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <div class="drag-handle">
-                                <i class="fas fa-arrows-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Slide 2 -->
-                <div class="slide-card active">
-                    <div class="slide-preview">
-                        <img src="../assets/slides/slide2.jpg" alt="Women Entrepreneurship">
-                        <div class="slide-overlay">
-                            <h3>Women Entrepreneurship</h3>
-                            <p>Training women to start and grow businesses</p>
-                            <button class="btn-view-slide">View Slide</button>
-                        </div>
-                    </div>
-                    <div class="slide-info">
-                        <div class="slide-details">
-                            <h4>Women Entrepreneurship</h4>
-                            <div class="slide-meta">
-                                <span class="slide-position">Position: 2</span>
-                                <span class="slide-status active">Active</span>
-                            </div>
-                        </div>
-                        <div class="slide-actions">
-                            <button class="btn-edit" data-id="2">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <div class="drag-handle">
-                                <i class="fas fa-arrows-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Slide 3 -->
-                <div class="slide-card">
-                    <div class="slide-preview">
-                        <div class="slide-preview-placeholder">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        <div class="slide-overlay">
-                            <h3>Healthcare Access</h3>
-                            <p>Improving healthcare for women and children</p>
-                            <button class="btn-view-slide">View Slide</button>
-                        </div>
-                    </div>
-                    <div class="slide-info">
-                        <div class="slide-details">
-                            <h4>Healthcare Access</h4>
-                            <div class="slide-meta">
-                                <span class="slide-position">Position: 3</span>
-                                <span class="slide-status inactive">Inactive</span>
-                            </div>
-                        </div>
-                        <div class="slide-actions">
-                            <button class="btn-edit" data-id="3">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="3">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <div class="drag-handle">
-                                <i class="fas fa-arrows-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Slide 4 -->
-                <div class="slide-card active">
-                    <div class="slide-preview">
-                        <img src="../assets/slides/slide4.jpg" alt="Community Impact">
-                        <div class="slide-overlay">
-                            <h3>Community Impact</h3>
-                            <p>Transforming communities through empowerment</p>
-                            <button class="btn-view-slide">View Slide</button>
-                        </div>
-                    </div>
-                    <div class="slide-info">
-                        <div class="slide-details">
-                            <h4>Community Impact</h4>
-                            <div class="slide-meta">
-                                <span class="slide-position">Position: 4</span>
-                                <span class="slide-status active">Active</span>
-                            </div>
-                        </div>
-                        <div class="slide-actions">
-                            <button class="btn-edit" data-id="4">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-delete" data-id="4">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <div class="drag-handle">
-                                <i class="fas fa-arrows-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Data loaded from API -->
             </div>
             
             <!-- Slide Management Actions -->
@@ -290,7 +161,7 @@
                         </div>
                     </div>
                     <div class="preview-controls">
-                        <button class="preview-control prev">
+                        <button class="preview-control prev" aria-label="Previous slide">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <div class="preview-dots">
@@ -299,7 +170,7 @@
                             <span class="dot"></span>
                             <span class="dot"></span>
                         </div>
-                        <button class="preview-control next">
+                        <button class="preview-control next" aria-label="Next slide">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -360,45 +231,53 @@
         <div class="content-grid">
             <div class="content-section">
                 <h3>Slide Performance</h3>
-                <div class="performance-stats">
-                    <div class="performance-item">
-                        <div class="performance-icon">
-                            <i class="fas fa-eye"></i>
+                <div id="slidePerformanceSection">
+                    <div class="performance-stats" id="performanceStats">
+                        <div class="performance-item">
+                            <div class="performance-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div>
+                                <div class="performance-number" id="perfTotalViews">—</div>
+                                <div class="performance-label">Total Views</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="performance-number">45,678</div>
-                            <div class="performance-label">Total Views</div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-icon">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div>
+                                <div class="performance-number" id="perfTotalClicks">—</div>
+                                <div class="performance-label">Clicks</div>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div>
+                                <div class="performance-number" id="perfClickRate">—</div>
+                                <div class="performance-label">Click Rate</div>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="performance-number" id="perfActiveSlides">—</div>
+                                <div class="performance-label">Active Slides</div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="performance-item">
-                        <div class="performance-icon">
-                            <i class="fas fa-mouse-pointer"></i>
-                        </div>
-                        <div>
-                            <div class="performance-number">1,234</div>
-                            <div class="performance-label">Clicks</div>
-                        </div>
-                    </div>
-                    
-                    <div class="performance-item">
-                        <div class="performance-icon">
-                            <i class="fas fa-percentage"></i>
-                        </div>
-                        <div>
-                            <div class="performance-number">2.7%</div>
-                            <div class="performance-label">Click Rate</div>
-                        </div>
-                    </div>
-                    
-                    <div class="performance-item">
-                        <div class="performance-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div>
-                            <div class="performance-number">+12%</div>
-                            <div class="performance-label">Engagement</div>
-                        </div>
+                    <!-- Empty state shown when total views = 0 -->
+                    <div id="performanceEmptyState" style="display:none;padding:36px;text-align:center;color:#6b7280;">
+                        <i class="fas fa-chart-bar" style="font-size:2.5em;display:block;margin-bottom:12px;opacity:.4;"></i>
+                        <p style="font-weight:600;margin-bottom:4px;">No performance data yet</p>
+                        <p style="font-size:.88em;">Views and clicks will appear here once slides are published and the homepage is visited.</p>
                     </div>
                 </div>
             </div>
@@ -406,29 +285,10 @@
             <div class="content-section">
                 <h3>Active Slides</h3>
                 <div class="active-slides-list">
-                    <div class="active-slide">
-                        <span class="slide-title">Education for Girls</span>
-                        <span class="slide-position">Position 1</span>
-                        <span class="slide-status-badge active">Active</span>
-                    </div>
-                    <div class="active-slide">
-                        <span class="slide-title">Women Entrepreneurship</span>
-                        <span class="slide-position">Position 2</span>
-                        <span class="slide-status-badge active">Active</span>
-                    </div>
-                    <div class="active-slide">
-                        <span class="slide-title">Community Impact</span>
-                        <span class="slide-position">Position 4</span>
-                        <span class="slide-status-badge active">Active</span>
-                    </div>
-                    <div class="active-slide">
-                        <span class="slide-title">Success Stories</span>
-                        <span class="slide-position">Position 5</span>
-                        <span class="slide-status-badge active">Active</span>
-                    </div>
+                    <!-- Loaded dynamically -->
                 </div>
                 <div class="slides-summary">
-                    <p><strong>4</strong> active slides out of <strong>5</strong> total slides</p>
+                    <p>Loading slides summary...</p>
                     <small>Maximum recommended: 6 slides</small>
                 </div>
             </div>
@@ -440,7 +300,7 @@
         <div class="modal-content wide-modal">
             <div class="modal-header">
                 <h2>Add New Slide</h2>
-                <button class="close-modal">
+                <button class="close-modal" title="Close Modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -517,7 +377,7 @@
                             <li>Optimize for web for faster loading</li>
                         </ul>
                     </div>
-                    <div class="image-preview-large" id="slideImagePreview" style="display: none;">
+                    <div class="image-preview-large" id="slideImagePreview" class="hidden">
                         <img id="slidePreviewImage" src="" alt="Slide Preview">
                         <div class="preview-actions">
                             <button type="button" class="btn-secondary replace-image">
@@ -573,6 +433,8 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script src="../js/admin.js"></script>
+    <script src="../js/manage-slides.js"></script>
 </body>
 </html>
