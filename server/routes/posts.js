@@ -61,11 +61,15 @@ router.post('/', async (req, res) => {
         
         await logActivity('create', 'post', result.rows[0].id, `Created post "${title}"`);
         
-        // Notify active subscribers
-        const { notifySubscribers } = require('../utils/notifier');
-        notifySubscribers('post', result.rows[0].id, title).catch(err => {
-            console.error('Notification error:', err);
-        });
+        // Notify active subscribers (safeguarded against missing files)
+        try {
+            const { notifySubscribers } = require('../utils/notifier');
+            notifySubscribers('post', result.rows[0].id, title).catch(err => {
+                console.error('Notification error:', err);
+            });
+        } catch (notifierErr) {
+            console.warn('[Notifier Warning] Could not load notifier module (ensure server/utils/notifier.js is committed):', notifierErr.message);
+        }
 
         res.status(201).json({
             success: true,

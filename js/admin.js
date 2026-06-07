@@ -264,12 +264,12 @@ class AdminDashboard {
     
     setupFileUploads() {
         document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function() {
-                const file = this.files[0];
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
                 if (file) {
                     this.handleFileUpload(file);
                 }
-            }.bind(this));
+            });
         });
     }
     
