@@ -313,7 +313,10 @@ function initNewsletterForms() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/newsletter/subscribe', {
+            const apiBase = window.location.hostname.includes('netlify.app')
+                ? 'https://gwofo.onrender.com/api'
+                : 'http://localhost:3000/api';
+            const response = await fetch(`${apiBase}/newsletter/subscribe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -586,8 +589,9 @@ function initSliders() {
         const heroSlider = new Slider('.hero-slider', {
             autoPlay: true,
             interval: 6000,
-            transitionSpeed: 1000
+            transitionSpeed: 500
         });
+        console.log('✓ Hero slider initialized', heroSlider);
     }
     
     // Initialize team slider if exists
@@ -1102,8 +1106,14 @@ class Slider {
         });
         
         // Show current slide
-        this.slides[index].classList.add('active');
-        this.slides[index].style.opacity = '1';
+        const currentSlide = this.slides[index];
+        currentSlide.classList.add('active');
+        
+        // Use a small delay to ensure CSS transitions work properly
+        setTimeout(() => {
+            currentSlide.style.opacity = '1';
+        }, 10);
+        
         this.currentSlide = index;
     }
     

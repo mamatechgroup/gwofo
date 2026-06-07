@@ -362,11 +362,15 @@ a:hover { color: var(--secondary-dark); }
     left: 0;
     width: 100%;
     opacity: 0;
-    transition: opacity var(--transition-slow);
+    transition: opacity 0.5s ease;
     background-color: #333;
+    z-index: 1;
+    will-change: opacity;
 }
 
-.slide-1 {
+.slide.active {
+    opacity: 1;
+}
     background-color: #333;
 }
 
@@ -389,6 +393,7 @@ a:hover { color: var(--secondary-dark); }
     color: var(--white);
     max-width: var(--container-wide);
     padding: 0 var(--container-padding);
+    z-index: 5;
 }
 
 .slide-content h1 {
