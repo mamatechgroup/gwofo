@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: gwofo-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        scope: run
+        sync: false
+    domains:
+      - gwofo-backend.onrender.com

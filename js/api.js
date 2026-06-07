@@ -1,7 +1,23 @@
 // API Service Utility for Frontend Integration
 // Save as: js/api.js
 
-const API_BASE_URL = 'http://localhost:3000/api';
+// Determine API base URL based on environment
+const API_BASE_URL = (() => {
+    const hostname = window.location.hostname;
+    
+    // Production (Netlify + Render)
+    if (hostname.includes('netlify.app')) {
+        return 'https://gwofo-backend.onrender.com/api';
+    }
+    
+    // Staging/Preview
+    if (hostname.includes('netlify-preview')) {
+        return 'https://gwofo-backend.onrender.com/api';
+    }
+    
+    // Local development
+    return 'http://localhost:3000/api';
+})();
 
 /**
  * Generic fetch wrapper with error handling
