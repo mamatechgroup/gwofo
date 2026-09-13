@@ -225,20 +225,31 @@ router.patch('/admin/:type/:id/status', requireAuth, async (req, res) => {
 
     try {
         const table = type === 'post' ? 'post_comments' : 'project_comments';
+        const isApproved = status === 'approved';
+        const commentId = parseInt(id, 10);
+        
+        let params = [status];
+        if (isApproved) {
+            params.push(req.user.id);
+        }
+        params.push(commentId);
+
         const result = await pool.query(
             `UPDATE ${table} 
-             SET status = $1, approved_date = ${status === 'approved' ? 'CURRENT_TIMESTAMP' : 'NULL'}, 
-                 approved_by = ${status === 'approved' ? '$2' : 'NULL'}, updated_at = CURRENT_TIMESTAMP
-             WHERE id = $3
+             SET status = $1, 
+                 approved_date = ${isApproved ? 'CURRENT_TIMESTAMP' : 'NULL'}, 
+                 approved_by = ${isApproved ? '$2' : 'NULL'}, 
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $${params.length}
              RETURNING *`,
-            status === 'approved' ? [status, req.user.id, id] : [status, id]
+            params
         );
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, error: 'Comment not found' });
         }
 
-        await logActivity('update', `${type}_comment`, id, `Changed comment #${id} status to ${status}`, req.user.id);
+        await logActivity('update', `${type}_comment`, commentId, `Changed comment #${commentId} status to ${status}`, req.user.id);
 
         res.json({
             success: true,
@@ -247,6 +258,84 @@ router.patch('/admin/:type/:id/status', requireAuth, async (req, res) => {
         });
     } catch (error) {
         console.error('Error updating comment status:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Bulk delete comments (supports mixed project & post comments)
+router.post('/admin/bulk-delete', requireAuth, async (req, res) => {
+    try {
+        const { items, type, ids, projectIds = [], postIds = [] } = req.body;
+
+        const targetProjectIds = new Set(projectIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id) && id > 0));
+        const targetPostIds = new Set(postIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id) && id > 0));
+
+        if (Array.isArray(items)) {
+            items.forEach(item => {
+                const id = parseInt(item.id, 10);
+                if (!isNaN(id) && id > 0) {
+                    if (item.type === 'project') targetProjectIds.add(id);
+                    else if (item.type === 'post') targetPostIds.add(id);
+                }
+            });
+        }
+
+        if (type && Array.isArray(ids)) {
+            ids.forEach(rawId => {
+                const id = parseInt(rawId, 10);
+                if (!isNaN(id) && id > 0) {
+                    if (type === 'project') targetProjectIds.add(id);
+                    else if (type === 'post') targetPostIds.add(id);
+                }
+            });
+        }
+
+        const projArr = Array.from(targetProjectIds);
+        const postArr = Array.from(targetPostIds);
+
+        if (projArr.length === 0 && postArr.length === 0) {
+            return res.status(400).json({ success: false, error: 'No valid comment IDs provided for deletion' });
+        }
+
+        let deletedProjectCount = 0;
+        let deletedPostCount = 0;
+        let deletedIds = [];
+
+        if (projArr.length > 0) {
+            const resProj = await pool.query(
+                `DELETE FROM project_comments WHERE id = ANY($1::int[]) RETURNING id`,
+                [projArr]
+            );
+            deletedProjectCount = resProj.rows.length;
+            deletedIds.push(...resProj.rows.map(r => ({ id: r.id, type: 'project' })));
+        }
+
+        if (postArr.length > 0) {
+            const resPost = await pool.query(
+                `DELETE FROM post_comments WHERE id = ANY($1::int[]) RETURNING id`,
+                [postArr]
+            );
+            deletedPostCount = resPost.rows.length;
+            deletedIds.push(...resPost.rows.map(r => ({ id: r.id, type: 'post' })));
+        }
+
+        const totalDeleted = deletedProjectCount + deletedPostCount;
+        await logActivity(
+            'delete',
+            'comments',
+            null,
+            `Bulk deleted ${totalDeleted} comment(s) (${deletedProjectCount} project, ${deletedPostCount} post)`,
+            req.user.id
+        );
+
+        res.json({
+            success: true,
+            message: `Successfully deleted ${totalDeleted} comment(s)`,
+            deletedCount: totalDeleted,
+            deletedIds
+        });
+    } catch (error) {
+        console.error('Error bulk deleting comments:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

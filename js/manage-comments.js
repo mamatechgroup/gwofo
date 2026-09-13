@@ -4,6 +4,9 @@ class ManageComments {
     constructor() {
         this.comments = [];
         this.filtered = [];
+        this.selectedComments = new Map(); // key: `${type}:${id}`, value: { id, type }
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
         this.init();
     }
 
@@ -24,9 +27,69 @@ class ManageComments {
         const filterType = document.getElementById('filterType');
         const searchInput = document.querySelector('.search-input');
 
-        if (filterStatus) filterStatus.addEventListener('change', () => this.applyFilters());
-        if (filterType) filterType.addEventListener('change', () => this.applyFilters());
-        if (searchInput) searchInput.addEventListener('input', (e) => this.search(e.target.value));
+        if (filterStatus) {
+            filterStatus.addEventListener('change', () => {
+                this.currentPage = 1;
+                this.applyFilters();
+            });
+        }
+        if (filterType) {
+            filterType.addEventListener('change', () => {
+                this.currentPage = 1;
+                this.applyFilters();
+            });
+        }
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.currentPage = 1;
+                this.search(e.target.value);
+            });
+        }
+
+        // Select all checkbox
+        const selectAll = document.getElementById('selectAllComments');
+        if (selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                const pageData = this.getCurrentPageData();
+                pageData.forEach(c => {
+                    const key = `${c.type}:${c.id}`;
+                    if (checked) {
+                        this.selectedComments.set(key, { id: c.id, type: c.type });
+                    } else {
+                        this.selectedComments.delete(key);
+                    }
+                });
+
+                document.querySelectorAll('.select-comment-item').forEach(cb => {
+                    cb.checked = checked;
+                    if (checked) cb.closest('tr')?.style.setProperty('background', '#f8fafc');
+                    else cb.closest('tr')?.style.removeProperty('background');
+                });
+                this.updateSelectionUI();
+            });
+        }
+
+        // Pagination Prev / Next
+        const prevBtn = document.getElementById('commentsPrevBtn');
+        const nextBtn = document.getElementById('commentsNextBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.render();
+                }
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+                if (this.currentPage < totalPages) {
+                    this.currentPage++;
+                    this.render();
+                }
+            });
+        }
 
         // Mobile drawer toggle
         const toggleBtn = document.querySelector('.mobile-toggle');
@@ -61,12 +124,17 @@ class ManageComments {
         }
     }
 
+    getCurrentPageData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filtered.slice(start, start + this.itemsPerPage);
+    }
+
     async loadComments() {
         const tbody = document.getElementById('commentsTableBody');
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p style="margin-top:10px;">Loading comments...</p>
                     </td>
@@ -81,6 +149,7 @@ class ManageComments {
 
             if (result.success && Array.isArray(result.data)) {
                 this.comments = result.data;
+                this.selectedComments.clear();
                 this.updateStats();
                 this.applyFilters();
             } else {
@@ -122,6 +191,11 @@ class ManageComments {
             return matchesStatus && matchesType;
         });
 
+        const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+        if (this.currentPage > totalPages) {
+            this.currentPage = totalPages;
+        }
+
         this.render();
     }
 
@@ -139,6 +213,7 @@ class ManageComments {
             (c.target_title || '').toLowerCase().includes(q)
         );
 
+        this.currentPage = 1;
         this.render();
     }
 
@@ -149,15 +224,19 @@ class ManageComments {
         if (this.filtered.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
                         <i class="fas fa-comment-slash fa-2x" style="margin-bottom:10px; opacity:0.5;"></i>
                         <p>No comments found matching the criteria.</p>
                     </td>
                 </tr>`;
+            this.updateSelectionUI();
+            this.updatePagination();
             return;
         }
 
-        tbody.innerHTML = this.filtered.map(c => {
+        const pageData = this.getCurrentPageData();
+
+        tbody.innerHTML = pageData.map(c => {
             const isApproved = c.status === 'approved';
             const isPending = c.status === 'pending';
             const badgeColor = isApproved ? '#16a34a' : (isPending ? '#d97706' : '#dc2626');
@@ -170,8 +249,14 @@ class ManageComments {
                 month: 'short', day: 'numeric', year: 'numeric'
             });
 
+            const key = `${c.type}:${c.id}`;
+            const isSelected = this.selectedComments.has(key);
+
             return `
-                <tr style="border-bottom:1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                <tr style="border-bottom:1px solid #f1f5f9; transition: background 0.2s; ${isSelected ? 'background:#f8fafc;' : ''}" onmouseover="if(!this.querySelector('.select-comment-item').checked) this.style.background='#f8fafc'" onmouseout="if(!this.querySelector('.select-comment-item').checked) this.style.background='transparent'">
+                    <td style="padding:14px 16px; text-align:center;">
+                        <input type="checkbox" class="select-comment-item" data-type="${c.type}" data-id="${c.id}" ${isSelected ? 'checked' : ''}>
+                    </td>
                     <td style="padding:14px 16px;">${typeBadge}</td>
                     <td style="padding:14px 16px; font-weight:600; color:#0f172a; max-width:180px;">${this.escapeHtml(c.target_title || 'General')}</td>
                     <td style="padding:14px 16px;">
@@ -210,6 +295,178 @@ class ManageComments {
                 </tr>
             `;
         }).join('');
+
+        this.bindRowSelection();
+        this.updateSelectionUI();
+        this.updatePagination();
+    }
+
+    bindRowSelection() {
+        document.querySelectorAll('.select-comment-item').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const id = parseInt(e.target.dataset.id, 10);
+                const type = e.target.dataset.type;
+                const key = `${type}:${id}`;
+                if (e.target.checked) {
+                    this.selectedComments.set(key, { id, type });
+                    e.target.closest('tr')?.style.setProperty('background', '#f8fafc');
+                } else {
+                    this.selectedComments.delete(key);
+                    e.target.closest('tr')?.style.removeProperty('background');
+                }
+                this.updateSelectionUI();
+            });
+        });
+    }
+
+    updateSelectionUI() {
+        const countSpan = document.getElementById('selectedCount');
+        const bulkDeleteBtn = document.getElementById('btnBulkDelete');
+        const selectAll = document.getElementById('selectAllComments');
+
+        const count = this.selectedComments.size;
+        if (countSpan) countSpan.textContent = count;
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.style.display = count > 0 ? 'inline-flex' : 'none';
+        }
+
+        if (selectAll) {
+            const pageData = this.getCurrentPageData();
+            if (pageData.length === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            } else {
+                const pageKeys = pageData.map(c => `${c.type}:${c.id}`);
+                const selectedOnPage = pageKeys.filter(k => this.selectedComments.has(k)).length;
+                if (selectedOnPage === 0) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                } else if (selectedOnPage === pageKeys.length) {
+                    selectAll.checked = true;
+                    selectAll.indeterminate = false;
+                } else {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = true;
+                }
+            }
+        }
+    }
+
+    async bulkDeleteSelected() {
+        const count = this.selectedComments.size;
+        if (count === 0) return;
+
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Selected Comments',
+            message: `Are you sure you want to permanently delete ${count} selected comment(s)? This action cannot be undone.`
+        });
+        if (!confirmed) return;
+
+        try {
+            const items = Array.from(this.selectedComments.values());
+            const res = await Comments.bulkDelete(items);
+
+            if (res && res.success) {
+                const deletedSet = new Set((res.deletedIds || items).map(i => `${i.type}:${i.id}`));
+                this.comments = this.comments.filter(c => !deletedSet.has(`${c.type}:${c.id}`));
+                this.filtered = this.filtered.filter(c => !deletedSet.has(`${c.type}:${c.id}`));
+                this.selectedComments.clear();
+
+                const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+                if (this.currentPage > totalPages) {
+                    this.currentPage = totalPages;
+                }
+
+                this.updateStats();
+                this.render();
+                window.updateSidebarBadges?.();
+                this.showNotification(`Successfully deleted ${res.deletedCount || count} comment(s)`);
+            } else {
+                alert(res?.error || 'Failed to bulk delete comments');
+            }
+        } catch (err) {
+            console.error('Error in bulkDeleteSelected:', err);
+            alert('Error deleting comments: ' + (err.message || 'Please try again'));
+        }
+    }
+
+    updatePagination() {
+        const total = this.filtered.length;
+        const totalPages = Math.ceil(total / this.itemsPerPage) || 1;
+        const start = total === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(this.currentPage * this.itemsPerPage, total);
+
+        const info = document.getElementById('commentsPaginationInfo');
+        if (info) {
+            info.textContent = total === 0 ? 'No comments found' : `Showing ${start}–${end} of ${total} comments`;
+        }
+
+        const prevBtn = document.getElementById('commentsPrevBtn');
+        const nextBtn = document.getElementById('commentsNextBtn');
+        if (prevBtn) prevBtn.disabled = this.currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = this.currentPage >= totalPages;
+
+        const numbersContainer = document.getElementById('commentsPaginationNumbers');
+        if (numbersContainer) {
+            this.renderPageNumbers(numbersContainer, this.currentPage, totalPages, (pageNum) => {
+                this.currentPage = pageNum;
+                this.render();
+            });
+        }
+    }
+
+    renderPageNumbers(container, currentPage, totalPages, onPageClick) {
+        container.innerHTML = '';
+        if (totalPages <= 1) {
+            const btn = document.createElement('button');
+            btn.className = 'pagination-btn active';
+            btn.textContent = '1';
+            btn.setAttribute('aria-label', 'Page 1');
+            container.appendChild(btn);
+            return;
+        }
+
+        let pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            if (currentPage > 3) pages.push('...');
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) pages.push(i);
+            if (currentPage < totalPages - 2) pages.push('...');
+            pages.push(totalPages);
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '…';
+                ellipsis.style.cssText = 'padding:0 6px; color:#64748b; font-weight:600; align-self:center; user-select:none;';
+                container.appendChild(ellipsis);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn${p === currentPage ? ' active' : ''}`;
+                btn.textContent = p;
+                btn.setAttribute('aria-label', `Page ${p}`);
+                if (p === currentPage) btn.setAttribute('aria-current', 'page');
+                btn.addEventListener('click', () => onPageClick(p));
+                container.appendChild(btn);
+            }
+        });
+    }
+
+    showNotification(message) {
+        const existing = document.getElementById('commentToast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.id = 'commentToast';
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#0f172a;color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.3);z-index:99999;font-weight:500;display:flex;align-items:center;gap:10px;font-size:0.9rem;animation:slideUp 0.3s ease-out;';
+        toast.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> <span>${this.escapeHtml(message)}</span>`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
     }
 
     viewComment(type, id) {
@@ -331,10 +588,20 @@ class ManageComments {
         try {
             const res = await Comments.delete(type, id);
             if (res.success) {
+                const key = `${type}:${id}`;
                 this.comments = this.comments.filter(c => !(c.type === type && c.id === id));
+                this.filtered = this.filtered.filter(c => !(c.type === type && c.id === id));
+                this.selectedComments.delete(key);
+
+                const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+                if (this.currentPage > totalPages) {
+                    this.currentPage = totalPages;
+                }
+
                 this.updateStats();
-                this.applyFilters();
+                this.render();
                 window.updateSidebarBadges?.();
+                this.showNotification('Comment deleted successfully');
             } else {
                 alert(res.error || 'Failed to delete comment');
             }
@@ -349,7 +616,7 @@ class ManageComments {
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#dc2626;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#dc2626;">
                         <i class="fas fa-exclamation-triangle fa-2x" style="margin-bottom:10px;"></i>
                         <p>${this.escapeHtml(msg)}</p>
                     </td>

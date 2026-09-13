@@ -227,6 +227,21 @@ const Comments = {
         return apiCall(`/comments/admin/${type}/${id}`, {
             method: 'DELETE'
         });
+    },
+
+    async bulkDelete(itemsOrType, ids) {
+        let body = {};
+        if (Array.isArray(itemsOrType)) {
+            body = { items: itemsOrType };
+        } else if (typeof itemsOrType === 'string' && Array.isArray(ids)) {
+            body = { type: itemsOrType, ids };
+        } else if (typeof itemsOrType === 'object') {
+            body = itemsOrType;
+        }
+        return apiCall('/comments/admin/bulk-delete', {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
     }
 };
 

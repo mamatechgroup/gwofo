@@ -205,13 +205,27 @@
                     </thead>
                     <tbody id="inquiryTableBody">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                            <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
                                 <i class="fas fa-spinner fa-spin fa-2x"></i>
                                 <p style="margin-top:10px;">Loading records...</p>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; flex-wrap:wrap; gap:12px;">
+                <span class="pagination-info" id="inquiriesPaginationInfo">Loading inquiries...</span>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <button class="pagination-btn" id="inquiriesPrevBtn" disabled aria-label="Previous page">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="pagination-numbers" id="inquiriesPaginationNumbers" style="display:flex; gap:6px; align-items:center;"></div>
+                    <button class="pagination-btn" id="inquiriesNextBtn" disabled aria-label="Next page">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </main>

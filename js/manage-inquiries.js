@@ -6,6 +6,8 @@ class ManageInquiries {
         this.records = [];
         this.filtered = [];
         this.selectedIds = new Set();
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
         this.init();
     }
 
@@ -28,6 +30,7 @@ class ManageInquiries {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.currentTab = btn.dataset.type;
+                this.currentPage = 1;
                 this.loadCurrentTab();
             });
         });
@@ -35,12 +38,39 @@ class ManageInquiries {
         // Filters and search
         const statusFilter = document.getElementById('inquiryStatusFilter');
         if (statusFilter) {
-            statusFilter.addEventListener('change', () => this.applyFilters());
+            statusFilter.addEventListener('change', () => {
+                this.currentPage = 1;
+                this.applyFilters();
+            });
         }
 
         const searchInput = document.querySelector('.search-input');
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => this.search(e.target.value));
+            searchInput.addEventListener('input', (e) => {
+                this.currentPage = 1;
+                this.search(e.target.value);
+            });
+        }
+
+        // Pagination Prev / Next
+        const prevBtn = document.getElementById('inquiriesPrevBtn');
+        const nextBtn = document.getElementById('inquiriesNextBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.render();
+                }
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+                if (this.currentPage < totalPages) {
+                    this.currentPage++;
+                    this.render();
+                }
+            });
         }
 
         // Mobile drawer toggle
@@ -116,7 +146,13 @@ class ManageInquiries {
         }
     }
 
+    getCurrentPageData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filtered.slice(start, start + this.itemsPerPage);
+    }
+
     async loadCurrentTab() {
+        this.currentPage = 1;
         this.selectedIds.clear();
         this.updateSelectionUI();
         this.renderHeader();
@@ -202,7 +238,8 @@ class ManageInquiries {
         if (selectAll) {
             selectAll.addEventListener('change', (e) => {
                 const checked = e.target.checked;
-                this.filtered.forEach(r => {
+                const pageData = this.getCurrentPageData();
+                pageData.forEach(r => {
                     if (checked) this.selectedIds.add(r.id);
                     else this.selectedIds.delete(r.id);
                 });
@@ -222,6 +259,10 @@ class ManageInquiries {
             if (status === 'all') return true;
             return r.status === status;
         });
+        const totalPages = Math.ceil(this.filtered.length / this.itemsPerPage) || 1;
+        if (this.currentPage > totalPages) {
+            this.currentPage = totalPages;
+        }
         this.render();
     }
 
@@ -237,6 +278,7 @@ class ManageInquiries {
             return str.includes(q);
         });
 
+        this.currentPage = 1;
         this.render();
     }
 
@@ -253,10 +295,13 @@ class ManageInquiries {
                     </td>
                 </tr>`;
             this.updateSelectionUI();
+            this.updatePagination();
             return;
         }
 
-        tbody.innerHTML = this.filtered.map(r => {
+        const pageData = this.getCurrentPageData();
+
+        tbody.innerHTML = pageData.map(r => {
             const dateStr = new Date(r.created_at).toLocaleDateString('en-US', {
                 month: 'short', day: 'numeric', year: 'numeric'
             });
@@ -386,6 +431,7 @@ class ManageInquiries {
 
         this.bindRowSelection();
         this.updateSelectionUI();
+        this.updatePagination();
     }
 
     viewRecord(type, id) {
@@ -603,15 +649,83 @@ class ManageInquiries {
         }
 
         const selectAll = document.getElementById('selectAllInquiries');
-        if (selectAll && this.filtered.length > 0) {
-            const allSelected = this.filtered.every(r => this.selectedIds.has(r.id));
-            const someSelected = this.filtered.some(r => this.selectedIds.has(r.id));
+        const pageData = this.getCurrentPageData();
+        if (selectAll && pageData.length > 0) {
+            const allSelected = pageData.every(r => this.selectedIds.has(r.id));
+            const someSelected = pageData.some(r => this.selectedIds.has(r.id));
             selectAll.checked = allSelected;
             selectAll.indeterminate = !allSelected && someSelected;
         } else if (selectAll) {
             selectAll.checked = false;
             selectAll.indeterminate = false;
         }
+    }
+
+    updatePagination() {
+        const total = this.filtered.length;
+        const totalPages = Math.ceil(total / this.itemsPerPage) || 1;
+        const start = total === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(this.currentPage * this.itemsPerPage, total);
+
+        const info = document.getElementById('inquiriesPaginationInfo');
+        if (info) {
+            info.textContent = total === 0 ? 'No records found' : `Showing ${start}–${end} of ${total} records`;
+        }
+
+        const prevBtn = document.getElementById('inquiriesPrevBtn');
+        const nextBtn = document.getElementById('inquiriesNextBtn');
+        if (prevBtn) prevBtn.disabled = this.currentPage <= 1;
+        if (nextBtn) nextBtn.disabled = this.currentPage >= totalPages;
+
+        const numbersContainer = document.getElementById('inquiriesPaginationNumbers');
+        if (numbersContainer) {
+            this.renderPageNumbers(numbersContainer, this.currentPage, totalPages, (pageNum) => {
+                this.currentPage = pageNum;
+                this.render();
+            });
+        }
+    }
+
+    renderPageNumbers(container, currentPage, totalPages, onPageClick) {
+        container.innerHTML = '';
+        if (totalPages <= 1) {
+            const btn = document.createElement('button');
+            btn.className = 'pagination-btn active';
+            btn.textContent = '1';
+            btn.setAttribute('aria-label', 'Page 1');
+            container.appendChild(btn);
+            return;
+        }
+
+        let pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            if (currentPage > 3) pages.push('...');
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) pages.push(i);
+            if (currentPage < totalPages - 2) pages.push('...');
+            pages.push(totalPages);
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '…';
+                ellipsis.style.cssText = 'padding:0 6px; color:#64748b; font-weight:600; align-self:center; user-select:none;';
+                container.appendChild(ellipsis);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn${p === currentPage ? ' active' : ''}`;
+                btn.textContent = p;
+                btn.setAttribute('aria-label', `Page ${p}`);
+                if (p === currentPage) btn.setAttribute('aria-current', 'page');
+                btn.addEventListener('click', () => onPageClick(p));
+                container.appendChild(btn);
+            }
+        });
     }
 
     async bulkDeleteSelected() {

@@ -168,6 +168,7 @@ class ManageProjects {
             const cOk = this.currentFilter.category === 'all' || p.category === this.currentFilter.category;
             return sOk && cOk;
         });
+        this.currentPage = 1;
         this.render();
     }
 
@@ -324,17 +325,67 @@ class ManageProjects {
 
     updatePagination() {
         const total      = this.filteredProjects.length;
-        const totalPages = Math.ceil(total / this.itemsPerPage);
+        const totalPages = Math.ceil(total / this.itemsPerPage) || 1;
         const info = document.querySelector('.pagination-info');
         if (info) {
             const start = total === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
             const end   = Math.min(this.currentPage * this.itemsPerPage, total);
-            info.textContent = `Showing ${start}–${end} of ${total} projects`;
+            info.textContent = total === 0 ? 'No projects found' : `Showing ${start}–${end} of ${total} projects`;
         }
         const prevBtn = document.querySelector('.pagination-btn[aria-label="Previous page"]');
         const nextBtn = document.querySelector('.pagination-btn[aria-label="Next page"]');
         if (prevBtn) prevBtn.disabled = this.currentPage <= 1;
         if (nextBtn) nextBtn.disabled = this.currentPage >= totalPages;
+
+        const numbersContainer = document.querySelector('.pagination-numbers');
+        if (numbersContainer) {
+            this.renderPageNumbers(numbersContainer, this.currentPage, totalPages, (pageNum) => {
+                this.currentPage = pageNum;
+                this.render();
+            });
+        }
+    }
+
+    renderPageNumbers(container, currentPage, totalPages, onPageClick) {
+        container.innerHTML = '';
+        if (totalPages <= 1) {
+            const btn = document.createElement('button');
+            btn.className = 'pagination-btn active';
+            btn.textContent = '1';
+            btn.setAttribute('aria-label', 'Page 1');
+            container.appendChild(btn);
+            return;
+        }
+
+        let pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            pages.push(1);
+            if (currentPage > 3) pages.push('...');
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) pages.push(i);
+            if (currentPage < totalPages - 2) pages.push('...');
+            pages.push(totalPages);
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '…';
+                ellipsis.style.cssText = 'padding:0 6px; color:#64748b; font-weight:600; align-self:center; user-select:none;';
+                container.appendChild(ellipsis);
+            } else {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn${p === currentPage ? ' active' : ''}`;
+                btn.textContent = p;
+                btn.setAttribute('aria-label', `Page ${p}`);
+                if (p === currentPage) btn.setAttribute('aria-current', 'page');
+                btn.addEventListener('click', () => onPageClick(p));
+                container.appendChild(btn);
+            }
+        });
     }
 
     // ─── Modal ────────────────────────────────────────────────────────────────
