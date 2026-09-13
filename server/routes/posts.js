@@ -4,6 +4,7 @@ const router = express.Router();
 const pool = require('../config/database');
 const { requireAuth } = require('./auth');
 const { logActivity } = require('../utils/logger');
+const { pingIndexNow } = require('../utils/indexnow');
 
 // Get all posts (public)
 router.get('/', async (req, res) => {
@@ -69,6 +70,12 @@ router.post('/', requireAuth, async (req, res) => {
             });
         } catch (_) {}
 
+        if ((status || 'draft') === 'published') {
+            pingIndexNow([`https://gwofoliberia.org/single.html?slug=${slug}`]).catch(err => {
+                console.error('IndexNow ping error:', err.message);
+            });
+        }
+
         res.status(201).json({
             success: true,
             message: 'Post created successfully',
@@ -110,6 +117,13 @@ router.put('/:id', requireAuth, async (req, res) => {
         );
 
         await logActivity('update', 'post', result.rows[0].id, `Updated post "${title}"`, req.user.id);
+
+        if (result.rows[0].status === 'published') {
+            const postSlug = result.rows[0].slug || result.rows[0].id;
+            pingIndexNow([`https://gwofoliberia.org/single.html?slug=${postSlug}`]).catch(err => {
+                console.error('IndexNow ping error:', err.message);
+            });
+        }
 
         res.json({
             success: true,

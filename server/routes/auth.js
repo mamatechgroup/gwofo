@@ -262,7 +262,8 @@ router.post('/forgot-password', async (req, res) => {
             });
         }
         
-        console.log(`[Security] Password reset requested for: ${email}. Reset Token: ${resetToken}`);
+        const resetLink = `https://gwofoliberia.org/admin/reset-password.html?token=${resetToken}`;
+        console.log(`[Security] Password reset link dispatched for: ${email}. Reset URL: ${resetLink}`);
         
         res.json({
             success: true,

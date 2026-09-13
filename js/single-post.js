@@ -145,6 +145,35 @@ function renderPost(index) {
     url.searchParams.set('id', currentPost.id);
     window.history.replaceState({}, '', url);
 
+    // Synchronize Document Title, Canonical URL & Social Meta
+    if (currentPost.title) {
+        document.title = `${currentPost.title} - Girls and Women Foundation Liberia`;
+    }
+    const canonicalUrl = `https://gwofoliberia.org/single.html?id=${currentPost.id}`;
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = canonicalUrl;
+
+    const setMetaProp = (prop, val) => {
+        let el = document.querySelector(`meta[property="${prop}"]`);
+        if (!el) {
+            el = document.createElement('meta');
+            el.setAttribute('property', prop);
+            document.head.appendChild(el);
+        }
+        el.setAttribute('content', val);
+    };
+    if (currentPost.title) setMetaProp('og:title', `${currentPost.title} - Girls and Women Foundation Liberia`);
+    setMetaProp('og:url', canonicalUrl);
+    if (currentPost.excerpt) setMetaProp('og:description', currentPost.excerpt);
+    if (currentPost.featured_image || currentPost.image_url) {
+        setMetaProp('og:image', currentPost.featured_image || currentPost.image_url);
+    }
+
     // Update Counter & Controls
     if (currentNumEl) currentNumEl.textContent = index + 1;
     if (breadcrumbTitle) breadcrumbTitle.textContent = currentPost.title ? currentPost.title.slice(0, 35) + '...' : 'Story';
@@ -229,7 +258,7 @@ function formatContent(content) {
 
 // ─── Social Sharing ───────────────────────────────────────────────────────────
 window.sharePost = function(network) {
-    const postUrl = window.location.href;
+    const postUrl = currentPost ? `https://gwofoliberia.org/single.html?id=${currentPost.id}` : 'https://gwofoliberia.org/single.html';
     const postTitle = currentPost ? currentPost.title : 'Girls and Women Foundation Liberia';
     
     switch (network) {

@@ -304,6 +304,54 @@ async function runTests() {
             manageSlidesJs.includes('nextPreviewSlide()') &&
             manageSlidesJs.includes('prevPreviewSlide()'));
 
+        // 25. Public Pages Canonical Identity Coverage
+        const publicPages = [
+            'about.html', 'become-partner.html', 'board.html', 'contact.html',
+            'get-involved.html', 'impact.html', 'index.html', 'ngo-partners.html',
+            'partners.html', 'projects.html', 'projects-education.html',
+            'projects-empowerment.html', 'projects-health.html', 'report.html',
+            'single.html', 'team.html'
+        ];
+        let allPagesHaveCanonical = true;
+        let allPagesHaveOg = true;
+        let allPagesHaveTwitter = true;
+
+        for (const page of publicPages) {
+            const content = fs.readFileSync(path.join(__dirname, '..', page), 'utf8');
+            if (!content.includes('rel="canonical"') || !content.includes('https://gwofoliberia.org')) {
+                allPagesHaveCanonical = false;
+            }
+            if (!content.includes('property="og:url"') || !content.includes('https://gwofoliberia.org')) {
+                allPagesHaveOg = false;
+            }
+            if (!content.includes('name="twitter:card"')) {
+                allPagesHaveTwitter = false;
+            }
+        }
+        assert('Canonical Identity: All 16 public HTML pages declare canonical https://gwofoliberia.org link', allPagesHaveCanonical);
+        assert('Canonical Identity: All 16 public HTML pages declare Open Graph og:url metadata', allPagesHaveOg);
+        assert('Canonical Identity: All 16 public HTML pages declare Twitter Card metadata', allPagesHaveTwitter);
+
+        // 26. Netlify default subdomain redirect
+        assert('Netlify: contains canonical redirect for gwofo.netlify.app', netlifyToml.includes('https://gwofo.netlify.app/*'));
+
+        // 27. Search Engine Isolation for Backend API
+        const apiHealthRes = await makeRequest('GET', '/api/health');
+        assert('Search Isolation: API routes return X-Robots-Tag: noindex, nofollow', apiHealthRes.headers['x-robots-tag'] === 'noindex, nofollow');
+
+        // 28. Auto-IndexNow Ping on Post Publish
+        const postsJsContent = fs.readFileSync(path.join(__dirname, 'routes/posts.js'), 'utf8');
+        assert('Auto-Discoverability: posts.js integrates pingIndexNow on creation/update', postsJsContent.includes('pingIndexNow'));
+
+        // 29. Canonical Password Reset Construction
+        const authJsContent = fs.readFileSync(path.join(__dirname, 'routes/auth.js'), 'utf8');
+        assert('Security & Canonical: auth.js dispatches canonical reset-password URL', authJsContent.includes('https://gwofoliberia.org/admin/reset-password.html?token='));
+
+        // 30. Dynamic Story Canonical & Social Sharing
+        const singlePostJs = fs.readFileSync(path.join(__dirname, '../js/single-post.js'), 'utf8');
+        assert('Dynamic Canonical: single-post.js synchronizes canonical link dynamically', singlePostJs.includes('canonicalLink.href = canonicalUrl'));
+        assert('Social Canonical: single-post.js shares canonical URL on social networks', singlePostJs.includes('https://gwofoliberia.org/single.html?id='));
+
 
     } catch (err) {
         console.error('Test Suite encountered unhandled error:', err);

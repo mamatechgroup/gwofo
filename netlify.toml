@@ -9,6 +9,13 @@
   status = 301
   force = true
 
+# Canonical 301 Redirect: Netlify default subdomain -> apex domain
+[[redirects]]
+  from = "https://gwofo.netlify.app/*"
+  to = "https://gwofoliberia.org/:splat"
+  status = 301
+  force = true
+
 # Dedicated 404 handler for missing pages (Prevents Soft 404)
 [[redirects]]
   from = "/*"

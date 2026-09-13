@@ -29,6 +29,9 @@ app.use((req, res, next) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    if (req.path.startsWith('/api') || req.path === '/health' || req.path.startsWith('/health/')) {
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
     next();
 });
 
