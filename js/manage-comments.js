@@ -11,7 +11,7 @@ class ManageComments {
         // Auth check
         const token = localStorage.getItem('adminToken');
         if (!token) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
 
@@ -90,7 +90,7 @@ class ManageComments {
             console.error('Error fetching comments:', err);
             this.showError('Authentication or network error: ' + (err.message || 'Please sign in again'));
             if (err.message && err.message.includes('401')) {
-                setTimeout(() => window.location.href = 'login.html', 1500);
+                setTimeout(() => window.location.href = 'login', 1500);
             }
         }
     }

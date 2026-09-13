@@ -1,10 +1,7 @@
 // Modern Single Post & News Blog Controller - GWOFO Platform
 // Handles post rendering, reading progress bar, social sharing, and moderated comments
 
-document.addEventListener('DOMContentLoaded', function () {
-    initSinglePost();
-    initReadingProgressBar();
-});
+
 
 // ─── DOM References ─────────────────────────────────────────────────────────────
 const container        = document.getElementById('singlePostContainer');
@@ -59,14 +56,33 @@ function initReadingProgressBar() {
     }, { passive: true });
 }
 
+function normalizePostImageUrl(url) {
+    if (!url) return '';
+    url = url.trim();
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+        return url;
+    }
+    return url.replace(/^\/+/, '');
+}
+
 // ─── Main Controller ──────────────────────────────────────────────────────────
 async function initSinglePost() {
     try {
-        const apiBase = window.API_BASE_URL || '/api';
-        const response = await fetch(`${apiBase}/posts`);
-        const result = await response.json();
+        let result = null;
+        if (window.Posts && typeof window.Posts.getAll === 'function') {
+            result = await window.Posts.getAll();
+        } else {
+            const apiBase = window.API_BASE_URL || '/api';
+            const response = await fetch(`${apiBase}/posts`);
+            if (response.ok) {
+                const ct = response.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                    result = await response.json();
+                }
+            }
+        }
 
-        if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+        if (result && result.success && Array.isArray(result.data) && result.data.length > 0) {
             allPosts = result.data.filter(p => p.status === 'published');
             if (allPosts.length === 0) allPosts = result.data; // fallback
         }
@@ -74,65 +90,83 @@ async function initSinglePost() {
         console.error('Error fetching posts:', err);
     }
 
-    if (allPosts.length === 0) {
-        if (container) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <i class="fas fa-newspaper fa-3x" style="color: #94a3b8; margin-bottom: 16px;"></i>
-                    <h3 style="color: #0f172a;">No Posts Available Yet</h3>
-                    <p style="color: #64748b;">Please check back shortly for updates from the field.</p>
-                    <a href="index.html" class="btn-primary" style="margin-top: 16px; display: inline-block;">Return Home</a>
-                </div>`;
+    try {
+        const postContainer = container || document.getElementById('singlePostContainer');
+        if (allPosts.length === 0) {
+            if (postContainer) {
+                postContainer.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <i class="fas fa-newspaper fa-3x" style="color: #94a3b8; margin-bottom: 16px;"></i>
+                        <h3 style="color: #0f172a;">No Posts Available Yet</h3>
+                        <p style="color: #64748b;">Please check back shortly for updates from the field.</p>
+                        <a href="index.html" class="btn-primary" style="margin-top: 16px; display: inline-block;">Return Home</a>
+                    </div>`;
+            }
+            return;
         }
-        return;
-    }
 
-    // Category filtering support if ?category= is passed
-    const categoryParam = getParam('category');
-    if (categoryParam) {
-        const filtered = allPosts.filter(p => (p.category || '').toLowerCase() === categoryParam.toLowerCase());
-        if (filtered.length > 0) {
-            allPosts = filtered;
+        // Category filtering support if ?category= is passed
+        const categoryParam = getParam('category');
+        if (categoryParam) {
+            const filtered = allPosts.filter(p => (p.category || '').toLowerCase() === categoryParam.toLowerCase());
+            if (filtered.length > 0) {
+                allPosts = filtered;
+            }
         }
+
+        // Determine initial index by ?slug= or ?id=
+        const requestedSlug = getParam('slug');
+        const requestedId = getParam('id');
+        if (requestedSlug) {
+            const foundIndex = allPosts.findIndex(p => (p.slug || '').toLowerCase() === requestedSlug.toLowerCase());
+            currentIndex = foundIndex >= 0 ? foundIndex : 0;
+        } else if (requestedId) {
+            const foundIndex = allPosts.findIndex(p => String(p.id) === String(requestedId));
+            currentIndex = foundIndex >= 0 ? foundIndex : 0;
+        } else {
+            currentIndex = 0;
+        }
+
+        const currentNum = document.getElementById('currentPostNumber');
+        const totalNum = document.getElementById('totalPostsNumber');
+        const navBar = document.getElementById('postNavBar');
+        const previous = document.getElementById('prevBtn');
+        const next = document.getElementById('nextBtn');
+
+        if (totalNum) totalNum.textContent = allPosts.length;
+        if (navBar) navBar.style.display = 'flex';
+
+        // Wire Navigation Buttons
+        if (previous) previous.addEventListener('click', () => navigatePost(-1));
+        if (next) next.addEventListener('click', () => navigatePost(1));
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') navigatePost(-1);
+            if (e.key === 'ArrowRight') navigatePost(1);
+        });
+
+        // Render initial post
+        renderPost(currentIndex);
+
+        // Wire comment submission form
+        initCommentForm();
+
+        // Load recent activities in sidebar
+        loadSidebarActivities();
+    } catch (err) {
+        console.error('Error rendering single post:', err);
     }
-
-    // Determine initial index
-    const requestedId = getParam('id');
-    if (requestedId) {
-        const foundIndex = allPosts.findIndex(p => String(p.id) === String(requestedId));
-        currentIndex = foundIndex >= 0 ? foundIndex : 0;
-    } else {
-        currentIndex = 0;
-    }
-
-    if (totalNumEl) totalNumEl.textContent = allPosts.length;
-    if (postNavBar) postNavBar.style.display = 'flex';
-
-    // Wire Navigation Buttons
-    if (prevBtn) prevBtn.addEventListener('click', () => navigatePost(-1));
-    if (nextBtn) nextBtn.addEventListener('click', () => navigatePost(1));
-
-    document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-        if (e.key === 'ArrowLeft') navigatePost(-1);
-        if (e.key === 'ArrowRight') navigatePost(1);
-    });
-
-    // Render initial post
-    renderPost(currentIndex);
-
-    // Wire comment submission form
-    initCommentForm();
-
-    // Load recent activities in sidebar
-    loadSidebarActivities();
 }
 
 function navigatePost(direction) {
     const newIndex = currentIndex + direction;
     if (newIndex >= 0 && newIndex < allPosts.length) {
         renderPost(newIndex);
-        window.scrollTo({ top: container.offsetTop - 100, behavior: 'smooth' });
+        const postContainer = container || document.getElementById('singlePostContainer');
+        if (postContainer) {
+            window.scrollTo({ top: postContainer.offsetTop - 100, behavior: 'smooth' });
+        }
     }
 }
 
@@ -187,18 +221,21 @@ function renderPost(index) {
 
     // Author image or avatar
     const authorInitials = (currentPost.author_name || 'Admin').charAt(0).toUpperCase();
-    const avatarHtml = currentPost.author_image
-        ? `<img src="${currentPost.author_image}" alt="${esc(currentPost.author_name)}" class="author-avatar" onerror="this.onerror=null; this.replaceWith(Object.assign(document.createElement('div'), {className: 'author-avatar', textContent: '${authorInitials}'}));">`
+    const authorImg = normalizePostImageUrl(currentPost.author_image);
+    const avatarHtml = authorImg
+        ? `<img src="${authorImg}" alt="${esc(currentPost.author_name)}" class="author-avatar" onerror="this.onerror=null; this.replaceWith(Object.assign(document.createElement('div'), {className: 'author-avatar', textContent: '${authorInitials}'}));">`
         : `<div class="author-avatar">${authorInitials}</div>`;
 
     // Featured Image
-    const featuredImg = currentPost.featured_image || currentPost.image_url;
+    const featuredImg = normalizePostImageUrl(currentPost.featured_image || currentPost.image_url);
     const mediaHtml = featuredImg
-        ? `<div class="article-featured-media"><img src="${featuredImg}" alt="${esc(currentPost.title)}" loading="lazy"></div>`
+        ? `<div class="article-featured-media"><img src="${featuredImg}" alt="${esc(currentPost.title)}" loading="lazy" onerror="this.onerror=null; this.parentElement.style.display='none';"></div>`
         : '';
 
     // Article HTML
-    container.innerHTML = `
+    const postContainer = container || document.getElementById('singlePostContainer');
+    if (postContainer) {
+        postContainer.innerHTML = `
         <header class="article-meta-header">
             <div class="author-info-block">
                 ${avatarHtml}
@@ -235,6 +272,7 @@ function renderPost(index) {
             </button>
         </div>
     `;
+    }
 
     // Load approved comments for this post
     loadPostComments(currentPost.id);
@@ -414,4 +452,20 @@ async function loadSidebarActivities() {
     } catch (_) {
         listEl.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">Grand Gedeh community health initiative completed.</p>';
     }
+}
+
+// ─── Initialization Trigger ───────────────────────────────────────────────────
+function startSinglePost() {
+    if (window._singlePostStarted) return;
+    window._singlePostStarted = true;
+    initSinglePost();
+    initReadingProgressBar();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startSinglePost);
+    window.addEventListener('load', startSinglePost);
+    setTimeout(startSinglePost, 100);
+} else {
+    startSinglePost();
 }

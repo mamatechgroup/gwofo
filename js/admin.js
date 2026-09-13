@@ -119,8 +119,19 @@ class AdminDashboard {
     constructor() {
         this.init();
     }
+
+    isLoginPage() {
+        const path = (window.location.pathname || '').toLowerCase();
+        return path.endsWith('/login') || path.endsWith('/login.html') || path.includes('/login') || path === 'login' || path === 'login.html';
+    }
     
     init() {
+        if (this.isLoginPage()) {
+            this.checkAuthentication();
+            this.setupLoginFunctionality();
+            return;
+        }
+
         this.checkAuthentication();
         this.setupEventListeners();
         this.loadDashboardData();
@@ -130,24 +141,23 @@ class AdminDashboard {
         this.setupFileUploads();
         this.setupActivityAnimations();
         this.setupModals();
-        this.setupLoginFunctionality();
         this.updateSidebarBadges();
         this.setupDashboardRedirects();
     }
     
     async checkAuthentication() {
-        const currentPage = window.location.pathname;
         const token = localStorage.getItem('adminToken');
+        const onLogin = this.isLoginPage();
         
-        if (currentPage.includes('login.html')) {
+        if (onLogin) {
             if (token) {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'dashboard';
             }
             return;
         }
         
         if (!token) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
         
@@ -158,14 +168,14 @@ class AdminDashboard {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminAuthenticated');
             localStorage.removeItem('adminUsername');
-            window.location.href = 'login.html';
+            window.location.href = 'login';
         }
     }
     
     setupLoginRedirect() {
         const token = localStorage.getItem('adminToken');
         if (token) {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard';
         }
     }
     
@@ -221,7 +231,7 @@ class AdminDashboard {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminAuthenticated');
         localStorage.removeItem('adminUsername');
-        window.location.href = 'login.html';
+        window.location.href = 'login';
     }
     
     setupMobileMenu() {
@@ -502,7 +512,12 @@ class AdminDashboard {
         // Fetch real data from API instead of using mockData
         const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
         fetch(`${baseUrl}/dashboard/summary`)
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const ct = response.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) throw new Error('Non-JSON response received');
+                return response.json();
+            })
             .then(result => {
                 if (result.success && result.data) {
                     const data = result.data;
@@ -756,6 +771,7 @@ class AdminDashboard {
     }
     
     async updateSidebarBadges() {
+        if (this.isLoginPage()) return;
         try {
             const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
             const token = localStorage.getItem('adminToken');
@@ -763,26 +779,28 @@ class AdminDashboard {
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
             const response = await fetch(`${baseUrl}/dashboard/stats`, { headers });
+            if (!response.ok) return;
+            const ct = response.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) return;
             const result = await response.json();
             if (result.success && result.data) {
                 const stats = result.data;
-                this.setSidebarBadge('manage-posts.html', stats.totalPosts);
-                this.setSidebarBadge('manage-projects.html', stats.totalProjects);
-                this.setSidebarBadge('manage-team.html', stats.totalTeamMembers);
-                this.setSidebarBadge('manage-partners.html', stats.totalPartners);
-                this.setSidebarBadge('manage-slides.html', stats.totalSlides);
-                this.setSidebarBadge('manage-subscriptions.html', stats.totalSubscriptions ?? stats.totalUsers);
-                this.setSidebarBadge('manage-comments.html', stats.pendingComments);
-                this.setSidebarBadge('manage-inquiries.html', stats.pendingInquiries);
+                this.setSidebarBadge('manage-posts', stats.totalPosts);
+                this.setSidebarBadge('manage-projects', stats.totalProjects);
+                this.setSidebarBadge('manage-team', stats.totalTeamMembers);
+                this.setSidebarBadge('manage-partners', stats.totalPartners);
+                this.setSidebarBadge('manage-slides', stats.totalSlides);
+                this.setSidebarBadge('manage-subscriptions', stats.totalSubscriptions ?? stats.totalUsers);
+                this.setSidebarBadge('manage-comments', stats.pendingComments);
+                this.setSidebarBadge('manage-inquiries', stats.pendingInquiries);
             }
         } catch (error) {
-            console.error('Error loading sidebar badges:', error);
+            console.warn('Sidebar badges could not be updated:', error.message);
         }
     }
 
-    setSidebarBadge(href, count) {
-        const link = document.querySelector(`.admin-menu a[href$="${href}"]`) || 
-                     document.querySelector(`.admin-menu a[href*="${href}"]`);
+    setSidebarBadge(slug, count) {
+        const link = document.querySelector(`.admin-menu a[href*="${slug}"]`);
         if (!link) return;
         let badge = link.querySelector('.badge');
         const num = parseInt(count, 10);
@@ -961,15 +979,18 @@ class AdminDashboard {
                     this.showNotification('Login successful! Redirecting...', 'success');
                     
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
+                        window.location.href = 'dashboard';
+                    }, 800);
                 } else {
                     this.showLoadingState(loginButton, false);
                     this.showLoginError('Invalid username or password');
                 }
             } catch (error) {
                 this.showLoadingState(loginButton, false);
-                this.showLoginError('Login failed. Please try again.');
+                const msg = error.message && !error.message.includes('HTTP 404') && !error.message.includes('API Error')
+                    ? error.message
+                    : 'Invalid username or password';
+                this.showLoginError(msg);
                 console.error('Login error:', error);
             }
         });
@@ -986,7 +1007,7 @@ class AdminDashboard {
             return false;
         } catch (error) {
             console.error('Login authentication error:', error);
-            return false;
+            throw error;
         }
     }
     

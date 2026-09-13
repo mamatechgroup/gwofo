@@ -11,7 +11,7 @@ class ManageInquiries {
     async init() {
         const token = localStorage.getItem('adminToken');
         if (!token) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
 
@@ -131,7 +131,7 @@ class ManageInquiries {
             console.error('Error fetching records:', err);
             this.showError('Error connecting to server: ' + err.message);
             if (err.message && err.message.includes('401')) {
-                setTimeout(() => window.location.href = 'login.html', 1500);
+                setTimeout(() => window.location.href = 'login', 1500);
             }
         }
     }

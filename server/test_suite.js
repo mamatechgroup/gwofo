@@ -375,6 +375,34 @@ async function runTests() {
         // Netlify configuration tests
         assert('Netlify: contains canonical 301 redirect for /index.html', netlifyToml.includes('from = "/index.html"'));
         assert('Netlify: contains dynamic proxy 200 rewrite for /sitemap.xml', netlifyToml.includes('from = "/sitemap.xml"') && netlifyToml.includes('https://api.gwofoliberia.org/sitemap.xml'));
+        assert('Netlify: contains dynamic proxy 200 rewrite for /api/*', netlifyToml.includes('from = "/api/*"') && netlifyToml.includes('https://api.gwofoliberia.org/api/:splat'));
+        assert('Netlify: contains clean URL rewrite for /admin/login', netlifyToml.includes('from = "/admin/login"') && netlifyToml.includes('to = "/admin/login.html"'));
+        assert('Netlify: contains 301 redirect for /admin/login.html', netlifyToml.includes('from = "/admin/login.html"') && netlifyToml.includes('to = "/admin/login"'));
+
+        // 32. Clean URLs & Extensionless Web Routes
+        const cleanLoginRes = await makeRequest('GET', '/admin/login');
+        assert('Clean URLs: GET /admin/login returns HTTP 200', cleanLoginRes.status === 200);
+        assert('Clean URLs: /admin/login content contains Admin Login', cleanLoginRes.raw.includes('Admin Login'));
+
+        const legacyLoginRes = await makeRequest('GET', '/admin/login.html');
+        assert('Clean URLs: GET /admin/login.html returns HTTP 301 canonical redirect', legacyLoginRes.status === 301);
+        assert('Clean URLs: /admin/login.html redirects to /admin/login', legacyLoginRes.headers.location === '/admin/login');
+
+        const cleanDashboardRes = await makeRequest('GET', '/admin/dashboard');
+        assert('Clean URLs: GET /admin/dashboard returns HTTP 200', cleanDashboardRes.status === 200);
+
+        const cleanSingleRes = await makeRequest('GET', '/single');
+        assert('Clean URLs: GET /single returns HTTP 200', cleanSingleRes.status === 200);
+        assert('Clean URLs: /single contains singlePostContainer', cleanSingleRes.raw.includes('singlePostContainer'));
+
+        // 33. Single Post Slug Resolution & Image Normalization
+        assert('Single Post: single-post.js supports ?slug= parameter lookup', singlePostJs.includes("getParam('slug')"));
+        assert('Single Post: single-post.js normalizes image URLs', singlePostJs.includes('normalizePostImageUrl'));
+
+        // 34. Admin Controller Login Isolation
+        const adminJsContent = fs.readFileSync(path.join(__dirname, '../js/admin.js'), 'utf8');
+        assert('Admin Controller: isolates login page from unauthenticated API calls', adminJsContent.includes('isLoginPage'));
+        assert('Admin Controller: updates badges safely without unhandled JSON parse error', adminJsContent.includes("if (this.isLoginPage()) return;"));
 
 
     } catch (err) {

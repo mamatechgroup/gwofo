@@ -23,12 +23,87 @@
   status = 301
   force = true
 
+# Dynamic API Proxy: Route Netlify /api/* directly to Render backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.gwofoliberia.org/api/:splat"
+  status = 200
+  force = true
+
+# Canonical 301 Redirect: /admin/login.html -> /admin/login
+[[redirects]]
+  from = "/admin/login.html"
+  to = "/admin/login"
+  status = 301
+  force = true
+
 # Dynamic Sitemap Proxy: Route Netlify /sitemap.xml to Render backend
 [[redirects]]
   from = "/sitemap.xml"
   to = "https://api.gwofoliberia.org/sitemap.xml"
   status = 200
   force = true
+
+# Clean URLs (200 rewrites for extensionless URLs)
+[[redirects]]
+  from = "/admin/login"
+  to = "/admin/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/dashboard"
+  to = "/admin/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/:page"
+  to = "/admin/:page.html"
+  status = 200
+
+[[redirects]]
+  from = "/single"
+  to = "/single.html"
+  status = 200
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/programs"
+  to = "/programs.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/donate"
+  to = "/donate.html"
+  status = 200
+
+[[redirects]]
+  from = "/team"
+  to = "/team.html"
+  status = 200
+
+[[redirects]]
+  from = "/partners"
+  to = "/partners.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
 
 # Dedicated 404 handler for missing pages (Prevents Soft 404)
 [[redirects]]

@@ -110,8 +110,24 @@ app.get('/index.html', (req, res) => {
     res.redirect(301, '/');
 });
 
-// Static files (serves root website files)
-app.use(express.static(path.join(__dirname, '../')));
+// Canonical Admin Login 301 Redirect: /admin/login.html -> /admin/login
+app.get('/admin/login.html', (req, res) => {
+    res.redirect(301, '/admin/login');
+});
+
+// Explicit Clean URL Route Handlers
+app.get('/admin/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../admin/login.html'));
+});
+app.get('/admin/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, '../admin/dashboard.html'));
+});
+app.get('/single', (req, res) => {
+    res.sendFile(path.join(__dirname, '../single.html'));
+});
+
+// Static files (serves root website files with automatic .html extension resolution)
+app.use(express.static(path.join(__dirname, '../'), { extensions: ['html'] }));
 
 // Routes
 app.use('/api/auth', rateLimiter(60 * 1000, 20), require('./routes/auth'));
