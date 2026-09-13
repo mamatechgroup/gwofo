@@ -3,27 +3,35 @@
 
 // Determine API base URL dynamically based on environment
 const API_BASE_URL = (() => {
+    // 1. Explicit window-level override (e.g., injected via build or head script)
+    if (typeof window !== 'undefined' && window.__API_URL__) {
+        return window.__API_URL__.replace(/\/$/, '');
+    }
+
     if (typeof window === 'undefined') return 'http://localhost:10000/api';
     const hostname = window.location.hostname;
     
-    // Remote Netlify / Render deployments
-    if (hostname.includes('netlify.app')) {
-        return 'https://gwofo.onrender.com/api';
+    // 2. Production domain (gwofoliberia.org), Netlify CDN previews, or subdomains
+    if (hostname === 'gwofoliberia.org' || 
+        hostname === 'www.gwofoliberia.org' || 
+        hostname.endsWith('.gwofoliberia.org') ||
+        hostname.includes('netlify.app')) {
+        return 'https://api.gwofoliberia.org/api';
     }
     
-    // Direct file opening or headless testing
-    if (window.location.protocol === 'file:' || !hostname) {
+    // 3. Direct local file opening or headless testing
+    if (window.location.protocol === 'file:' || !hostname || hostname === 'localhost' || hostname === '127.0.0.1') {
         return 'http://localhost:10000/api';
     }
     
-    // Current host / local / custom domain
+    // 4. Fallback: relative API on current host
     return `${window.location.protocol}//${window.location.host}/api`;
 })();
 
 window.API_BASE_URL = API_BASE_URL;
 
 /**
- * Generic fetch wrapper with token management and error handling
+ * Generic fetch wrapper with token management, error handling, and timeout safety
  */
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -35,8 +43,13 @@ async function apiCall(endpoint, options = {}) {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
     
+    // 15-second timeout controller to prevent hanging connections
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
+
     const config = {
         ...options,
+        signal: options.signal || controller.signal,
         headers: {
             ...defaultHeaders,
             ...(options.headers || {})
@@ -45,6 +58,7 @@ async function apiCall(endpoint, options = {}) {
     
     try {
         const response = await fetch(url, config);
+        clearTimeout(timeoutId);
         const data = await response.json().catch(() => ({}));
         
         if (!response.ok) {
@@ -53,6 +67,11 @@ async function apiCall(endpoint, options = {}) {
         
         return data;
     } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            console.error(`API Timeout (${endpoint}): Request exceeded 15s`);
+            throw new Error('Request timed out. Please check your network connection.');
+        }
         console.error(`API Error (${endpoint}):`, error.message || error);
         throw error;
     }

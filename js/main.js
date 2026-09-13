@@ -1298,7 +1298,7 @@ function initPartnersSlider() {
     });
 }
 
-// Slider Class for Hero Slider
+// Slider Class for Hero Slider - Production Hardened
 class Slider {
     constructor(containerSelector, options = {}) {
         this.container = document.querySelector(containerSelector);
@@ -1307,12 +1307,17 @@ class Slider {
         this.slides = this.container.querySelectorAll('.slide');
         this.currentSlide = 0;
         this.slideInterval = null;
+        this.preloadedImages = new Set();
+        this.isTabActive = !document.hidden;
         
+        // Accessibility: check user motion preference
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         // Default options
         this.options = {
-            autoPlay: true,
+            autoPlay: !prefersReducedMotion,
             interval: 5000,
-            transitionSpeed: 1000,
+            transitionSpeed: prefersReducedMotion ? 100 : 700,
             ...options
         };
         
@@ -1328,20 +1333,64 @@ class Slider {
         // Initialize controls
         this.initControls();
         
-        // Start autoplay if enabled
-        if (this.options.autoPlay) {
+        // Start autoplay if enabled and tab is active
+        if (this.options.autoPlay && this.isTabActive) {
             this.startAutoPlay();
         }
         
         // Pause autoplay on hover
         this.container.addEventListener('mouseenter', () => this.pauseAutoPlay());
-        this.container.addEventListener('mouseleave', () => this.resumeAutoPlay());
+        this.container.addEventListener('mouseleave', () => {
+            if (this.isTabActive) this.resumeAutoPlay();
+        });
+        
+        // Page Visibility API: pause slider when tab is inactive to prevent animation bursts
+        document.addEventListener('visibilitychange', () => {
+            this.isTabActive = !document.hidden;
+            if (document.hidden) {
+                this.pauseAutoPlay();
+            } else {
+                if (this.options.autoPlay) {
+                    this.resumeAutoPlay();
+                }
+            }
+        });
+
+        // Listen for reduced motion preference changes
+        if (window.matchMedia) {
+            const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+            motionQuery.addEventListener('change', (e) => {
+                if (e.matches) {
+                    this.options.autoPlay = false;
+                    this.pauseAutoPlay();
+                } else {
+                    this.options.autoPlay = true;
+                    if (this.isTabActive) this.resumeAutoPlay();
+                }
+            });
+        }
         
         // Touch support for mobile
         this.initTouchEvents();
 
         // Sync with live backend active slides
         this.syncWithBackend();
+    }
+
+    preloadImage(url) {
+        if (!url || this.preloadedImages.has(url)) return Promise.resolve();
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                this.preloadedImages.add(url);
+                resolve();
+            };
+            img.onerror = () => {
+                console.warn('Failed to preload slide image:', url);
+                resolve(); // Resolve anyway so transitions aren't blocked
+            };
+            img.src = url;
+        });
     }
 
     async syncWithBackend() {
@@ -1356,18 +1405,23 @@ class Slider {
 
                 const sortedSlides = data.data.sort((a, b) => (a.position || 0) - (b.position || 0));
                 
-                // Render live slides
+                // Preload all backend slide images in parallel before rendering
+                const imageUrls = sortedSlides.map(s => s.image_url).filter(Boolean);
+                await Promise.all(imageUrls.map(url => this.preloadImage(url)));
+
+                // Render live slides with clean escaping & CTA tracking attributes
                 sliderEl.innerHTML = sortedSlides.map((s, idx) => {
-                    const bgImage = s.image_url ? `url('${s.image_url}')` : '';
+                    const bgImage = s.image_url ? `url('${encodeURI(s.image_url)}')` : '';
                     const inlineStyle = bgImage ? `style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), ${bgImage};"` : '';
                     const btnLink = s.button_link || 'projects.html';
                     const btnText = s.button_text || 'Learn More';
+                    const slideId = s.id ? `data-slide-id="${s.id}"` : '';
                     return `
-                        <div class="slide slide-db ${idx === 0 ? 'active' : ''}" ${inlineStyle}>
+                        <div class="slide slide-db ${idx === 0 ? 'active' : ''}" ${inlineStyle} ${slideId}>
                             <div class="slide-content">
                                 <h1>${(s.title || '').replace(/</g, '&lt;')}</h1>
                                 <p>${(s.description || '').replace(/</g, '&lt;')}</p>
-                                <a href="${btnLink}" class="btn-primary"><i class="fas fa-arrow-right"></i> ${btnText}</a>
+                                <a href="${btnLink}" class="btn-primary slide-cta" ${slideId}><i class="fas fa-arrow-right"></i> ${btnText}</a>
                             </div>
                         </div>
                     `;
@@ -1375,6 +1429,21 @@ class Slider {
 
                 this.slides = this.container.querySelectorAll('.slide');
                 this.currentSlide = 0;
+
+                // Bind CTA tracking to all rendered slide buttons
+                this.container.querySelectorAll('.slide-cta').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const sId = btn.dataset.slideId;
+                        if (sId) {
+                            const clickUrl = `${apiBase}/slides/${sId}/click`;
+                            if (navigator.sendBeacon) {
+                                navigator.sendBeacon(clickUrl);
+                            } else {
+                                fetch(clickUrl, { method: 'POST', keepalive: true }).catch(() => {});
+                            }
+                        }
+                    });
+                });
             }
         } catch (err) {
             console.warn('Hero slider backend sync fallback:', err.message);
@@ -1390,6 +1459,16 @@ class Slider {
 
         if (!incoming) return;
 
+        // Preload next upcoming slide image early
+        const nextNextIndex = (index + 1) % this.slides.length;
+        const nextSlideEl = this.slides[nextNextIndex];
+        if (nextSlideEl) {
+            const bgMatch = (nextSlideEl.style.backgroundImage || '').match(/url\(['"]?(.*?)['"]?\)/);
+            if (bgMatch && bgMatch[1]) {
+                this.preloadImage(bgMatch[1]);
+            }
+        }
+
         if (immediate || !current || current === incoming) {
             this.slides.forEach(s => {
                 s.classList.remove('active', 'incoming');
@@ -1401,7 +1480,7 @@ class Slider {
             return;
         }
 
-        // Double-buffered crossfade: incoming slide fades in on top
+        // Double-buffered crossfade: incoming slide fades in smoothly
         incoming.classList.add('incoming');
         incoming.style.opacity = '0';
         void incoming.offsetWidth; // force browser reflow
@@ -1420,11 +1499,13 @@ class Slider {
     }
     
     nextSlide() {
+        if (!this.slides || this.slides.length === 0) return;
         const nextIndex = (this.currentSlide + 1) % this.slides.length;
         this.showSlide(nextIndex);
     }
     
     prevSlide() {
+        if (!this.slides || this.slides.length === 0) return;
         const prevIndex = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
         this.showSlide(prevIndex);
     }
@@ -1434,17 +1515,29 @@ class Slider {
         const nextBtn = this.container.querySelector('.slider-next');
         
         if (prevBtn) {
-            prevBtn.addEventListener('click', () => this.prevSlide());
+            prevBtn.addEventListener('click', () => {
+                this.pauseAutoPlay();
+                this.prevSlide();
+                if (this.isTabActive) this.resumeAutoPlay();
+            });
         }
         
         if (nextBtn) {
-            nextBtn.addEventListener('click', () => this.nextSlide());
+            nextBtn.addEventListener('click', () => {
+                this.pauseAutoPlay();
+                this.nextSlide();
+                if (this.isTabActive) this.resumeAutoPlay();
+            });
         }
     }
     
     startAutoPlay() {
+        if (!this.options.autoPlay) return;
+        if (this.slideInterval) clearInterval(this.slideInterval);
         this.slideInterval = setInterval(() => {
-            this.nextSlide();
+            if (this.isTabActive) {
+                this.nextSlide();
+            }
         }, this.options.interval);
     }
     
@@ -1456,7 +1549,7 @@ class Slider {
     }
     
     resumeAutoPlay() {
-        if (this.options.autoPlay && !this.slideInterval) {
+        if (this.options.autoPlay && !this.slideInterval && this.isTabActive) {
             this.startAutoPlay();
         }
     }

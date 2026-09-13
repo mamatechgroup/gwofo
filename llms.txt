@@ -16,8 +16,8 @@ Girls and Women Foundation Liberia (GWOFO) is a grassroots non-governmental, non
   - Julia Zeon Rue (Administrative Lead)
   - William Beallah (Financial Coordinator)
   - George A. Paye (Field Mobilizer)
-- **Primary Website**: https://gwfoliberia.org
-- **Contact Email**: info@gwfoliberia.org / gwofo.liberia@gmail.com
+- **Primary Website**: https://gwofoliberia.org
+- **Contact Email**: info@gwofoliberia.org / gwofo.liberia@gmail.com
 - **Phone**: +231 88 888 0698 / +231 770 409 441
 
 ## Core Strategic Pillars
@@ -34,20 +34,20 @@ Girls and Women Foundation Liberia (GWOFO) is a grassroots non-governmental, non
 - **Major Active Projects**: 3 flagship community projects
 
 ## Primary Web Pages
-- [Home Page](https://gwfoliberia.org/)
-- [About Us & Mission](https://gwfoliberia.org/about.html)
-- [All Projects](https://gwfoliberia.org/projects.html)
-- [Education Programs](https://gwfoliberia.org/projects-education.html)
-- [Empowerment Initiatives](https://gwfoliberia.org/projects-empowerment.html)
-- [Health & SRHR Access](https://gwfoliberia.org/projects-health.html)
-- [News & Stories](https://gwfoliberia.org/single.html)
-- [Partners & Donors](https://gwfoliberia.org/partners.html)
-- [Leadership & Team](https://gwfoliberia.org/team.html)
-- [Governing Board](https://gwfoliberia.org/board.html)
-- [Impact Metrics](https://gwfoliberia.org/impact.html)
-- [Get Involved & Volunteer](https://gwfoliberia.org/get-involved.html)
-- [Become a Partner](https://gwfoliberia.org/become-partner.html)
-- [Contact](https://gwfoliberia.org/contact.html)
+- [Home Page](https://gwofoliberia.org/)
+- [About Us & Mission](https://gwofoliberia.org/about.html)
+- [All Projects](https://gwofoliberia.org/projects.html)
+- [Education Programs](https://gwofoliberia.org/projects-education.html)
+- [Empowerment Initiatives](https://gwofoliberia.org/projects-empowerment.html)
+- [Health & SRHR Access](https://gwofoliberia.org/projects-health.html)
+- [News & Stories](https://gwofoliberia.org/single.html)
+- [Partners & Donors](https://gwofoliberia.org/partners.html)
+- [Leadership & Team](https://gwofoliberia.org/team.html)
+- [Governing Board](https://gwofoliberia.org/board.html)
+- [Impact Metrics](https://gwofoliberia.org/impact.html)
+- [Get Involved & Volunteer](https://gwofoliberia.org/get-involved.html)
+- [Become a Partner](https://gwofoliberia.org/become-partner.html)
+- [Contact](https://gwofoliberia.org/contact.html)
 
 ## Public API Endpoints
 - `GET /api/stats/public`: Real-time computed impact metrics (women empowered, funding mobilized, volunteers, active projects).

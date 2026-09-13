@@ -28,9 +28,9 @@ function makeRequest(method, endpoint, data = null, headers = {}) {
             res.on('end', () => {
                 try {
                     const parsed = body ? JSON.parse(body) : {};
-                    resolve({ status: res.statusCode, headers: res.headers, data: parsed });
+                    resolve({ status: res.statusCode, headers: res.headers, data: parsed, raw: body });
                 } catch (e) {
-                    resolve({ status: res.statusCode, headers: res.headers, raw: body });
+                    resolve({ status: res.statusCode, headers: res.headers, data: body, raw: body });
                 }
             });
         });
@@ -101,7 +101,7 @@ async function runTests() {
         // 4. Inquiries: Contact submission
         const contactSub = await makeRequest('POST', '/api/inquiries/contact', {
             name: 'Verification Bot',
-            email: 'verify@gwfoliberia.org',
+            email: 'verify@gwofoliberia.org',
             phone: '+231888000000',
             subject: 'Automated Audit Verification',
             message: 'Testing production inquiry ingestion and database persistence.'
@@ -111,7 +111,7 @@ async function runTests() {
         // 5. Inquiries: Volunteer submission
         const volSub = await makeRequest('POST', '/api/inquiries/volunteer', {
             full_name: 'Volunteer Test Candidate',
-            email: 'volunteer.test@gwfoliberia.org',
+            email: 'volunteer.test@gwofoliberia.org',
             phone: '+231770000000',
             location: 'Zwedru',
             volunteer_type: 'local',
@@ -139,7 +139,7 @@ async function runTests() {
         const targetProjectId = projectsRes.data?.data?.[0]?.id || 4;
         const commentSub = await makeRequest('POST', `/api/comments/project/${targetProjectId}`, {
             author_name: 'Community Member',
-            author_email: 'community@gwfoliberia.org',
+            author_email: 'community@gwofoliberia.org',
             content: 'Great progress on the rural women liveskills empowerment project!'
         });
         assert('Project Comment Submission', commentSub.status === 201 && commentSub.data.success);
@@ -242,6 +242,51 @@ async function runTests() {
         // 15. Deployment: render.yaml Health Check Path Configured
         const renderYaml = fs.readFileSync(path.join(__dirname, '../render.yaml'), 'utf8');
         assert('Deployment: render.yaml contains healthCheckPath: /health', renderYaml.includes('healthCheckPath: /health'));
+        assert('Deployment: render.yaml contains custom domain api.gwofoliberia.org', renderYaml.includes('api.gwofoliberia.org'));
+        assert('Deployment: render.yaml contains strict CORS_ORIGIN', renderYaml.includes('https://gwofoliberia.org'));
+
+        // 16. Netlify Architecture & CDN Security
+        const netlifyToml = fs.readFileSync(path.join(__dirname, '../netlify.toml'), 'utf8');
+        assert('Netlify: contains canonical 301 www to apex redirect', netlifyToml.includes('https://www.gwofoliberia.org/*') && netlifyToml.includes('status = 301'));
+        assert('Netlify: contains dedicated 404 redirect rule', netlifyToml.includes('to = "/404.html"') && netlifyToml.includes('status = 404'));
+        assert('Netlify: environment targets api.gwofoliberia.org', netlifyToml.includes('https://api.gwofoliberia.org/api'));
+
+        // 17. SEO & Discoverability: Dynamic Sitemap XML
+        const sitemapRes = await makeRequest('GET', '/sitemap.xml');
+        assert('SEO: Dynamic sitemap returns HTTP 200', sitemapRes.status === 200);
+        const sitemapXml = typeof sitemapRes.data === 'string' ? sitemapRes.data : JSON.stringify(sitemapRes.data);
+        assert('SEO: Dynamic sitemap contains canonical gwofoliberia.org', sitemapXml.includes('https://gwofoliberia.org/'));
+        assert('SEO: Dynamic sitemap eliminates duplicate index.html', !sitemapXml.includes('https://gwofoliberia.org/index.html'));
+
+        // 18. IndexNow Verification Key Route
+        const indexNowRes = await makeRequest('GET', '/gwofoliberia2025indexnow.txt');
+        assert('IndexNow: Key verification route returns HTTP 200', indexNowRes.status === 200);
+        const indexNowText = typeof indexNowRes.data === 'string' ? indexNowRes.data : JSON.stringify(indexNowRes.data);
+        assert('IndexNow: Key matches expected value', indexNowText.includes('gwofoliberia2025indexnow'));
+
+        // 19. Soft 404 Prevention: Unknown HTML route returns HTTP 404
+        const notFoundHtml = await makeRequest('GET', '/unknown-random-audit-test-page-404');
+        assert('404 Prevention: Unknown web route returns strict HTTP 404', notFoundHtml.status === 404);
+
+        // 20. 404 Prevention: Unknown API route returns HTTP 404 JSON
+        const notFoundApi = await makeRequest('GET', '/api/unknown-audit-endpoint');
+        assert('404 Prevention: Unknown API route returns strict HTTP 404', notFoundApi.status === 404);
+
+        // 21. AI Discoverability: robots.txt contains OAI-SearchBot and canonical sitemap
+        assert('AI Discoverability: robots.txt allows OAI-SearchBot', robotsContent.includes('OAI-SearchBot'));
+        assert('SEO: robots.txt references canonical gwofoliberia.org sitemap', robotsContent.includes('https://gwofoliberia.org/sitemap.xml'));
+
+        // 22. Security Headers on Server Response
+        const probeRes = await makeRequest('GET', '/health');
+        assert('Security Headers: X-Content-Type-Options nosniff', probeRes.headers['x-content-type-options'] === 'nosniff');
+        assert('Security Headers: Strict-Transport-Security HSTS configured', typeof probeRes.headers['strict-transport-security'] === 'string');
+        assert('Security Headers: Cross-Origin-Opener-Policy configured', typeof probeRes.headers['cross-origin-opener-policy'] === 'string');
+
+        // 23. Frontend API Resolution Utility
+        const apiJsContent = fs.readFileSync(path.join(__dirname, '../js/api.js'), 'utf8');
+        assert('Frontend API: js/api.js resolves gwofoliberia.org to api.gwofoliberia.org', apiJsContent.includes('https://api.gwofoliberia.org/api'));
+        assert('Frontend API: js/api.js supports window.__API_URL__ override', apiJsContent.includes('window.__API_URL__'));
+        assert('Frontend API: js/api.js includes 15s timeout safety controller', apiJsContent.includes('AbortController') && apiJsContent.includes('timeoutMs'));
 
 
     } catch (err) {

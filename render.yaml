@@ -11,8 +11,10 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: CORS_ORIGIN
+        value: https://gwofoliberia.org,https://www.gwofoliberia.org
       - key: DATABASE_URL
         scope: run
         sync: false
     domains:
-      - gwofo.onrender.com
+      - api.gwofoliberia.org

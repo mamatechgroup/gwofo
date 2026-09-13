@@ -1,5 +1,5 @@
 # Robots.txt for Girls & Women Foundation Liberia (GWOFO)
-# https://gwfoliberia.org
+# https://gwofoliberia.org
 
 # Standard Search Engines
 User-agent: Googlebot
@@ -15,6 +15,7 @@ Disallow: /api/auth/
 Disallow: /api/backups/
 
 # AI Search Crawlers & LLM Agents
+User-agent: OAI-SearchBot
 User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: ClaudeBot
@@ -40,4 +41,4 @@ Disallow: /api/auth/
 Disallow: /api/backups/
 
 # Sitemap & LLMs Index
-Sitemap: https://gwfoliberia.org/sitemap.xml
+Sitemap: https://gwofoliberia.org/sitemap.xml

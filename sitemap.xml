@@ -4,104 +4,98 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
-    <loc>https://gwfoliberia.org/</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/index.html</loc>
-    <lastmod>2025-05-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://gwfoliberia.org/about.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/about.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/projects.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/projects.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/projects-education.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/projects-education.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/projects-empowerment.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/projects-empowerment.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/projects-health.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/projects-health.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/single.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/single.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/partners.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/partners.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/ngo-partners.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/ngo-partners.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/team.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/team.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/board.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/board.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/impact.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/impact.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/get-involved.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/get-involved.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/become-partner.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/become-partner.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/report.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/report.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gwfoliberia.org/contact.html</loc>
-    <lastmod>2025-05-01</lastmod>
+    <loc>https://gwofoliberia.org/contact.html</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

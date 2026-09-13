@@ -288,11 +288,11 @@ ON CONFLICT (id) DO NOTHING;
 -- Insert default social media links if not exists
 INSERT INTO social_links (platform, display_name, url, icon_class, color_class, is_active, display_order)
 VALUES 
-    ('facebook', 'Facebook', 'https://facebook.com/gwfoliberia', 'fab fa-facebook-f', 'facebook', true, 1),
-    ('twitter', 'Twitter', 'https://twitter.com/gwfoliberia', 'fab fa-twitter', 'twitter', true, 2),
-    ('instagram', 'Instagram', 'https://instagram.com/gwfoliberia', 'fab fa-instagram', 'instagram', true, 3),
-    ('linkedin', 'LinkedIn', 'https://linkedin.com/company/gwfoliberia', 'fab fa-linkedin-in', 'linkedin', true, 4),
-    ('youtube', 'YouTube', 'https://youtube.com/@gwfoliberia', 'fab fa-youtube', 'youtube', true, 5),
+    ('facebook', 'Facebook', 'https://facebook.com/gwofoliberia', 'fab fa-facebook-f', 'facebook', true, 1),
+    ('twitter', 'Twitter', 'https://twitter.com/gwofoliberia', 'fab fa-twitter', 'twitter', true, 2),
+    ('instagram', 'Instagram', 'https://instagram.com/gwofoliberia', 'fab fa-instagram', 'instagram', true, 3),
+    ('linkedin', 'LinkedIn', 'https://linkedin.com/company/gwofoliberia', 'fab fa-linkedin-in', 'linkedin', true, 4),
+    ('youtube', 'YouTube', 'https://youtube.com/@gwofoliberia', 'fab fa-youtube', 'youtube', true, 5),
     ('whatsapp', 'WhatsApp', 'https://wa.me/231888880698', 'fab fa-whatsapp', 'whatsapp', true, 6)
 ON CONFLICT (platform) DO NOTHING;
 

@@ -6,6 +6,7 @@ const path = require('path');
 const initializeDatabase = require('./config/init');
 const pool = require('./config/database');
 const { startBackupScheduler, stopBackupScheduler } = require('./utils/scheduler');
+const { INDEXNOW_KEY } = require('./utils/indexnow');
 
 dotenv.config();
 
@@ -25,17 +26,37 @@ app.use((req, res, next) => {
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     next();
 });
 
-// Middleware - CORS Configuration
-let allowedOrigin = process.env.CORS_ORIGIN || '*';
-if (typeof allowedOrigin === 'string' && allowedOrigin !== '*') {
-    allowedOrigin = allowedOrigin.replace(/\/$/, '');
-}
+// Middleware - CORS Configuration with Strict Whitelist
+const allowedOrigins = (process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',').map(s => s.trim().replace(/\/$/, '')) 
+    : []
+).concat(['https://gwofoliberia.org', 'https://www.gwofoliberia.org']);
 
 const corsOptions = {
-    origin: allowedOrigin,
+    origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, server-to-server, health monitors)
+        if (!origin) return callback(null, true);
+        
+        const cleanOrigin = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(cleanOrigin)) {
+            return callback(null, true);
+        }
+        
+        // In development, allow localhost and 127.0.0.1 on any port
+        if (process.env.NODE_ENV !== 'production') {
+            if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)) {
+                return callback(null, true);
+            }
+        }
+        
+        callback(new Error('CORS policy: Origin not allowed by CORS whitelist'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -134,8 +155,80 @@ app.get(['/health/ready', '/api/health/ready'], async (req, res) => {
     }
 });
 
+// Dynamic Sitemap Generator with real PostgreSQL published post dates
+app.get('/sitemap.xml', async (req, res) => {
+    const canonicalHost = 'https://gwofoliberia.org';
+    const staticPages = [
+        { loc: '/', changefreq: 'weekly', priority: '1.0' },
+        { loc: '/about.html', changefreq: 'monthly', priority: '0.9' },
+        { loc: '/projects.html', changefreq: 'weekly', priority: '0.9' },
+        { loc: '/projects-education.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/projects-empowerment.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/projects-health.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/single.html', changefreq: 'daily', priority: '0.9' },
+        { loc: '/partners.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/ngo-partners.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/team.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/board.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/impact.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/get-involved.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/become-partner.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/report.html', changefreq: 'monthly', priority: '0.8' },
+        { loc: '/contact.html', changefreq: 'monthly', priority: '0.8' }
+    ];
+
+    try {
+        let postRows = [];
+        try {
+            const result = await pool.query(
+                "SELECT slug, updated_at, created_at FROM posts WHERE status = 'published' ORDER BY updated_at DESC"
+            );
+            postRows = result.rows || [];
+        } catch (dbErr) {
+            console.warn('⚠️ Dynamic sitemap DB query fallback:', dbErr.message);
+        }
+
+        const nowIso = new Date().toISOString().split('T')[0];
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+        for (const page of staticPages) {
+            xml += `  <url>\n    <loc>${canonicalHost}${page.loc}</loc>\n    <lastmod>${nowIso}</lastmod>\n    <changefreq>${page.changefreq}</changefreq>\n    <priority>${page.priority}</priority>\n  </url>\n`;
+        }
+
+        for (const post of postRows) {
+            const lastMod = (post.updated_at || post.created_at || new Date()).toISOString().split('T')[0];
+            const postSlug = encodeURIComponent(post.slug || '');
+            xml += `  <url>\n    <loc>${canonicalHost}/single.html?slug=${postSlug}</loc>\n    <lastmod>${lastMod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+        }
+
+        xml += '</urlset>';
+        res.type('application/xml').send(xml);
+    } catch (err) {
+        console.error('Error generating dynamic sitemap:', err);
+        res.sendFile(path.join(__dirname, '../sitemap.xml'));
+    }
+});
+
+// IndexNow Verification Key Route
+app.get(`/${INDEXNOW_KEY}.txt`, (req, res) => {
+    res.type('text/plain').send(INDEXNOW_KEY);
+});
+app.get('/:key.txt', (req, res, next) => {
+    if (req.params.key === INDEXNOW_KEY) {
+        return res.type('text/plain').send(INDEXNOW_KEY);
+    }
+    next();
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
+    if (err && err.message && err.message.includes('CORS')) {
+        return res.status(403).json({
+            success: false,
+            error: 'CORS forbidden: Origin not allowed'
+        });
+    }
     console.error('Server error:', err.stack || err.message);
     res.status(500).json({
         success: false,
@@ -149,10 +242,10 @@ app.use('/api/*', (req, res) => {
     res.status(404).json({ success: false, error: 'API route not found' });
 });
 
-// Fallback for HTML5 client routing if accessed directly
+// Fallback for HTML5 client requests: send 404.html with strict 404 HTTP status
 app.use((req, res) => {
     if (req.accepts('html')) {
-        return res.sendFile(path.join(__dirname, '../index.html'));
+        return res.status(404).sendFile(path.join(__dirname, '../404.html'));
     }
     res.status(404).json({ success: false, error: 'Not found' });
 });
