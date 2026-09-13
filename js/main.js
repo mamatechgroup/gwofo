@@ -837,7 +837,7 @@ function initSliders() {
     }
 }
 
-// Team Slider Implementation - Fixed
+// Team Slider Implementation - Dynamic & Fully Responsive
 function initTeamSlider() {
     const sliderContainer = document.querySelector('.team-slider-container');
     const slider = document.querySelector('.team-slider');
@@ -847,62 +847,62 @@ function initTeamSlider() {
     
     if (!sliderContainer || !slider || cards.length === 0) return;
     
-    let currentPosition = 0;
     let currentIndex = 0;
-    const cardWidth = 300; // 300px card width + 30px gap
-    let cardsPerView = calculateCardsPerView();
     
-    // Calculate how many cards fit in the viewport
-    function calculateCardsPerView() {
-        const containerWidth = sliderContainer.offsetWidth;
-        return Math.floor(containerWidth / cardWidth);
+    // Calculate single card step width including horizontal margins
+    function getStepWidth() {
+        if (!cards[0]) return 0;
+        const style = window.getComputedStyle(cards[0]);
+        const ml = parseFloat(style.marginLeft) || 0;
+        const mr = parseFloat(style.marginRight) || 0;
+        return cards[0].getBoundingClientRect().width + ml + mr;
     }
     
-    // Calculate maximum scroll position
-    function getMaxPosition() {
-        const totalCards = cards.length;
-        const maxIndex = Math.max(0, totalCards - cardsPerView);
-        return -maxIndex * cardWidth;
+    // Calculate how many cards fit in the viewport
+    function getCardsPerView() {
+        const containerWidth = sliderContainer.getBoundingClientRect().width || sliderContainer.offsetWidth;
+        const step = getStepWidth();
+        if (step <= 0) return 1;
+        return Math.max(1, Math.floor((containerWidth + 4) / step));
+    }
+    
+    // Calculate maximum index allowed
+    function getMaxIndex() {
+        const cpv = getCardsPerView();
+        return Math.max(0, cards.length - cpv);
     }
     
     // Update slider position
-    function updateSliderPosition() {
-        slider.style.transform = `translateX(${currentPosition}px)`;
-        slider.style.transition = 'transform 0.5s ease';
+    function updateSliderPosition(animate = true) {
+        const step = getStepWidth();
+        const maxIdx = getMaxIndex();
+        if (currentIndex > maxIdx) currentIndex = maxIdx;
+        if (currentIndex < 0) currentIndex = 0;
+        
+        slider.style.transition = animate ? 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+        slider.style.transform = `translateX(-${currentIndex * step}px)`;
     }
     
     // Move to next set of cards
     function nextSlide() {
-        const maxPosition = getMaxPosition();
-        const newPosition = currentPosition - (cardsPerView * cardWidth);
-        
-        if (newPosition < maxPosition) {
-            // If we're at the end, loop back to start
-            currentPosition = 0;
-            currentIndex = 0;
+        const maxIdx = getMaxIndex();
+        if (currentIndex >= maxIdx) {
+            currentIndex = 0; // Loop to start
         } else {
-            currentPosition = Math.max(newPosition, maxPosition);
-            currentIndex = Math.min(currentIndex + cardsPerView, cards.length - cardsPerView);
+            currentIndex = Math.min(currentIndex + 1, maxIdx);
         }
-        
-        updateSliderPosition();
+        updateSliderPosition(true);
     }
     
     // Move to previous set of cards
     function prevSlide() {
-        const newPosition = currentPosition + (cardsPerView * cardWidth);
-        
-        if (newPosition > 0) {
-            // If we're at the beginning, loop to end
-            const maxPosition = getMaxPosition();
-            currentPosition = maxPosition;
-            currentIndex = Math.max(0, cards.length - cardsPerView);
+        const maxIdx = getMaxIndex();
+        if (currentIndex <= 0) {
+            currentIndex = maxIdx; // Loop to end
         } else {
-            currentPosition = Math.min(newPosition, 0);
-            currentIndex = Math.max(currentIndex - cardsPerView, 0);
+            currentIndex = Math.max(currentIndex - 1, 0);
         }
-        
-        updateSliderPosition();
+        updateSliderPosition(true);
     }
     
     // Event listeners for buttons
@@ -919,16 +919,12 @@ function initTeamSlider() {
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            cardsPerView = calculateCardsPerView();
-            // Adjust position if needed
-            const maxPosition = getMaxPosition();
-            currentPosition = Math.max(currentPosition, maxPosition);
-            updateSliderPosition();
-        }, 250);
+            updateSliderPosition(false);
+        }, 150);
     });
     
     // Initialize slider position
-    updateSliderPosition();
+    updateSliderPosition(false);
     
     // Add keyboard navigation
     sliderContainer.setAttribute('tabindex', '0');
@@ -942,31 +938,37 @@ function initTeamSlider() {
         }
     });
     
-    // Add swipe functionality for mobile
+    // Add swipe functionality for touch devices
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
+    let touchEndY = 0;
     
     sliderContainer.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
+        if (!e.touches || !e.touches[0]) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
     }, { passive: true });
     
     sliderContainer.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
+        if (!e.changedTouches || !e.changedTouches[0]) return;
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
         handleSwipe();
     }, { passive: true });
     
     function handleSwipe() {
-        const minSwipeDistance = 50;
-        const distance = touchStartX - touchEndX;
+        const minSwipeDistance = 35;
+        const deltaX = touchStartX - touchEndX;
+        const deltaY = touchStartY - touchEndY;
         
-        if (Math.abs(distance) < minSwipeDistance) return;
-        
-        if (distance > 0) {
-            // Swipe left - next slide
-            nextSlide();
-        } else {
-            // Swipe right - previous slide
-            prevSlide();
+        // Only trigger if horizontal swipe is more pronounced than vertical scroll
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+            if (deltaX > 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
         }
     }
 }
