@@ -79,8 +79,10 @@ router.get('/summary', async (req, res) => {
                     (SELECT COUNT(*) FROM slides) as total_slides,
                     (SELECT COUNT(*) FROM newsletter_subscriptions WHERE status = 'active') as total_subscriptions,
                     (SELECT COUNT(*) FROM posts WHERE status = 'published') as published_posts,
-                    (SELECT COUNT(*) FROM projects WHERE status = 'active') as active_projects,
                     ((SELECT COUNT(*) FROM project_comments WHERE status = 'pending') + (SELECT COUNT(*) FROM post_comments WHERE status = 'pending')) as pending_comments,
+                    ((SELECT COUNT(*) FROM project_comments WHERE status = 'approved') + (SELECT COUNT(*) FROM post_comments WHERE status = 'approved')) as approved_comments,
+                    ((SELECT COUNT(*) FROM project_comments WHERE status = 'rejected') + (SELECT COUNT(*) FROM post_comments WHERE status = 'rejected')) as rejected_comments,
+                    ((SELECT COUNT(*) FROM project_comments) + (SELECT COUNT(*) FROM post_comments)) as total_comments,
                     ((SELECT COUNT(*) FROM contact_messages WHERE status = 'unread' OR status = 'pending') + (SELECT COUNT(*) FROM partnership_inquiries WHERE status = 'pending') + (SELECT COUNT(*) FROM volunteer_applications WHERE status = 'pending')) as pending_inquiries`
             ),
             pool.query(

@@ -216,6 +216,10 @@ const Comments = {
         return apiCall(`/comments/admin/all?${params.toString()}`);
     },
 
+    async getStats() {
+        return apiCall('/comments/admin/stats');
+    },
+
     async updateStatus(type, id, status) {
         return apiCall(`/comments/admin/${type}/${id}/status`, {
             method: 'PATCH',

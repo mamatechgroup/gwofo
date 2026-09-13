@@ -99,31 +99,31 @@
         </div>
 
         <!-- Quick Summary Stats -->
-        <div class="content-section" style="margin-bottom: 20px;">
-            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
-                    <div style="color:#64748b; font-size:0.85rem; font-weight:600;">TOTAL COMMENTS</div>
-                    <div id="statTotalComments" style="font-size:1.8rem; font-weight:700; color:#0f172a; margin-top:6px;">0</div>
+        <div class="content-section comments-summary-section">
+            <div class="stats-grid comments-stats-grid">
+                <div class="stat-card comments-stat-card">
+                    <div class="comments-stat-title total">TOTAL COMMENTS</div>
+                    <div id="statTotalComments" class="comments-stat-number total">0</div>
                 </div>
-                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
-                    <div style="color:#d97706; font-size:0.85rem; font-weight:600;">PENDING REVIEW</div>
-                    <div id="statPendingComments" style="font-size:1.8rem; font-weight:700; color:#d97706; margin-top:6px;">0</div>
+                <div class="stat-card comments-stat-card">
+                    <div class="comments-stat-title pending">PENDING REVIEW</div>
+                    <div id="statPendingComments" class="comments-stat-number pending">0</div>
                 </div>
-                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
-                    <div style="color:#16a34a; font-size:0.85rem; font-weight:600;">APPROVED / LIVE</div>
-                    <div id="statApprovedComments" style="font-size:1.8rem; font-weight:700; color:#16a34a; margin-top:6px;">0</div>
+                <div class="stat-card comments-stat-card">
+                    <div class="comments-stat-title approved">APPROVED / LIVE</div>
+                    <div id="statApprovedComments" class="comments-stat-number approved">0</div>
                 </div>
-                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
-                    <div style="color:#dc2626; font-size:0.85rem; font-weight:600;">REJECTED</div>
-                    <div id="statRejectedComments" style="font-size:1.8rem; font-weight:700; color:#dc2626; margin-top:6px;">0</div>
+                <div class="stat-card comments-stat-card">
+                    <div class="comments-stat-title rejected">REJECTED</div>
+                    <div id="statRejectedComments" class="comments-stat-number rejected">0</div>
                 </div>
             </div>
         </div>
 
         <!-- Filters & Table -->
         <div class="content-section">
-            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
-                <div class="filters" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <div class="section-header comments-section-header">
+                <div class="filters comments-filters">
                     <select id="filterStatus" class="filter-select" title="Filter by Status">
                         <option value="all">All Statuses</option>
                         <option value="pending" selected>Pending Review</option>
@@ -135,7 +135,7 @@
                         <option value="project">Projects Only</option>
                         <option value="post">Posts Only</option>
                     </select>
-                    <button id="btnBulkDelete" class="btn-secondary" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; display:none; align-items:center; gap:8px; padding:9px 16px; border-radius:8px; font-weight:600; cursor:pointer;" onclick="manageComments.bulkDeleteSelected()">
+                    <button id="btnBulkDelete" class="btn-secondary btn-bulk-delete-comments" onclick="manageComments.bulkDeleteSelected()">
                         <i class="fas fa-trash-alt"></i> Delete Selected (<span id="selectedCount">0</span>)
                     </button>
                 </div>
@@ -145,27 +145,27 @@
             </div>
 
             <!-- Table Container -->
-            <div class="table-container" style="background:#fff; border-radius:10px; border:1px solid #e2e8f0; overflow-x:auto;">
-                <table class="data-table" style="width:100%; border-collapse:collapse;">
+            <div class="table-container comments-table-wrapper">
+                <table class="data-table comments-table">
                     <thead>
-                        <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
-                            <th style="padding:14px 16px; width:40px; text-align:center;">
-                                <input type="checkbox" id="selectAllComments" aria-label="Select all comments">
+                        <tr class="comments-table-header-row">
+                            <th class="comments-th-select">
+                                <input type="checkbox" id="selectAllComments" aria-label="Select all comments" class="comments-select-all-input">
                             </th>
-                            <th style="padding:14px 16px;">Type</th>
-                            <th style="padding:14px 16px;">Target</th>
-                            <th style="padding:14px 16px;">Author</th>
-                            <th style="padding:14px 16px;">Comment Content</th>
-                            <th style="padding:14px 16px;">Submitted</th>
-                            <th style="padding:14px 16px;">Status</th>
-                            <th style="padding:14px 16px; text-align:center;">Actions</th>
+                            <th class="comments-th">Type</th>
+                            <th class="comments-th">Target</th>
+                            <th class="comments-th">Author</th>
+                            <th class="comments-th">Comment Content</th>
+                            <th class="comments-th">Submitted</th>
+                            <th class="comments-th">Status</th>
+                            <th class="comments-th-actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="commentsTableBody">
                         <tr>
-                            <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
-                                <i class="fas fa-spinner fa-spin fa-2x"></i>
-                                <p style="margin-top:10px;">Loading comments...</p>
+                            <td colspan="8" class="comments-loading-cell">
+                                <i class="fas fa-spinner fa-spin fa-2x comments-loading-spinner"></i>
+                                <p class="comments-loading-text">Loading comments...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -173,13 +173,13 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; flex-wrap:wrap; gap:12px;">
-                <span class="pagination-info" id="commentsPaginationInfo">Loading comments...</span>
-                <div style="display:flex; align-items:center; gap:6px;">
+            <div class="pagination comments-pagination-bar" id="commentsPagination">
+                <span class="pagination-info comments-pagination-info" id="commentsPaginationInfo">Loading comments...</span>
+                <div class="comments-pagination-controls">
                     <button class="pagination-btn" id="commentsPrevBtn" disabled aria-label="Previous page">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <div class="pagination-numbers" id="commentsPaginationNumbers" style="display:flex; gap:6px; align-items:center;"></div>
+                    <div class="pagination-numbers comments-pagination-numbers" id="commentsPaginationNumbers"></div>
                     <button class="pagination-btn" id="commentsNextBtn" disabled aria-label="Next page">
                         <i class="fas fa-chevron-right"></i>
                     </button>

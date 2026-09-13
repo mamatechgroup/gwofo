@@ -195,21 +195,70 @@ router.get('/admin/all', requireAuth, async (req, res) => {
         // Sort descending by created_at
         rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-        // Get pending count for badges
-        const pendingRes = await pool.query(`
+        // Get complete persistent stats for overview cards and badges
+        const statsRes = await pool.query(`
             SELECT 
-                (SELECT COUNT(*) FROM project_comments WHERE status = 'pending') +
-                (SELECT COUNT(*) FROM post_comments WHERE status = 'pending') as total_pending
+                (SELECT COUNT(*) FROM project_comments) + (SELECT COUNT(*) FROM post_comments) as total_comments,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'pending') + (SELECT COUNT(*) FROM post_comments WHERE status = 'pending') as total_pending,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'approved') + (SELECT COUNT(*) FROM post_comments WHERE status = 'approved') as total_approved,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'rejected') + (SELECT COUNT(*) FROM post_comments WHERE status = 'rejected') as total_rejected
         `);
+
+        const statsRow = statsRes.rows[0] || {};
+        const stats = {
+            total: parseInt(statsRow.total_comments, 10) || 0,
+            pending: parseInt(statsRow.total_pending, 10) || 0,
+            approved: parseInt(statsRow.total_approved, 10) || 0,
+            rejected: parseInt(statsRow.total_rejected, 10) || 0,
+            total_comments: parseInt(statsRow.total_comments, 10) || 0,
+            total_pending: parseInt(statsRow.total_pending, 10) || 0,
+            total_approved: parseInt(statsRow.total_approved, 10) || 0,
+            total_rejected: parseInt(statsRow.total_rejected, 10) || 0
+        };
 
         res.json({
             success: true,
             data: rows,
             count: rows.length,
-            pendingCount: parseInt(pendingRes.rows[0].total_pending, 10) || 0
+            pendingCount: stats.pending,
+            stats
         });
     } catch (error) {
         console.error('Error fetching admin comments:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get comments stats summary (independent of active table filters)
+router.get('/admin/stats', requireAuth, async (req, res) => {
+    try {
+        const statsRes = await pool.query(`
+            SELECT 
+                (SELECT COUNT(*) FROM project_comments) + (SELECT COUNT(*) FROM post_comments) as total_comments,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'pending') + (SELECT COUNT(*) FROM post_comments WHERE status = 'pending') as total_pending,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'approved') + (SELECT COUNT(*) FROM post_comments WHERE status = 'approved') as total_approved,
+                (SELECT COUNT(*) FROM project_comments WHERE status = 'rejected') + (SELECT COUNT(*) FROM post_comments WHERE status = 'rejected') as total_rejected
+        `);
+
+        const statsRow = statsRes.rows[0] || {};
+        const stats = {
+            total: parseInt(statsRow.total_comments, 10) || 0,
+            pending: parseInt(statsRow.total_pending, 10) || 0,
+            approved: parseInt(statsRow.total_approved, 10) || 0,
+            rejected: parseInt(statsRow.total_rejected, 10) || 0,
+            total_comments: parseInt(statsRow.total_comments, 10) || 0,
+            total_pending: parseInt(statsRow.total_pending, 10) || 0,
+            total_approved: parseInt(statsRow.total_approved, 10) || 0,
+            total_rejected: parseInt(statsRow.total_rejected, 10) || 0
+        };
+
+        res.json({
+            success: true,
+            data: stats,
+            stats
+        });
+    } catch (error) {
+        console.error('Error fetching comments stats:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

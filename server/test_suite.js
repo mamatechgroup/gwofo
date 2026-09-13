@@ -562,6 +562,41 @@ async function runTests() {
             assert(`Pagination Architecture (${page.name}): JS updates pagination state in updatePagination`, jsContent.includes('updatePagination('));
         }
 
+        // 40. Comments Persistent Counters & Zero Inline Styles
+        // 40a. GET /api/comments/admin/stats unauthenticated check
+        const unauthStatsRes = await makeRequest('GET', '/api/comments/admin/stats');
+        assert('Comments Admin Stats: returns 401 unauthenticated', unauthStatsRes.status === 401);
+
+        // 40b. GET /api/comments/admin/stats authenticated check
+        const authStatsRes = await makeRequest('GET', '/api/comments/admin/stats', null, {
+            'Authorization': `Bearer ${token}`
+        });
+        assert('Comments Admin Stats: returns 200 authenticated', authStatsRes.status === 200);
+        assert('Comments Admin Stats: returns total_comments number', typeof authStatsRes.data?.data?.total_comments === 'number');
+        assert('Comments Admin Stats: returns total_pending number', typeof authStatsRes.data?.data?.total_pending === 'number');
+        assert('Comments Admin Stats: returns total_approved number', typeof authStatsRes.data?.data?.total_approved === 'number');
+        assert('Comments Admin Stats: returns total_rejected number', typeof authStatsRes.data?.data?.total_rejected === 'number');
+
+        // 40c. GET /api/comments/admin/all returns stats object matching global database state even when filtering
+        const filteredCommentsRes = await makeRequest('GET', '/api/comments/admin/all?status=pending', null, {
+            'Authorization': `Bearer ${token}`
+        });
+        assert('Comments Admin All (filtered): returns global stats object', filteredCommentsRes.status === 200 && !!filteredCommentsRes.data?.stats);
+        assert('Comments Admin All (filtered): stats.total >= stats.pending', filteredCommentsRes.data?.stats?.total >= filteredCommentsRes.data?.stats?.pending);
+
+        // 40d. Verify Comments.getStats in js/api.js
+        assert('Client API: Comments.getStats method exists', apiJsContent.includes('getStats()') || apiJsContent.includes('getStats:'));
+
+        // 40e. Verify ManageComments controller implements fetchStats and handles stats persistence
+        const currentManageCommentsJs = fs.readFileSync(path.join(__dirname, '../js/manage-comments.js'), 'utf8');
+        assert('Manage Comments Controller: implements fetchStats', currentManageCommentsJs.includes('fetchStats()') || currentManageCommentsJs.includes('fetchStats('));
+        assert('Manage Comments Controller: tracks persistent this.stats', currentManageCommentsJs.includes('this.stats'));
+
+        // 40f. Verify admin/manage-comments.html has zero inline styles (addressing Microsoft Edge Tools warning)
+        const currentManageCommentsHtml = fs.readFileSync(path.join(__dirname, '../admin/manage-comments.html'), 'utf8');
+        const inlineStyleMatches = (currentManageCommentsHtml.match(/\sstyle\s*=\s*["']/gi) || []);
+        assert('Manage Comments HTML: zero inline style attributes (Edge Tools lint clean)', inlineStyleMatches.length === 0);
+
 
     } catch (err) {
         console.error('Test Suite encountered unhandled error:', err);

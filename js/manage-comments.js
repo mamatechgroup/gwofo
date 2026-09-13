@@ -5,6 +5,7 @@ class ManageComments {
         this.comments = [];
         this.filtered = [];
         this.selectedComments = new Map(); // key: `${type}:${id}`, value: { id, type }
+        this.stats = { total: 0, pending: 0, approved: 0, rejected: 0 };
         this.currentPage = 1;
         this.itemsPerPage = 10;
         this.init();
@@ -19,7 +20,7 @@ class ManageComments {
         }
 
         this.setupEventListeners();
-        await this.loadComments();
+        await Promise.all([this.loadComments(), this.fetchStats()]);
     }
 
     setupEventListeners() {
@@ -63,8 +64,7 @@ class ManageComments {
 
                 document.querySelectorAll('.select-comment-item').forEach(cb => {
                     cb.checked = checked;
-                    if (checked) cb.closest('tr')?.style.setProperty('background', '#f8fafc');
-                    else cb.closest('tr')?.style.removeProperty('background');
+                    cb.closest('tr')?.classList.toggle('selected', checked);
                 });
                 this.updateSelectionUI();
             });
@@ -129,14 +129,28 @@ class ManageComments {
         return this.filtered.slice(start, start + this.itemsPerPage);
     }
 
+    async fetchStats() {
+        try {
+            const res = await Comments.getStats();
+            if (res && res.success && (res.data || res.stats)) {
+                const s = res.data || res.stats;
+                this.updateStats(s);
+                return s;
+            }
+        } catch (err) {
+            console.warn('Could not fetch comment stats independently:', err);
+        }
+        return null;
+    }
+
     async loadComments() {
         const tbody = document.getElementById('commentsTableBody');
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
-                        <i class="fas fa-spinner fa-spin fa-2x"></i>
-                        <p style="margin-top:10px;">Loading comments...</p>
+                    <td colspan="8" class="comments-loading-cell">
+                        <i class="fas fa-spinner fa-spin comments-loading-spinner"></i>
+                        <p class="comments-loading-text">Loading comments...</p>
                     </td>
                 </tr>`;
         }
@@ -150,7 +164,11 @@ class ManageComments {
             if (result.success && Array.isArray(result.data)) {
                 this.comments = result.data;
                 this.selectedComments.clear();
-                this.updateStats();
+                if (result.stats) {
+                    this.updateStats(result.stats);
+                } else {
+                    await this.fetchStats();
+                }
                 this.applyFilters();
             } else {
                 this.showError('Failed to load comments');
@@ -164,21 +182,25 @@ class ManageComments {
         }
     }
 
-    updateStats() {
-        const total = this.comments.length;
-        const pending = this.comments.filter(c => c.status === 'pending').length;
-        const approved = this.comments.filter(c => c.status === 'approved').length;
-        const rejected = this.comments.filter(c => c.status === 'rejected').length;
+    updateStats(stats) {
+        if (stats) {
+            this.stats = {
+                total: Number(stats.total ?? stats.total_comments ?? 0),
+                pending: Number(stats.pending ?? stats.total_pending ?? 0),
+                approved: Number(stats.approved ?? stats.total_approved ?? 0),
+                rejected: Number(stats.rejected ?? stats.total_rejected ?? 0)
+            };
+        }
 
         const statTotal = document.getElementById('statTotalComments');
         const statPending = document.getElementById('statPendingComments');
         const statApproved = document.getElementById('statApprovedComments');
         const statRejected = document.getElementById('statRejectedComments');
 
-        if (statTotal) statTotal.textContent = total;
-        if (statPending) statPending.textContent = pending;
-        if (statApproved) statApproved.textContent = approved;
-        if (statRejected) statRejected.textContent = rejected;
+        if (statTotal) statTotal.textContent = this.stats.total;
+        if (statPending) statPending.textContent = this.stats.pending;
+        if (statApproved) statApproved.textContent = this.stats.approved;
+        if (statRejected) statRejected.textContent = this.stats.rejected;
     }
 
     applyFilters() {
@@ -224,7 +246,7 @@ class ManageComments {
         if (this.filtered.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
+                    <td colspan="8" class="comments-loading-cell">
                         <i class="fas fa-comment-slash fa-2x" style="margin-bottom:10px; opacity:0.5;"></i>
                         <p>No comments found matching the criteria.</p>
                     </td>
@@ -239,11 +261,9 @@ class ManageComments {
         tbody.innerHTML = pageData.map(c => {
             const isApproved = c.status === 'approved';
             const isPending = c.status === 'pending';
-            const badgeColor = isApproved ? '#16a34a' : (isPending ? '#d97706' : '#dc2626');
-            const badgeBg = isApproved ? '#dcfce7' : (isPending ? '#fef3c7' : '#fee2e2');
             const typeBadge = c.type === 'project' 
-                ? '<span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:0.75rem; font-weight:600;">Project</span>'
-                : '<span style="background:#f3e8ff; color:#7e22ce; padding:3px 8px; border-radius:12px; font-size:0.75rem; font-weight:600;">Post</span>';
+                ? '<span class="comment-type-badge project">Project</span>'
+                : '<span class="comment-type-badge post">Post</span>';
 
             const createdDate = new Date(c.created_at).toLocaleDateString('en-US', {
                 month: 'short', day: 'numeric', year: 'numeric'
@@ -253,42 +273,42 @@ class ManageComments {
             const isSelected = this.selectedComments.has(key);
 
             return `
-                <tr style="border-bottom:1px solid #f1f5f9; transition: background 0.2s; ${isSelected ? 'background:#f8fafc;' : ''}" onmouseover="if(!this.querySelector('.select-comment-item').checked) this.style.background='#f8fafc'" onmouseout="if(!this.querySelector('.select-comment-item').checked) this.style.background='transparent'">
-                    <td style="padding:14px 16px; text-align:center;">
+                <tr class="comment-row ${isSelected ? 'selected' : ''}">
+                    <td class="comment-td-select">
                         <input type="checkbox" class="select-comment-item" data-type="${c.type}" data-id="${c.id}" ${isSelected ? 'checked' : ''}>
                     </td>
-                    <td style="padding:14px 16px;">${typeBadge}</td>
-                    <td style="padding:14px 16px; font-weight:600; color:#0f172a; max-width:180px;">${this.escapeHtml(c.target_title || 'General')}</td>
-                    <td style="padding:14px 16px;">
-                        <div style="font-weight:600; color:#1e293b;">${this.escapeHtml(c.author_name)}</div>
-                        <div style="font-size:0.8rem; color:#64748b;">${this.escapeHtml(c.author_email || '')}</div>
+                    <td class="comment-td-type">${typeBadge}</td>
+                    <td class="comment-td-target">${this.escapeHtml(c.target_title || 'General')}</td>
+                    <td class="comment-td-author">
+                        <div class="comment-author-name">${this.escapeHtml(c.author_name)}</div>
+                        <div class="comment-author-email">${this.escapeHtml(c.author_email || '')}</div>
                     </td>
-                    <td style="padding:14px 16px; color:#334155; max-width:280px; font-size:0.9rem;">
+                    <td class="comment-td-content">
                         ${this.escapeHtml(c.content)}
                     </td>
-                    <td style="padding:14px 16px; color:#64748b; font-size:0.85rem; white-space:nowrap;">
+                    <td class="comment-td-date">
                         ${createdDate}
                     </td>
-                    <td style="padding:14px 16px;">
-                        <span style="background:${badgeBg}; color:${badgeColor}; padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:600; text-transform:capitalize;">
+                    <td class="comment-td-status">
+                        <span class="comment-status-pill ${c.status}">
                             ${c.status}
                         </span>
                     </td>
-                    <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
-                        <button onclick="manageComments.viewComment('${c.type}', ${c.id})" title="View Comment Details" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                    <td class="comment-td-actions">
+                        <button class="btn-comment-action btn-comment-view" onclick="manageComments.viewComment('${c.type}', ${c.id})" title="View Comment Details">
                             <i class="fas fa-eye"></i>
                         </button>
                         ${isPending || c.status === 'rejected' ? `
-                            <button onclick="manageComments.updateStatus('${c.type}', ${c.id}, 'approved')" title="Approve Comment" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                            <button class="btn-comment-action btn-comment-approve" onclick="manageComments.updateStatus('${c.type}', ${c.id}, 'approved')" title="Approve Comment">
                                 <i class="fas fa-check"></i>
                             </button>
                         ` : ''}
                         ${isPending || c.status === 'approved' ? `
-                            <button onclick="manageComments.updateStatus('${c.type}', ${c.id}, 'rejected')" title="Reject Comment" style="background:#d97706; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                            <button class="btn-comment-action btn-comment-reject" onclick="manageComments.updateStatus('${c.type}', ${c.id}, 'rejected')" title="Reject Comment">
                                 <i class="fas fa-ban"></i>
                             </button>
                         ` : ''}
-                        <button onclick="manageComments.deleteComment('${c.type}', ${c.id})" title="Delete Comment" style="background:#dc2626; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;">
+                        <button class="btn-comment-action btn-comment-delete" onclick="manageComments.deleteComment('${c.type}', ${c.id})" title="Delete Comment">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
@@ -309,10 +329,10 @@ class ManageComments {
                 const key = `${type}:${id}`;
                 if (e.target.checked) {
                     this.selectedComments.set(key, { id, type });
-                    e.target.closest('tr')?.style.setProperty('background', '#f8fafc');
+                    e.target.closest('tr')?.classList.add('selected');
                 } else {
                     this.selectedComments.delete(key);
-                    e.target.closest('tr')?.style.removeProperty('background');
+                    e.target.closest('tr')?.classList.remove('selected');
                 }
                 this.updateSelectionUI();
             });
@@ -377,7 +397,7 @@ class ManageComments {
                     this.currentPage = totalPages;
                 }
 
-                this.updateStats();
+                await this.fetchStats();
                 this.render();
                 window.updateSidebarBadges?.();
                 this.showNotification(`Successfully deleted ${res.deletedCount || count} comment(s)`);
@@ -566,7 +586,7 @@ class ManageComments {
                 // Update local comment
                 const target = this.comments.find(c => c.type === type && c.id === id);
                 if (target) target.status = newStatus;
-                this.updateStats();
+                await this.fetchStats();
                 this.applyFilters();
                 window.updateSidebarBadges?.();
             } else {
@@ -598,7 +618,7 @@ class ManageComments {
                     this.currentPage = totalPages;
                 }
 
-                this.updateStats();
+                await this.fetchStats();
                 this.render();
                 window.updateSidebarBadges?.();
                 this.showNotification('Comment deleted successfully');
