@@ -143,7 +143,11 @@ class ManageSubscriptions {
     // ─── Actions ──────────────────────────────────────────────────────────────
 
     async deleteSubscription(id) {
-        if (!confirm('Delete this subscription permanently?')) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Subscription',
+            message: 'Delete this newsletter subscription permanently? This action cannot be undone.'
+        });
+        if (!confirmed) return;
         try {
             const result = await Newsletter.delete(id);
             if (result.success) {
@@ -162,7 +166,15 @@ class ManageSubscriptions {
     }
 
     async unsubscribe(id) {
-        if (!confirm('Mark this email as unsubscribed?')) return;
+        const confirmed = await window.confirmModal({
+            title: 'Confirm Unsubscribe',
+            message: 'Mark this subscriber email as unsubscribed?',
+            confirmText: 'Unsubscribe',
+            cancelText: 'Cancel',
+            type: 'warning',
+            icon: 'fas fa-user-slash'
+        });
+        if (!confirmed) return;
         try {
             const result = await Newsletter.unsubscribe(id);
             if (result.success) {

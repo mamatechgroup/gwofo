@@ -218,7 +218,11 @@ class ManageBackups {
     // ─── Delete Backup ────────────────────────────────────────────────────────
 
     async deleteBackup(filename) {
-        if (!confirm(`Delete backup "${filename}"? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Backup File',
+            message: `Delete backup "${filename}"? This action cannot be undone.`
+        });
+        if (!confirmed) return;
         try {
             const result = await this.apiFetch(`/${encodeURIComponent(filename)}`, { method: 'DELETE' });
             if (result.success) {
@@ -236,7 +240,15 @@ class ManageBackups {
     // ─── Restore Backup ───────────────────────────────────────────────────────
 
     async restoreBackup(filename) {
-        if (!confirm(`⚠️ Restore from "${filename}"?\n\nThis will OVERWRITE all current database data with the backup. This action cannot be undone.`)) return;
+        const confirmed = await window.confirmModal({
+            title: '⚠️ Restore Database Backup',
+            message: `Restore from "${filename}"? This will OVERWRITE all current database records with data from this snapshot. This action cannot be undone.`,
+            confirmText: 'Restore Database',
+            cancelText: 'Cancel',
+            type: 'warning',
+            icon: 'fas fa-exclamation-triangle'
+        });
+        if (!confirmed) return;
 
         this.showNotification('Restoring database… please wait', 'info');
 

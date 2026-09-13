@@ -351,7 +351,11 @@ class ManagePosts {
 
     async deletePost(postId) {
         const post = this.posts.find(p => p.id == postId);
-        if (!confirm(`Delete "${post?.title || 'this post'}"? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Post',
+            message: `Delete "${post?.title || 'this post'}"? This cannot be undone.`
+        });
+        if (!confirmed) return;
 
         try {
             const result = await Posts.delete(postId);
@@ -385,7 +389,11 @@ class ManagePosts {
         }
 
         if (action === 'delete') {
-            if (!confirm(`Delete ${selected.length} post(s)? This cannot be undone.`)) return;
+            const confirmed = await window.confirmDelete({
+                title: 'Delete Selected Posts',
+                message: `Delete ${selected.length} post(s)? This cannot be undone.`
+            });
+            if (!confirmed) return;
         }
 
         let successCount = 0;

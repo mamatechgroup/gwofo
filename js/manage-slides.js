@@ -264,7 +264,11 @@ class ManageSlides {
 
     async deleteSlide(id) {
         const s = this.slides.find(s => s.id == id);
-        if (!confirm(`Delete slide "${s?.title || 'this slide'}"? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Homepage Slide',
+            message: `Delete slide "${s?.title || 'this slide'}"? This cannot be undone.`
+        });
+        if (!confirmed) return;
 
         try {
             const result = await Slides.delete(id);

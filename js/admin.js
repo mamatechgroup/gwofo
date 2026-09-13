@@ -1,5 +1,120 @@
 // admin.js - Consolidated and Optimized Admin Dashboard JavaScript
 
+/**
+ * Global Custom Delete & Action Confirmation Modal
+ * Replaces native browser confirm() with an accessible, branded popup dialog.
+ * Returns a Promise<boolean>.
+ */
+window.confirmModal = function(options = {}) {
+    return new Promise((resolve) => {
+        const config = typeof options === 'string'
+            ? { message: options }
+            : { ...options };
+
+        const title = config.title || 'Confirm Action';
+        const message = config.message || 'Are you sure you want to proceed?';
+        const confirmText = config.confirmText || 'Confirm';
+        const cancelText = config.cancelText || 'Cancel';
+        const type = config.type || (config.danger !== false ? 'danger' : 'info');
+        const iconClass = config.icon || (type === 'danger' ? 'fas fa-trash-alt' : (type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-question-circle'));
+
+        let overlay = document.getElementById('gwofoConfirmOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'gwofoConfirmOverlay';
+            overlay.className = 'gwofo-confirm-overlay';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.innerHTML = `
+                <div class="gwofo-confirm-card">
+                    <div class="gwofo-confirm-icon ${type}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="gwofo-confirm-content">
+                        <h3 class="gwofo-confirm-title">${title}</h3>
+                        <p class="gwofo-confirm-message">${message}</p>
+                    </div>
+                    <div class="gwofo-confirm-actions">
+                        <button type="button" class="gwofo-confirm-btn cancel">${cancelText}</button>
+                        <button type="button" class="gwofo-confirm-btn confirm ${type}">${confirmText}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        } else {
+            overlay.querySelector('.gwofo-confirm-icon').className = `gwofo-confirm-icon ${type}`;
+            overlay.querySelector('.gwofo-confirm-icon i').className = iconClass;
+            overlay.querySelector('.gwofo-confirm-title').textContent = title;
+            overlay.querySelector('.gwofo-confirm-message').textContent = message;
+            const cancelBtn = overlay.querySelector('.gwofo-confirm-btn.cancel');
+            cancelBtn.textContent = cancelText;
+            const confirmBtn = overlay.querySelector('.gwofo-confirm-btn.confirm');
+            confirmBtn.textContent = confirmText;
+            confirmBtn.className = `gwofo-confirm-btn confirm ${type}`;
+        }
+
+        const cancelBtn = overlay.querySelector('.gwofo-confirm-btn.cancel');
+        const confirmBtn = overlay.querySelector('.gwofo-confirm-btn.confirm');
+
+        let resolved = false;
+        function finish(result) {
+            if (resolved) return;
+            resolved = true;
+            overlay.classList.remove('active');
+            document.removeEventListener('keydown', handleKey);
+            overlay.removeEventListener('click', handleBackdrop);
+            setTimeout(() => {
+                if (!overlay.classList.contains('active')) {
+                    overlay.style.display = 'none';
+                }
+            }, 220);
+            resolve(result);
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                finish(false);
+            } else if (e.key === 'Enter' && document.activeElement === confirmBtn) {
+                e.preventDefault();
+                finish(true);
+            }
+        }
+
+        function handleBackdrop(e) {
+            if (e.target === overlay) {
+                finish(false);
+            }
+        }
+
+        cancelBtn.onclick = () => finish(false);
+        confirmBtn.onclick = () => finish(true);
+        document.addEventListener('keydown', handleKey);
+        overlay.addEventListener('click', handleBackdrop);
+
+        overlay.style.display = 'flex';
+        void overlay.offsetWidth;
+        overlay.classList.add('active');
+
+        setTimeout(() => cancelBtn.focus(), 50);
+    });
+};
+
+window.confirmDelete = function(options = {}) {
+    const config = typeof options === 'string'
+        ? { message: options }
+        : { ...options };
+
+    return window.confirmModal({
+        title: config.title || 'Confirm Deletion',
+        message: config.message || 'Are you sure you want to delete this item? This action cannot be undone.',
+        confirmText: config.confirmText || 'Delete',
+        cancelText: config.cancelText || 'Cancel',
+        type: 'danger',
+        icon: 'fas fa-trash-alt'
+    });
+};
+
 class AdminDashboard {
     constructor() {
         this.init();
@@ -610,7 +725,11 @@ class AdminDashboard {
     }
     
     async deleteItem(type, id) {
-        if (confirm(`Are you sure you want to delete this ${type}?`)) {
+        const confirmed = await window.confirmDelete({
+            title: `Delete ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+            message: `Are you sure you want to delete this ${type}? This action cannot be undone.`
+        });
+        if (confirmed) {
             try {
                 let result;
                 if (type === 'post') {

@@ -5103,4 +5103,154 @@ select.error {
     }
 }
 
+/* ==========================================================================
+   CUSTOM CONFIRMATION POPUP MODAL
+   ========================================================================== */
+.gwofo-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+}
+
+.gwofo-confirm-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gwofo-confirm-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    max-width: 440px;
+    width: 100%;
+    padding: 28px 24px 24px;
+    text-align: center;
+    box-sizing: border-box;
+    transform: scale(0.94) translateY(8px);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gwofo-confirm-overlay.active .gwofo-confirm-card {
+    transform: scale(1) translateY(0);
+}
+
+.gwofo-confirm-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.gwofo-confirm-icon.danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.gwofo-confirm-icon.warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.gwofo-confirm-icon.info {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.gwofo-confirm-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 10px;
+    line-height: 1.3;
+}
+
+.gwofo-confirm-message {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.55;
+    margin: 0 0 24px;
+    word-break: break-word;
+}
+
+.gwofo-confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.gwofo-confirm-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+}
+
+.gwofo-confirm-btn.cancel {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.gwofo-confirm-btn.cancel:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.gwofo-confirm-btn.confirm.danger {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.gwofo-confirm-btn.confirm.danger:hover {
+    background: #b91c1c;
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+}
+
+.gwofo-confirm-btn.confirm.warning {
+    background: #d97706;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+.gwofo-confirm-btn.confirm.warning:hover {
+    background: #b45309;
+    box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+}
+
+.gwofo-confirm-btn:focus-visible {
+    outline: 2px solid #003366;
+    outline-offset: 2px;
+}
+
+
 

@@ -258,7 +258,11 @@ class ManagePartners {
 
     async deletePartner(id) {
         const p = this.partners.find(p => p.id == id);
-        if (!confirm(`Remove "${p?.name || 'this partner'}"? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Remove Partner',
+            message: `Remove "${p?.name || 'this partner'}"? This cannot be undone.`
+        });
+        if (!confirmed) return;
 
         try {
             const result = await Partners.delete(id);

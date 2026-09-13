@@ -272,7 +272,11 @@ class ManageSocial {
     }
 
     async confirmDelete(id, name) {
-        if (!confirm(`Are you sure you want to delete the social link "${name}"? This action cannot be undone.`)) {
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Social Link',
+            message: `Are you sure you want to delete the social link "${name}"? This action cannot be undone.`
+        });
+        if (!confirmed) {
             return;
         }
 

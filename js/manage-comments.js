@@ -322,7 +322,11 @@ class ManageComments {
     }
 
     async deleteComment(type, id) {
-        if (!confirm('Are you sure you want to permanently delete this comment?')) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Comment',
+            message: 'Are you sure you want to permanently delete this comment? This action cannot be undone.'
+        });
+        if (!confirmed) return;
 
         try {
             const res = await Comments.delete(type, id);

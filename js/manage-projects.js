@@ -389,7 +389,11 @@ class ManageProjects {
 
     async deleteProject(id) {
         const project = this.projects.find(p => p.id == id);
-        if (!confirm(`Delete "${project?.name || 'this project'}"? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Project',
+            message: `Delete "${project?.name || 'this project'}"? This cannot be undone.`
+        });
+        if (!confirmed) return;
 
         try {
             const result = await Projects.delete(id);

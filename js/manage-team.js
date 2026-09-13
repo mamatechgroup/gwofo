@@ -282,7 +282,11 @@ class ManageTeam {
     async deleteMember(id) {
         const m = this.members.find(m => m.id == id);
         const name = m ? `${m.first_name} ${m.last_name}` : 'this member';
-        if (!confirm(`Remove "${name}" from the team? This cannot be undone.`)) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Remove Team Member',
+            message: `Remove "${name}" from the team? This cannot be undone.`
+        });
+        if (!confirmed) return;
 
         try {
             const result = await Team.delete(id);

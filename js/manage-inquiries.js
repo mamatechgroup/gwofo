@@ -524,7 +524,11 @@ class ManageInquiries {
     }
 
     async deleteRecord(type, id) {
-        if (!confirm('Are you sure you want to delete this record?')) return;
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Inquiry Record',
+            message: 'Are you sure you want to delete this record? This action cannot be undone.'
+        });
+        if (!confirmed) return;
 
         try {
             const res = await Inquiries.delete(type, id);
