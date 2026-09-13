@@ -6,22 +6,35 @@ const pool = require('../config/database');
 // Get dashboard overview statistics
 router.get('/stats', async (req, res) => {
     try {
-        const [posts, projects, team, partners, subs] = await Promise.all([
+        const [posts, projects, team, partners, slides, subs, projectComments, postComments, contacts, partnerInq, volunteers] = await Promise.all([
             pool.query('SELECT COUNT(*) as count FROM posts'),
             pool.query('SELECT COUNT(*) as count FROM projects'),
             pool.query('SELECT COUNT(*) as count FROM team_members'),
             pool.query('SELECT COUNT(*) as count FROM partners'),
-            pool.query("SELECT COUNT(*) as count FROM newsletter_subscriptions WHERE status = 'active'")
+            pool.query('SELECT COUNT(*) as count FROM slides'),
+            pool.query("SELECT COUNT(*) as count FROM newsletter_subscriptions WHERE status = 'active'"),
+            pool.query("SELECT COUNT(*) as count FROM project_comments WHERE status = 'pending'"),
+            pool.query("SELECT COUNT(*) as count FROM post_comments WHERE status = 'pending'"),
+            pool.query("SELECT COUNT(*) as count FROM contact_messages WHERE status = 'unread' OR status = 'pending' OR status = 'new'"),
+            pool.query("SELECT COUNT(*) as count FROM partnership_inquiries WHERE status = 'pending' OR status = 'new'"),
+            pool.query("SELECT COUNT(*) as count FROM volunteer_applications WHERE status = 'pending' OR status = 'new'")
         ]);
         
+        const totalPendingComments = parseInt(projectComments.rows[0].count) + parseInt(postComments.rows[0].count);
+        const totalPendingInquiries = parseInt(contacts.rows[0].count) + parseInt(partnerInq.rows[0].count) + parseInt(volunteers.rows[0].count);
+
         res.json({
             success: true,
             data: {
                 totalPosts: parseInt(posts.rows[0].count),
                 totalProjects: parseInt(projects.rows[0].count),
                 totalUsers: parseInt(subs.rows[0].count),
+                totalSubscriptions: parseInt(subs.rows[0].count),
                 totalPartners: parseInt(partners.rows[0].count),
-                totalTeamMembers: parseInt(team.rows[0].count)
+                totalTeamMembers: parseInt(team.rows[0].count),
+                totalSlides: parseInt(slides.rows[0].count),
+                pendingComments: totalPendingComments,
+                pendingInquiries: totalPendingInquiries
             }
         });
     } catch (error) {
@@ -63,9 +76,12 @@ router.get('/summary', async (req, res) => {
                     (SELECT COUNT(*) FROM projects) as total_projects,
                     (SELECT COUNT(*) FROM team_members) as total_team,
                     (SELECT COUNT(*) FROM partners) as total_partners,
+                    (SELECT COUNT(*) FROM slides) as total_slides,
                     (SELECT COUNT(*) FROM newsletter_subscriptions WHERE status = 'active') as total_subscriptions,
                     (SELECT COUNT(*) FROM posts WHERE status = 'published') as published_posts,
-                    (SELECT COUNT(*) FROM projects WHERE status = 'active') as active_projects`
+                    (SELECT COUNT(*) FROM projects WHERE status = 'active') as active_projects,
+                    ((SELECT COUNT(*) FROM project_comments WHERE status = 'pending') + (SELECT COUNT(*) FROM post_comments WHERE status = 'pending')) as pending_comments,
+                    ((SELECT COUNT(*) FROM contact_messages WHERE status = 'unread' OR status = 'pending') + (SELECT COUNT(*) FROM partnership_inquiries WHERE status = 'pending') + (SELECT COUNT(*) FROM volunteer_applications WHERE status = 'pending')) as pending_inquiries`
             ),
             pool.query(
                 `SELECT id, title, author_name, published_date, status FROM posts ORDER BY created_at DESC LIMIT 5`

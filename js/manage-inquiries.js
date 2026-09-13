@@ -97,6 +97,7 @@ class ManageInquiries {
                 if (badgeP) badgeP.textContent = d.total_partnerships || 0;
                 if (badgeV) badgeV.textContent = d.total_volunteers || 0;
             }
+            window.updateSidebarBadges?.();
         } catch (err) {
             console.warn('Error loading inquiries stats:', err);
         }
@@ -247,6 +248,9 @@ class ManageInquiries {
                             </span>
                         </td>
                         <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
+                            <button onclick="manageInquiries.viewRecord('${this.currentTab}', ${r.id})" title="View Details" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
                             ${status !== 'responded' ? `
                                 <button onclick="manageInquiries.updateStatus('${this.currentTab}', ${r.id}, 'responded')" title="Mark as Responded" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
                                     <i class="fas fa-check"></i>
@@ -278,6 +282,9 @@ class ManageInquiries {
                             </span>
                         </td>
                         <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
+                            <button onclick="manageInquiries.viewRecord('${this.currentTab}', ${r.id})" title="View Details" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
                             <button onclick="manageInquiries.updateStatus('${this.currentTab}', ${r.id}, 'approved')" title="Approve Proposal" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
                                 <i class="fas fa-check"></i>
                             </button>
@@ -310,6 +317,9 @@ class ManageInquiries {
                             </span>
                         </td>
                         <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
+                            <button onclick="manageInquiries.viewRecord('${this.currentTab}', ${r.id})" title="View Details" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
                             <button onclick="manageInquiries.updateStatus('${this.currentTab}', ${r.id}, 'approved')" title="Approve Volunteer" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
                                 <i class="fas fa-check"></i>
                             </button>
@@ -325,6 +335,176 @@ class ManageInquiries {
         }).join('');
     }
 
+    viewRecord(type, id) {
+        const r = this.records.find(item => item.id === id);
+        if (!r) return;
+
+        const dateStr = new Date(r.created_at).toLocaleString();
+        const existingModal = document.getElementById('inquiryDetailModal');
+        if (existingModal) existingModal.remove();
+
+        let title = 'Inquiry Details';
+        let contentHtml = '';
+        let actionButtons = '';
+
+        if (type === 'contact') {
+            title = 'Contact Message';
+            contentHtml = `
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">From</div>
+                    <div style="font-size:1rem;font-weight:600;color:#0f172a;margin-top:2px;">${this.escapeHtml(r.name)}</div>
+                    <div style="font-size:0.88rem;color:#475569;margin-top:2px;">
+                        <a href="mailto:${this.escapeHtml(r.email)}" style="color:#003366;">${this.escapeHtml(r.email)}</a> ${r.phone ? '· ' + this.escapeHtml(r.phone) : ''}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Subject</div>
+                    <div style="font-size:0.95rem;font-weight:500;color:#1e293b;margin-top:2px;">${this.escapeHtml(r.subject || 'General Inquiry')}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Message</div>
+                    <div style="margin-top:4px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;font-size:0.92rem;color:#334155;line-height:1.6;white-space:pre-wrap;max-height:180px;overflow-y:auto;">
+                        ${this.escapeHtml(r.message)}
+                    </div>
+                </div>
+            `;
+            actionButtons = `
+                ${r.status !== 'responded' ? `
+                    <button id="inqModalRespondBtn" style="background:#16a34a;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                        <i class="fas fa-check"></i> Mark Responded
+                    </button>
+                ` : ''}
+                <button id="inqModalDeleteBtn" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            `;
+        } else if (type === 'partner') {
+            title = 'Partnership Proposal';
+            contentHtml = `
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Organization</div>
+                    <div style="font-size:1.05rem;font-weight:600;color:#0f172a;margin-top:2px;">${this.escapeHtml(r.organization_name)}</div>
+                    ${r.website ? `<div style="font-size:0.85rem;"><a href="${this.escapeHtml(r.website)}" target="_blank" style="color:#003366;">${this.escapeHtml(r.website)}</a></div>` : ''}
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Contact Person</div>
+                    <div style="font-size:0.92rem;color:#1e293b;margin-top:2px;">${this.escapeHtml(r.contact_name)} &lt;<a href="mailto:${this.escapeHtml(r.email)}" style="color:#003366;">${this.escapeHtml(r.email)}</a>&gt;</div>
+                    ${r.phone ? `<small style="color:#64748b;">Phone: ${this.escapeHtml(r.phone)}</small>` : ''}
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Proposal Details</div>
+                    <div style="margin-top:4px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;font-size:0.92rem;color:#334155;line-height:1.6;white-space:pre-wrap;max-height:180px;overflow-y:auto;">
+                        ${this.escapeHtml(r.proposed_collaboration || r.message || r.details || 'No details provided')}
+                    </div>
+                </div>
+            `;
+            actionButtons = `
+                <button id="inqModalApproveBtn" style="background:#16a34a;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-check"></i> Approve Proposal
+                </button>
+                <button id="inqModalRejectBtn" style="background:#d97706;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-archive"></i> Archive Proposal
+                </button>
+                <button id="inqModalDeleteBtn" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            `;
+        } else {
+            title = 'Volunteer Application';
+            contentHtml = `
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Applicant</div>
+                    <div style="font-size:1.05rem;font-weight:600;color:#0f172a;margin-top:2px;">${this.escapeHtml(r.full_name)}</div>
+                    <div style="font-size:0.88rem;color:#475569;margin-top:2px;">
+                        <a href="mailto:${this.escapeHtml(r.email)}" style="color:#003366;">${this.escapeHtml(r.email)}</a> ${r.phone ? '· ' + this.escapeHtml(r.phone) : ''} · Location: ${this.escapeHtml(r.location || 'Liberia')}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Skills & Availability</div>
+                    <div style="font-size:0.92rem;color:#1e293b;margin-top:2px;"><strong>Skills:</strong> ${this.escapeHtml(r.skills || 'N/A')}</div>
+                    ${r.availability ? `<div style="font-size:0.88rem;color:#64748b;margin-top:2px;">Availability: ${this.escapeHtml(r.availability)}</div>` : ''}
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Motivation</div>
+                    <div style="margin-top:4px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;font-size:0.92rem;color:#334155;line-height:1.6;white-space:pre-wrap;max-height:180px;overflow-y:auto;">
+                        ${this.escapeHtml(r.motivation || 'No motivation note')}
+                    </div>
+                </div>
+            `;
+            actionButtons = `
+                <button id="inqModalApproveBtn" style="background:#16a34a;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-check"></i> Approve Application
+                </button>
+                <button id="inqModalRejectBtn" style="background:#d97706;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button id="inqModalDeleteBtn" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            `;
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'inquiryDetailModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;box-sizing:border-box;';
+
+        modal.innerHTML = `
+            <div style="background:#fff;border-radius:12px;max-width:580px;width:100%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;animation:fadeIn 0.2s ease-out;">
+                <div style="padding:18px 24px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+                    <h3 style="margin:0;font-size:1.15rem;color:#0f172a;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-inbox" style="color:#003366;"></i> ${title}
+                    </h3>
+                    <button id="closeInquiryModal" style="background:none;border:none;font-size:1.25rem;color:#64748b;cursor:pointer;padding:4px;">&times;</button>
+                </div>
+                <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+                    ${contentHtml}
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #f1f5f9;">
+                        <div>
+                            <span style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Received: </span>
+                            <span style="font-size:0.85rem;color:#475569;">${dateStr}</span>
+                        </div>
+                        <div>
+                            <span style="padding:4px 10px;border-radius:20px;font-size:0.8rem;font-weight:600;text-transform:capitalize;background:#f1f5f9;color:#334155;">
+                                ${r.status || 'new'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:16px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
+                    ${actionButtons}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('#closeInquiryModal')?.addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        modal.querySelector('#inqModalRespondBtn')?.addEventListener('click', async () => {
+            await this.updateStatus(type, id, 'responded');
+            closeModal();
+        });
+        modal.querySelector('#inqModalApproveBtn')?.addEventListener('click', async () => {
+            await this.updateStatus(type, id, 'approved');
+            closeModal();
+        });
+        modal.querySelector('#inqModalRejectBtn')?.addEventListener('click', async () => {
+            await this.updateStatus(type, id, 'rejected');
+            closeModal();
+        });
+        modal.querySelector('#inqModalDeleteBtn')?.addEventListener('click', async () => {
+            await this.deleteRecord(type, id);
+            closeModal();
+        });
+
+        // Automatically mark unread contact messages as read when viewed
+        if (type === 'contact' && (r.status === 'unread' || r.status === 'new')) {
+            this.updateStatus(type, id, 'read');
+        }
+    }
+
     async updateStatus(type, id, newStatus) {
         try {
             const res = await Inquiries.updateStatus(type, id, newStatus);
@@ -333,6 +513,7 @@ class ManageInquiries {
                 if (target) target.status = newStatus;
                 this.applyFilters();
                 this.loadStats();
+                window.updateSidebarBadges?.();
             } else {
                 alert(res.error || 'Failed to update status');
             }
@@ -351,6 +532,7 @@ class ManageInquiries {
                 this.records = this.records.filter(r => r.id !== id);
                 this.applyFilters();
                 this.loadStats();
+                window.updateSidebarBadges?.();
             } else {
                 alert(res.error || 'Failed to delete record');
             }

@@ -381,8 +381,12 @@ class AdminDashboard {
     }
     
     loadDashboardData() {
+        if (!document.getElementById('recentPostsTable') && !document.getElementById('recentProjectsTable') && !document.querySelector('[data-stat]')) {
+            return;
+        }
         // Fetch real data from API instead of using mockData
-        fetch(`${API_BASE_URL}/dashboard/summary`)
+        const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
+        fetch(`${baseUrl}/dashboard/summary`)
             .then(response => response.json())
             .then(result => {
                 if (result.success && result.data) {
@@ -634,7 +638,12 @@ class AdminDashboard {
     
     async updateSidebarBadges() {
         try {
-            const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+            const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
+            const token = localStorage.getItem('adminToken');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const response = await fetch(`${baseUrl}/dashboard/stats`, { headers });
             const result = await response.json();
             if (result.success && result.data) {
                 const stats = result.data;
@@ -642,7 +651,10 @@ class AdminDashboard {
                 this.setSidebarBadge('manage-projects.html', stats.totalProjects);
                 this.setSidebarBadge('manage-team.html', stats.totalTeamMembers);
                 this.setSidebarBadge('manage-partners.html', stats.totalPartners);
-                this.setSidebarBadge('manage-subscriptions.html', stats.totalUsers);
+                this.setSidebarBadge('manage-slides.html', stats.totalSlides);
+                this.setSidebarBadge('manage-subscriptions.html', stats.totalSubscriptions ?? stats.totalUsers);
+                this.setSidebarBadge('manage-comments.html', stats.pendingComments);
+                this.setSidebarBadge('manage-inquiries.html', stats.pendingInquiries);
             }
         } catch (error) {
             console.error('Error loading sidebar badges:', error);
@@ -650,15 +662,22 @@ class AdminDashboard {
     }
 
     setSidebarBadge(href, count) {
-        const link = document.querySelector(`.admin-menu a[href="${href}"]`);
+        const link = document.querySelector(`.admin-menu a[href$="${href}"]`) || 
+                     document.querySelector(`.admin-menu a[href*="${href}"]`);
         if (!link) return;
         let badge = link.querySelector('.badge');
+        const num = parseInt(count, 10);
+        if (isNaN(num) || num <= 0) {
+            if (badge) badge.style.display = 'none';
+            return;
+        }
         if (!badge) {
             badge = document.createElement('span');
             badge.className = 'badge';
             link.appendChild(badge);
         }
-        badge.textContent = count;
+        badge.textContent = num;
+        badge.style.display = 'inline-block';
     }
 
     loadRecentActivity(isUserRefresh = false) {
@@ -882,6 +901,63 @@ class AdminDashboard {
 
 // Initialize admin dashboard
 let admin = null;
+
+// Global helper for updating sidebar badges across all admin controllers
+window.updateSidebarBadges = async function() {
+    if (window.admin && typeof window.admin.updateSidebarBadges === 'function') {
+        return await window.admin.updateSidebarBadges();
+    }
+    // Fallback if admin instance not yet created
+    try {
+        const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
+        const token = localStorage.getItem('adminToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${baseUrl}/dashboard/stats`, { headers });
+        const result = await response.json();
+        if (result.success && result.data) {
+            const stats = result.data;
+            const setBadge = (href, count) => {
+                const link = document.querySelector(`.admin-menu a[href$="${href}"]`) || 
+                             document.querySelector(`.admin-menu a[href*="${href}"]`);
+                if (!link) return;
+                let badge = link.querySelector('.badge');
+                const num = parseInt(count, 10);
+                if (isNaN(num) || num <= 0) {
+                    if (badge) badge.style.display = 'none';
+                    return;
+                }
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge';
+                    link.appendChild(badge);
+                }
+                badge.textContent = num;
+                badge.style.display = 'inline-block';
+            };
+            setBadge('manage-posts.html', stats.totalPosts);
+            setBadge('manage-projects.html', stats.totalProjects);
+            setBadge('manage-team.html', stats.totalTeamMembers);
+            setBadge('manage-partners.html', stats.totalPartners);
+            setBadge('manage-slides.html', stats.totalSlides);
+            setBadge('manage-subscriptions.html', stats.totalSubscriptions ?? stats.totalUsers);
+            setBadge('manage-comments.html', stats.pendingComments);
+            setBadge('manage-inquiries.html', stats.pendingInquiries);
+        }
+    } catch (e) {
+        console.error('Error updating sidebar badges:', e);
+    }
+};
+
+window.notifyContentChanged = function() {
+    window.updateSidebarBadges();
+    window.dispatchEvent(new CustomEvent('gwofo:content-changed'));
+};
+
+window.addEventListener('gwofo:content-changed', () => {
+    window.updateSidebarBadges();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     admin = new AdminDashboard();

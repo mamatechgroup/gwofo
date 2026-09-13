@@ -370,6 +370,7 @@ class ManageProjects {
                 this.showNotification(this.editingId ? 'Project updated!' : 'Project created!', 'success');
                 this.closeModal();
                 await this.loadProjects();
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Save failed', 'error');
             }
@@ -397,6 +398,7 @@ class ManageProjects {
                 this.applyFilters();
                 this.updateOverviewStats();
                 this.showNotification('Project deleted', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }

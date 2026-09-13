@@ -190,6 +190,9 @@ class ManageComments {
                         </span>
                     </td>
                     <td style="padding:14px 16px; text-align:center; white-space:nowrap;">
+                        <button onclick="manageComments.viewComment('${c.type}', ${c.id})" title="View Comment Details" style="background:#003366; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         ${isPending || c.status === 'rejected' ? `
                             <button onclick="manageComments.updateStatus('${c.type}', ${c.id}, 'approved')" title="Approve Comment" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; margin-right:4px;">
                                 <i class="fas fa-check"></i>
@@ -209,6 +212,96 @@ class ManageComments {
         }).join('');
     }
 
+    viewComment(type, id) {
+        const c = this.comments.find(item => item.type === type && item.id === id);
+        if (!c) return;
+
+        const dateStr = new Date(c.created_at).toLocaleString();
+        const existingModal = document.getElementById('commentDetailModal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'commentDetailModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;box-sizing:border-box;';
+
+        modal.innerHTML = `
+            <div style="background:#fff;border-radius:12px;max-width:550px;width:100%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;animation:fadeIn 0.2s ease-out;">
+                <div style="padding:18px 24px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+                    <h3 style="margin:0;font-size:1.15rem;color:#0f172a;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-comment-dots" style="color:#003366;"></i> Comment Details
+                    </h3>
+                    <button id="closeCommentModal" style="background:none;border:none;font-size:1.25rem;color:#64748b;cursor:pointer;padding:4px;">&times;</button>
+                </div>
+                <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Type & Target</div>
+                        <div style="font-size:0.95rem;font-weight:600;color:#0f172a;margin-top:2px;">
+                            <span style="text-transform:capitalize;">${c.type}</span>: ${this.escapeHtml(c.target_title || '#' + c.target_id)}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Author</div>
+                        <div style="font-size:0.92rem;color:#1e293b;margin-top:2px;">
+                            <strong>${this.escapeHtml(c.author_name)}</strong> &lt;<a href="mailto:${this.escapeHtml(c.author_email)}" style="color:#003366;">${this.escapeHtml(c.author_email)}</a>&gt;
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Submitted On</div>
+                        <div style="font-size:0.88rem;color:#475569;margin-top:2px;">${dateStr}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
+                        <div style="margin-top:4px;">
+                            <span style="padding:4px 10px;border-radius:20px;font-size:0.8rem;font-weight:600;text-transform:capitalize;background:${c.status==='approved'?'#dcfce7':c.status==='rejected'?'#fee2e2':'#fef3c7'};color:${c.status==='approved'?'#16a34a':c.status==='rejected'?'#dc2626':'#d97706'};">
+                                ${c.status}
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Comment Message</div>
+                        <div style="margin-top:4px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;font-size:0.92rem;color:#334155;line-height:1.6;white-space:pre-wrap;max-height:180px;overflow-y:auto;">
+                            ${this.escapeHtml(c.content)}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:16px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;">
+                    ${c.status !== 'approved' ? `
+                        <button id="modalApproveBtn" style="background:#16a34a;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                    ` : ''}
+                    ${c.status !== 'rejected' ? `
+                        <button id="modalRejectBtn" style="background:#d97706;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                            <i class="fas fa-ban"></i> Reject
+                        </button>
+                    ` : ''}
+                    <button id="modalDeleteBtn" style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-weight:600;cursor:pointer;">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('#closeCommentModal')?.addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        modal.querySelector('#modalApproveBtn')?.addEventListener('click', async () => {
+            await this.updateStatus(c.type, c.id, 'approved');
+            closeModal();
+        });
+        modal.querySelector('#modalRejectBtn')?.addEventListener('click', async () => {
+            await this.updateStatus(c.type, c.id, 'rejected');
+            closeModal();
+        });
+        modal.querySelector('#modalDeleteBtn')?.addEventListener('click', async () => {
+            await this.deleteComment(c.type, c.id);
+            closeModal();
+        });
+    }
+
     async updateStatus(type, id, newStatus) {
         try {
             const res = await Comments.updateStatus(type, id, newStatus);
@@ -218,6 +311,7 @@ class ManageComments {
                 if (target) target.status = newStatus;
                 this.updateStats();
                 this.applyFilters();
+                window.updateSidebarBadges?.();
             } else {
                 alert(res.error || 'Failed to update status');
             }
@@ -236,6 +330,7 @@ class ManageComments {
                 this.comments = this.comments.filter(c => !(c.type === type && c.id === id));
                 this.updateStats();
                 this.applyFilters();
+                window.updateSidebarBadges?.();
             } else {
                 alert(res.error || 'Failed to delete comment');
             }

@@ -239,6 +239,7 @@ class ManagePartners {
                 this.showNotification(this.editingId ? 'Partner updated!' : 'Partner added!', 'success');
                 this.closeModal();
                 await this.loadPartners();
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Save failed', 'error');
             }
@@ -269,6 +270,7 @@ class ManagePartners {
                 this.updateLevelsDistribution();
                 this.loadRecentActivities();
                 this.showNotification('Partner removed', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }

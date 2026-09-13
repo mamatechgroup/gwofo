@@ -332,6 +332,7 @@ class ManagePosts {
                 this.showNotification(this.editingPostId ? 'Post updated!' : 'Post created!', 'success');
                 this.closeModal();
                 await this.loadPosts();
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Save failed', 'error');
             }
@@ -360,6 +361,7 @@ class ManagePosts {
                 this.updateStats();
                 this.updateCategoryDistribution();
                 this.showNotification('Post deleted', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }
@@ -401,6 +403,7 @@ class ManagePosts {
 
         this.showNotification(`${successCount}/${selected.length} posts updated`, 'success');
         await this.loadPosts();
+        window.updateSidebarBadges?.();
         if (actionSelect) actionSelect.value = '';
     }
 

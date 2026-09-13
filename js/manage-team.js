@@ -262,6 +262,7 @@ class ManageTeam {
                 this.showNotification(this.editingId ? 'Member updated!' : 'Member added!', 'success');
                 this.closeModal();
                 await this.loadMembers();
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Save failed', 'error');
             }
@@ -291,6 +292,7 @@ class ManageTeam {
                 this.updateStats();
                 this.updateDepartmentDistribution();
                 this.showNotification('Member removed', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }

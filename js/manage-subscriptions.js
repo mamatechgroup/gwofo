@@ -151,6 +151,7 @@ class ManageSubscriptions {
                 this.applyFilters();
                 this.updateStats();
                 this.showNotification('Subscription deleted', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }
@@ -170,6 +171,7 @@ class ManageSubscriptions {
                 this.applyFilters();
                 this.updateStats();
                 this.showNotification('Subscription updated', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Update failed', 'error');
             }

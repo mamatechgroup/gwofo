@@ -245,6 +245,7 @@ class ManageSlides {
                 this.showNotification(this.editingId ? 'Slide updated!' : 'Slide created!', 'success');
                 this.closeModal();
                 await this.loadSlides();
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Save failed', 'error');
             }
@@ -274,6 +275,7 @@ class ManageSlides {
                 this.updateStats();
                 this.updateActiveSlidesList();
                 this.showNotification('Slide deleted', 'success');
+                window.updateSidebarBadges?.();
             } else {
                 this.showNotification(result.error || 'Delete failed', 'error');
             }
