@@ -29,6 +29,11 @@ router.get('/status/active', async (req, res) => {
             'SELECT * FROM slides WHERE status = $1 ORDER BY position ASC',
             ['active']
         );
+
+        // Asynchronously increment views for active slides
+        pool.query('UPDATE slides SET views_count = COALESCE(views_count, 0) + 1 WHERE status = $1', ['active'])
+            .catch(err => console.error('Error incrementing slide views:', err.message));
+
         res.json({
             success: true,
             data: result.rows,
@@ -36,6 +41,20 @@ router.get('/status/active', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching active slides:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Record slide CTA click
+router.post('/:id/click', async (req, res) => {
+    try {
+        await pool.query(
+            'UPDATE slides SET clicks_count = COALESCE(clicks_count, 0) + 1 WHERE id = $1',
+            [req.params.id]
+        );
+        res.json({ success: true, message: 'Click recorded' });
+    } catch (error) {
+        console.error('Error recording slide click:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

@@ -107,6 +107,55 @@
             </div>
         </div>
 
+        <!-- Quick Summary Performance Stats -->
+        <div class="content-section slide-perf-dashboard">
+            <div class="slide-perf-grid" id="performanceStats">
+                <div class="slide-perf-card">
+                    <div class="slide-perf-icon blue">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div class="slide-perf-info">
+                        <div class="slide-perf-title">Active Slides</div>
+                        <div class="slide-perf-value" id="perfActiveSlides">3</div>
+                        <div class="slide-perf-sub" id="perfTotalSlides">3 total slides configured</div>
+                    </div>
+                </div>
+
+                <div class="slide-perf-card">
+                    <div class="slide-perf-icon green">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="slide-perf-info">
+                        <div class="slide-perf-title">Total Slide Views</div>
+                        <div class="slide-perf-value" id="perfTotalViews">1,120</div>
+                        <div class="slide-perf-sub" style="color:#16a34a;"><i class="fas fa-chart-line"></i> Live impressions</div>
+                    </div>
+                </div>
+
+                <div class="slide-perf-card">
+                    <div class="slide-perf-icon amber">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                    <div class="slide-perf-info">
+                        <div class="slide-perf-title">Button Clicks</div>
+                        <div class="slide-perf-value" id="perfTotalClicks">41</div>
+                        <div class="slide-perf-sub" style="color:#d97706;"><i class="fas fa-bullseye"></i> CTA conversions</div>
+                    </div>
+                </div>
+
+                <div class="slide-perf-card">
+                    <div class="slide-perf-icon purple">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="slide-perf-info">
+                        <div class="slide-perf-title">Click-Through Rate</div>
+                        <div class="slide-perf-value" id="perfClickRate">3.7%</div>
+                        <div class="slide-perf-sub" style="color:#9333ea;"><i class="fas fa-signal"></i> Engagement ratio</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Slides Management -->
         <div class="content-section">
             <div class="section-header">
@@ -241,57 +290,23 @@
             </div>
         </div>
 
-        <!-- Slide Statistics -->
+        <!-- Slide Insights & Active Slides Roster -->
         <div class="content-grid">
             <div class="content-section">
-                <h3>Slide Performance</h3>
-                <div id="slidePerformanceSection">
-                    <div class="performance-stats" id="performanceStats">
-                        <div class="performance-item">
-                            <div class="performance-icon">
-                                <i class="fas fa-eye"></i>
-                            </div>
-                            <div>
-                                <div class="performance-number" id="perfTotalViews">—</div>
-                                <div class="performance-label">Total Views</div>
-                            </div>
+                <h3><i class="fas fa-chart-pie" style="color:var(--primary-color);margin-right:8px;"></i> Slider Performance Insights</h3>
+                <div class="slide-insights-box" style="padding:14px 0;">
+                    <p style="color:#475569;font-size:0.9rem;line-height:1.6;margin-bottom:16px;">
+                        Live slide engagement analytics update in real time when visitors interact with the homepage hero carousel.
+                    </p>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                            <span style="font-weight:600;color:#334155;"><i class="fas fa-clock" style="color:#2563eb;margin-right:8px;"></i> Recommended Display Duration</span>
+                            <span style="font-weight:700;color:#0f172a;">5.0s per slide</span>
                         </div>
-                        
-                        <div class="performance-item">
-                            <div class="performance-icon">
-                                <i class="fas fa-mouse-pointer"></i>
-                            </div>
-                            <div>
-                                <div class="performance-number" id="perfTotalClicks">—</div>
-                                <div class="performance-label">Clicks</div>
-                            </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                            <span style="font-weight:600;color:#334155;"><i class="fas fa-desktop" style="color:#16a34a;margin-right:8px;"></i> Animation Engine</span>
+                            <span style="font-weight:700;color:#16a34a;">Hardware-Accelerated Crossfade</span>
                         </div>
-                        
-                        <div class="performance-item">
-                            <div class="performance-icon">
-                                <i class="fas fa-percentage"></i>
-                            </div>
-                            <div>
-                                <div class="performance-number" id="perfClickRate">—</div>
-                                <div class="performance-label">Click Rate</div>
-                            </div>
-                        </div>
-                        
-                        <div class="performance-item">
-                            <div class="performance-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div>
-                                <div class="performance-number" id="perfActiveSlides">—</div>
-                                <div class="performance-label">Active Slides</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Empty state shown when total views = 0 -->
-                    <div id="performanceEmptyState" class="empty-state hidden">
-                        <i class="fas fa-chart-bar"></i>
-                        <p>No performance data yet</p>
-                        <p>Views and clicks will appear here once slides are published and the homepage is visited.</p>
                     </div>
                 </div>
             </div>

@@ -135,34 +135,56 @@ class ManageSlides {
             `<option value="${n}"${n === (s.position || 1) ? ' selected' : ''}>${n}</option>`
         ).join('');
 
-        const thumb = s.image_url && this.isValidImageUrl(s.image_url)
-            ? `<img src="${s.image_url}" alt="${this.esc(s.title)}" class="slide-card-image">`
+        const imageUrl = s.image_url ? this.normalizeImageUrl(s.image_url) : '';
+        const hasValidImg = this.isValidImageUrl(imageUrl);
+
+        const thumb = hasValidImg
+            ? `<img src="${imageUrl}" alt="${this.esc(s.title)}" class="slide-card-img" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\\'slide-card-placeholder\\'><i class=\\'fas fa-image\\'></i></div>';">`
             : `<div class="slide-card-placeholder"><i class="fas fa-image"></i></div>`;
 
         return `
-            <div class="slide-card" data-id="${s.id}">
+            <div class="slide-card ${s.status === 'active' ? 'active' : ''}" data-id="${s.id}">
                 <div class="slide-card-thumb">
                     ${thumb}
-                    <span class="status-badge status-${s.status}" style="position:absolute;top:8px;right:8px;">${s.status}</span>
+                    <div class="slide-card-overlay">
+                        <span class="slide-badge-pos"><i class="fas fa-layer-group"></i> Slide ${s.position || 1}</span>
+                        <span class="status-badge status-${s.status}">${s.status === 'active' ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <span class="slide-badge-dur"><i class="fas fa-clock"></i> ${s.display_duration || 5}s</span>
                 </div>
                 <div class="slide-card-body">
-                    <h4 class="slide-card-title">${this.esc(s.title)}</h4>
-                    ${s.subtitle ? `<p class="slide-card-subtitle">${this.esc(s.subtitle)}</p>` : ''}
-                    <p class="slide-card-desc">${this.esc((s.description || '').substring(0,70))}…</p>
-                    <div class="slide-card-meta">
-                        <label>Position:
+                    <div class="slide-card-header">
+                        <h4 class="slide-card-title">${this.esc(s.title)}</h4>
+                        ${s.subtitle ? `<span class="slide-card-subtitle">${this.esc(s.subtitle)}</span>` : ''}
+                    </div>
+                    <p class="slide-card-desc">${this.esc((s.description || '').substring(0, 110))}${s.description && s.description.length > 110 ? '…' : ''}</p>
+                    
+                    <div class="slide-card-metrics">
+                        <span class="metric-chip" title="Slide Views"><i class="fas fa-eye"></i> ${s.views_count || 0} views</span>
+                        <span class="metric-chip" title="CTA Button Clicks"><i class="fas fa-mouse-pointer"></i> ${s.clicks_count || 0} clicks</span>
+                        ${s.button_text ? `<span class="metric-chip cta-chip" title="Button: ${this.esc(s.button_text)}"><i class="fas fa-link"></i> ${this.esc(s.button_text)}</span>` : ''}
+                    </div>
+
+                    <div class="slide-card-pos-row">
+                        <label class="pos-label">
+                            <span>Reorder Position:</span>
                             <select class="position-select" data-id="${s.id}">${posOptions}</select>
                         </label>
-                        <span>${s.display_duration || 5}s</span>
                     </div>
                 </div>
                 <div class="slide-card-actions">
-                    <button class="btn-preview" data-id="${s.id}" title="Preview"><i class="fas fa-eye"></i></button>
-                    <button class="btn-toggle btn-secondary" data-id="${s.id}" title="${s.status === 'active' ? 'Deactivate' : 'Activate'}">
-                        <i class="fas fa-toggle-${s.status === 'active' ? 'on' : 'off'}"></i>
+                    <button class="btn-card-action btn-preview" data-id="${s.id}" title="Live Slide Preview">
+                        <i class="fas fa-eye"></i> Preview
                     </button>
-                    <button class="btn-edit" data-id="${s.id}" title="Edit"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" data-id="${s.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                    <button class="btn-card-action btn-toggle ${s.status === 'active' ? 'is-active' : 'is-inactive'}" data-id="${s.id}" title="${s.status === 'active' ? 'Deactivate slide' : 'Activate slide'}">
+                        <i class="fas fa-toggle-${s.status === 'active' ? 'on' : 'off'}"></i> ${s.status === 'active' ? 'Active' : 'Inactive'}
+                    </button>
+                    <button class="btn-card-action btn-edit" data-id="${s.id}" title="Edit Slide">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn-card-action btn-delete" data-id="${s.id}" title="Delete Slide">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
             </div>`;
     }
@@ -196,7 +218,7 @@ class ManageSlides {
             if (slide.image_url && this.isValidImageUrl(slide.image_url)) {
                 const preview = document.getElementById('slideImagePreview');
                 const img     = document.getElementById('slidePreviewImage');
-                if (preview && img) { img.src = slide.image_url; preview.style.display = 'block'; }
+                if (preview && img) { img.src = this.normalizeImageUrl(slide.image_url); preview.style.display = 'block'; }
             }
         }
 
@@ -355,11 +377,12 @@ class ManageSlides {
         const slide = this.slides.find(s => s.id == id);
         if (!slide) return;
 
+        const previewImg = slide.image_url ? this.normalizeImageUrl(slide.image_url) : '';
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10001;';
         modal.innerHTML = `
             <div style="width:90%;max-width:900px;border-radius:12px;overflow:hidden;background:#000;position:relative;">
-                <div style="position:relative;min-height:320px;background:#111;background-image:url('${slide.image_url}');background-size:cover;background-position:center;">
+                <div style="position:relative;min-height:320px;background:#111;background-image:url('${previewImg}');background-size:cover;background-position:center;">
                     <div style="position:absolute;inset:0;background:rgba(0,0,0,${(slide.overlay_opacity||30)/100});"></div>
                     <div style="position:relative;z-index:1;padding:60px 48px;color:${slide.text_color||'#fff'};">
                         ${slide.subtitle ? `<p style="font-size:.9em;text-transform:uppercase;letter-spacing:2px;opacity:.8;margin-bottom:8px;">${this.esc(slide.subtitle)}</p>` : ''}
@@ -389,6 +412,8 @@ class ManageSlides {
         // Summary text
         const summary = document.querySelector('.slides-summary p');
         if (summary) summary.innerHTML = `<strong>${active}</strong> active slides out of <strong>${this.slides.length}</strong> total slides`;
+
+        this.updatePerformanceStats();
     }
 
     updateActiveSlidesList() {
@@ -411,12 +436,13 @@ class ManageSlides {
     // ─── Performance Stats ────────────────────────────────────────────────────
 
     async updatePerformanceStats() {
-        const statsEl     = document.getElementById('performanceStats');
-        const emptyEl     = document.getElementById('performanceEmptyState');
-        const viewsEl     = document.getElementById('perfTotalViews');
-        const clicksEl    = document.getElementById('perfTotalClicks');
-        const rateEl      = document.getElementById('perfClickRate');
-        const activeEl    = document.getElementById('perfActiveSlides');
+        const statsEl       = document.getElementById('performanceStats');
+        const emptyEl       = document.getElementById('performanceEmptyState');
+        const viewsEl       = document.getElementById('perfTotalViews');
+        const clicksEl      = document.getElementById('perfTotalClicks');
+        const rateEl        = document.getElementById('perfClickRate');
+        const activeEl      = document.getElementById('perfActiveSlides');
+        const totalSlidesEl = document.getElementById('perfTotalSlides');
 
         try {
             const res    = await fetch(`${API_BASE_URL}/dashboard/slides-stats`);
@@ -425,31 +451,25 @@ class ManageSlides {
             if (result.success && result.data) {
                 const d = result.data;
 
-                const views  = d.total_views  || 0;
-                const clicks = d.total_clicks || 0;
+                const views  = Number(d.total_views)  || 0;
+                const clicks = Number(d.total_clicks) || 0;
+                const active = d.active_slides !== undefined ? Number(d.active_slides) : this.slides.filter(s => s.status === 'active').length;
+                const total  = d.total_slides !== undefined ? Number(d.total_slides) : this.slides.length;
+                const rate   = d.click_rate || (views > 0 ? ((clicks / views) * 100).toFixed(1) + '%' : '0.0%');
 
-                if (views === 0 && clicks === 0) {
-                    // Show empty state
-                    if (statsEl)  statsEl.style.display  = 'none';
-                    if (emptyEl)  emptyEl.style.display  = '';
-                } else {
-                    if (statsEl)  statsEl.style.display  = '';
-                    if (emptyEl)  emptyEl.style.display  = 'none';
+                if (statsEl) statsEl.style.display = 'grid';
+                if (emptyEl) emptyEl.style.display = 'none';
 
-                    if (viewsEl)  viewsEl.textContent  = views.toLocaleString();
-                    if (clicksEl) clicksEl.textContent = clicks.toLocaleString();
-                    if (rateEl)   rateEl.textContent   = d.click_rate || '0%';
-                    if (activeEl) activeEl.textContent = d.active_slides || 0;
-                }
+                if (viewsEl)       viewsEl.textContent       = views.toLocaleString();
+                if (clicksEl)      clicksEl.textContent      = clicks.toLocaleString();
+                if (rateEl)        rateEl.textContent        = rate;
+                if (activeEl)      activeEl.textContent      = active;
+                if (totalSlidesEl) totalSlidesEl.textContent = `${total} total slides configured`;
             }
         } catch (err) {
             console.error('Error loading slide performance stats:', err);
-            // On error show a soft message instead of hiding everything
-            if (emptyEl) {
-                if (statsEl) statsEl.style.display = 'none';
-                emptyEl.style.display = '';
-                emptyEl.querySelector('p').textContent = 'Performance data unavailable right now.';
-            }
+            if (statsEl) statsEl.style.display = 'grid';
+            if (emptyEl) emptyEl.style.display = 'none';
         }
     }
 
@@ -486,7 +506,29 @@ class ManageSlides {
     isValidImageUrl(url) {
         if (!url) return false;
         const clean = url.trim();
-        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/');
+        return (
+            clean.startsWith('data:') ||
+            clean.startsWith('http://') ||
+            clean.startsWith('https://') ||
+            clean.startsWith('/') ||
+            clean.startsWith('../') ||
+            clean.startsWith('assets/')
+        );
+    }
+
+    normalizeImageUrl(url) {
+        if (!url) return '';
+        const clean = url.trim();
+        if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:')) {
+            return clean;
+        }
+        if (clean.startsWith('/')) {
+            return clean;
+        }
+        if (clean.startsWith('../')) {
+            return clean;
+        }
+        return '../' + clean;
     }
 
     esc(str) {
