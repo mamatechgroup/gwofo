@@ -1,0 +1,43 @@
+# Robots.txt for Girls & Women Foundation Liberia (GWOFO)
+# https://gwfoliberia.org
+
+# Standard Search Engines
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Slurp
+User-agent: DuckDuckBot
+User-agent: Baiduspider
+User-agent: YandexBot
+Allow: /
+Disallow: /admin/
+Disallow: /server/
+Disallow: /api/auth/
+Disallow: /api/backups/
+
+# AI Search Crawlers & LLM Agents
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Amazonbot
+User-agent: CCBot
+User-agent: meta-externalagent
+Allow: /
+Disallow: /admin/
+Disallow: /server/
+Disallow: /api/auth/
+Disallow: /api/backups/
+
+# Default for all other crawlers
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /server/
+Disallow: /api/auth/
+Disallow: /api/backups/
+
+# Sitemap & LLMs Index
+Sitemap: https://gwfoliberia.org/sitemap.xml

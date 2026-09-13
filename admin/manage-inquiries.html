@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Inquiries &amp; Applications - Admin Dashboard</title>
+    <!-- Favicon / Browser Tab Logo -->
+    <link rel="icon" type="image/svg+xml" href="../assets/images/gwofo-logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .inquiry-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: #003366;
+            background: #ffffff;
+            border-bottom: 3px solid #003366;
+        }
+        .inquiry-badge {
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .tab-btn.active .inquiry-badge {
+            background: #003366;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            <a href="manage-team.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </a>
+            <a href="manage-partners.html" class="menu-item">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+            </a>
+            <a href="manage-slides.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+            </a>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
+            </a>
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            <a href="manage-inquiries.html" class="menu-item active">
+                <i class="fas fa-inbox"></i>
+                <span>Inquiries &amp; Volunteers</span>
+            </a>
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" title="Logout from Admin Dashboard" onclick="Auth.logout().then(() => window.location.href='login.html')">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Inquiries &amp; Community Applications</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img"><span>A</span></div>
+                    <div class="profile-info">
+                        <span class="profile-name">Administrator</span>
+                        <span class="profile-role">Applications Director</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search inquiries, names, emails...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <div class="content-section" style="margin-bottom: 20px;">
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#003366; font-size:0.85rem; font-weight:600;">CONTACT MESSAGES</div>
+                    <div id="statContactCount" style="font-size:1.8rem; font-weight:700; color:#0f172a; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#d97706; font-size:0.85rem; font-weight:600;">PARTNERSHIP PROPOSALS</div>
+                    <div id="statPartnerCount" style="font-size:1.8rem; font-weight:700; color:#d97706; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#16a34a; font-size:0.85rem; font-weight:600;">VOLUNTEER APPLICATIONS</div>
+                    <div id="statVolunteerCount" style="font-size:1.8rem; font-weight:700; color:#16a34a; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#6366f1; font-size:0.85rem; font-weight:600;">PENDING ACTION</div>
+                    <div id="statPendingAction" style="font-size:1.8rem; font-weight:700; color:#6366f1; margin-top:6px;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section with Tabs & Content -->
+        <div class="content-section">
+            <!-- Navigation Tabs -->
+            <div class="inquiry-tabs">
+                <button class="tab-btn active" data-type="contact">
+                    <i class="fas fa-envelope"></i> Contact Messages <span class="inquiry-badge" id="badgeContact">0</span>
+                </button>
+                <button class="tab-btn" data-type="partner">
+                    <i class="fas fa-handshake"></i> Partnership Inquiries <span class="inquiry-badge" id="badgePartner">0</span>
+                </button>
+                <button class="tab-btn" data-type="volunteer">
+                    <i class="fas fa-hands-helping"></i> Volunteer Applications <span class="inquiry-badge" id="badgeVolunteer">0</span>
+                </button>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+                <div class="filters" style="display:flex; gap:12px;">
+                    <select id="inquiryStatusFilter" class="filter-select" title="Filter by Status">
+                        <option value="all">All Statuses</option>
+                        <option value="new">New / Unread</option>
+                        <option value="pending">Pending</option>
+                        <option value="responded">Responded / Contacted</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected / Archived</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="manageInquiries.loadCurrentTab()" title="Refresh List">
+                    <i class="fas fa-sync-alt"></i> Refresh List
+                </button>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container" style="background:#fff; border-radius:10px; border:1px solid #e2e8f0; overflow-x:auto;">
+                <table class="data-table" style="width:100%; border-collapse:collapse;">
+                    <thead id="inquiryTableHeader">
+                        <!-- Populated dynamically per active tab -->
+                    </thead>
+                    <tbody id="inquiryTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p style="margin-top:10px;">Loading records...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/manage-inquiries.js"></script>
+</body>
+</html>

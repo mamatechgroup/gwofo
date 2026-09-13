@@ -1,4 +1,4 @@
--- PostgreSQL Schema for GWOFO Admin Dashboard
+-- PostgreSQL Schema for GWOFO Admin Dashboard & Public Platform
 
 -- Admin Users Table
 CREATE TABLE IF NOT EXISTS admin_users (
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS projects (
     end_date DATE,
     manager_id INTEGER REFERENCES admin_users(id),
     manager_name VARCHAR(100),
-    image VARCHAR(255),
+    image TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS team_members (
     position VARCHAR(100) NOT NULL,
     department VARCHAR(100),
     bio TEXT,
-    profile_image VARCHAR(255),
+    profile_image TEXT,
     linkedin_url VARCHAR(255),
     twitter_url VARCHAR(255),
     facebook_url VARCHAR(255),
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS partners (
     phone VARCHAR(20),
     website VARCHAR(255),
     description TEXT,
-    logo_url VARCHAR(255),
+    logo_url TEXT,
     agreement_file VARCHAR(255),
     start_date DATE,
     end_date DATE,
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS slides (
     description TEXT NOT NULL,
     position INTEGER UNIQUE,
     status VARCHAR(20) DEFAULT 'active',
-    image_url VARCHAR(255) NOT NULL,
+    image_url TEXT,
     button_text VARCHAR(100),
     button_link VARCHAR(255),
     text_color VARCHAR(20) DEFAULT '#ffffff',
@@ -149,15 +149,76 @@ CREATE TABLE IF NOT EXISTS project_comments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Post Comments Table
+CREATE TABLE IF NOT EXISTS post_comments (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    author_name VARCHAR(100) NOT NULL,
+    author_email VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    approved_date TIMESTAMP,
+    approved_by INTEGER REFERENCES admin_users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Contact Inquiries Table
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(50),
+    subject VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Partnership Inquiries Table
+CREATE TABLE IF NOT EXISTS partnership_inquiries (
+    id SERIAL PRIMARY KEY,
+    organization_name VARCHAR(255) NOT NULL,
+    organization_type VARCHAR(100) NOT NULL,
+    organization_size VARCHAR(50),
+    contact_name VARCHAR(100) NOT NULL,
+    contact_title VARCHAR(100),
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(50) NOT NULL,
+    interest VARCHAR(100),
+    partnership_type VARCHAR(100),
+    details TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Volunteer Applications Table
+CREATE TABLE IF NOT EXISTS volunteer_applications (
+    id SERIAL PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(50),
+    location VARCHAR(100) NOT NULL,
+    volunteer_type VARCHAR(50) NOT NULL,
+    skills TEXT NOT NULL,
+    availability TEXT,
+    motivation TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Dashboard Statistics Table
 CREATE TABLE IF NOT EXISTS dashboard_stats (
     id SERIAL PRIMARY KEY,
     total_posts INTEGER DEFAULT 0,
-    total_projects INTEGER DEFAULT 18,
-    total_team_members INTEGER DEFAULT 8,
-    total_partners INTEGER DEFAULT 12,
+    total_projects INTEGER DEFAULT 3,
+    total_team_members INTEGER DEFAULT 5,
+    total_partners INTEGER DEFAULT 3,
     total_visitors INTEGER DEFAULT 0,
-    total_beneficiaries INTEGER DEFAULT 1250,
+    total_beneficiaries INTEGER DEFAULT 30,
+    volunteers_trained INTEGER DEFAULT 20,
+    counties_reached INTEGER DEFAULT 2,
+    funding_mobilized DECIMAL(12, 2) DEFAULT 146481.93,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -172,7 +233,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexes for better query performance
+-- Create indexes for query performance
 CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
@@ -188,13 +249,50 @@ CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscriptions(sta
 CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscriptions(email);
 CREATE INDEX IF NOT EXISTS idx_comments_project ON project_comments(project_id);
 CREATE INDEX IF NOT EXISTS idx_comments_status ON project_comments(status);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post ON post_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_comments_status ON post_comments(status);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_partnership_status ON partnership_inquiries(status);
+CREATE INDEX IF NOT EXISTS idx_partnership_created ON partnership_inquiries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_volunteer_status ON volunteer_applications(status);
+CREATE INDEX IF NOT EXISTS idx_volunteer_created ON volunteer_applications(created_at DESC);
 
--- Insert default admin user (password: 'password')
+-- Social Links Table
+CREATE TABLE IF NOT EXISTS social_links (
+    id SERIAL PRIMARY KEY,
+    platform VARCHAR(50) UNIQUE NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    url TEXT NOT NULL,
+    icon_class VARCHAR(50) NOT NULL,
+    color_class VARCHAR(50),
+    is_active BOOLEAN DEFAULT true,
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_links_order ON social_links(display_order ASC);
+CREATE INDEX IF NOT EXISTS idx_social_links_active ON social_links(is_active);
+
+-- Insert default admin user if not exists
 INSERT INTO admin_users (username, email, password_hash, role, status)
 VALUES ('admin', 'admin@gwofo.org', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', 'active')
 ON CONFLICT (username) DO NOTHING;
 
--- Insert default dashboard stats
-INSERT INTO dashboard_stats (total_posts, total_projects, total_team_members, total_partners)
-VALUES (45, 18, 8, 12)
-ON CONFLICT DO NOTHING;
+-- Insert default dashboard stats if not exists
+INSERT INTO dashboard_stats (id, total_posts, total_projects, total_team_members, total_partners, total_beneficiaries, volunteers_trained, counties_reached, funding_mobilized)
+VALUES (1, 2, 3, 5, 3, 30, 20, 2, 146481.93)
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert default social media links if not exists
+INSERT INTO social_links (platform, display_name, url, icon_class, color_class, is_active, display_order)
+VALUES 
+    ('facebook', 'Facebook', 'https://facebook.com/gwfoliberia', 'fab fa-facebook-f', 'facebook', true, 1),
+    ('twitter', 'Twitter', 'https://twitter.com/gwfoliberia', 'fab fa-twitter', 'twitter', true, 2),
+    ('instagram', 'Instagram', 'https://instagram.com/gwfoliberia', 'fab fa-instagram', 'instagram', true, 3),
+    ('linkedin', 'LinkedIn', 'https://linkedin.com/company/gwfoliberia', 'fab fa-linkedin-in', 'linkedin', true, 4),
+    ('youtube', 'YouTube', 'https://youtube.com/@gwfoliberia', 'fab fa-youtube', 'youtube', true, 5),
+    ('whatsapp', 'WhatsApp', 'https://wa.me/231888880698', 'fab fa-whatsapp', 'whatsapp', true, 6)
+ON CONFLICT (platform) DO NOTHING;
+

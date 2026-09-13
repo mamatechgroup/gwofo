@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News &amp; Stories - Girls and Women Foundation Liberia</title>
+    <!-- Favicon / Browser Tab Logo -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/gwofo-logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="description" content="Read the latest news, updates, advocacy campaigns, and inspiring success stories from Girls and Women Foundation Liberia.">
+    
+    <!-- Open Graph & Social -->
+    <meta property="og:title" content="News &amp; Stories - Girls and Women Foundation Liberia">
+    <meta property="og:description" content="Inspiring community stories and updates empowering girls and women in Liberia.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://gwfoliberia.org/single.html">
+    <meta property="og:image" content="https://gwfoliberia.org/assets/images/gwofo-logo.svg">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern Single Post & Blog Styles */
+        .reading-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            width: 0%;
+            background: linear-gradient(90deg, #003366, #ff6600);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+
+        .single-post-page {
+            padding: 40px 0 80px;
+            margin-top: 70px;
+            min-height: 80vh;
+            background: #f8fafc;
+        }
+
+        .blog-grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 991.98px) {
+            .blog-grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .article-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 36px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 767.98px) {
+            .article-card {
+                padding: 20px 16px;
+            }
+        }
+
+        .article-meta-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .author-info-block {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #003366;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .author-details h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #0f172a;
+        }
+
+        .author-details .post-date {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .article-category-badge {
+            background: rgba(0, 51, 102, 0.08);
+            color: #003366;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-title-hero {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            color: #0f172a;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+
+        .article-featured-media {
+            margin: 24px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 480px;
+            background: #0f172a;
+        }
+
+        .article-featured-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .article-body {
+            font-size: 1.08rem;
+            line-height: 1.8;
+            color: #334155;
+            margin: 28px 0;
+        }
+
+        .article-body p {
+            margin-bottom: 20px;
+        }
+
+        .article-body h2 {
+            font-size: 1.6rem;
+            color: #003366;
+            margin: 30px 0 15px;
+        }
+
+        .article-body blockquote {
+            border-left: 4px solid #003366;
+            padding: 14px 20px;
+            background: #f8fafc;
+            font-style: italic;
+            margin: 24px 0;
+            color: #1e293b;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Social Share Strip */
+        .social-share-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 0;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .social-share-strip span {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .share-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .share-icon-btn:hover {
+            background: #003366;
+            color: #fff;
+            border-color: #003366;
+            transform: translateY(-2px);
+        }
+
+        /* Post Navigation */
+        .post-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            gap: 16px;
+        }
+
+        .post-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: #1e293b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .post-nav-btn:hover:not(:disabled) {
+            background: #003366;
+            color: #fff;
+            border-color: #003366;
+        }
+
+        .post-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .comments-header h3 {
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .comment-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+        }
+
+        .comment-author-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author-name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .comment-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .comment-text {
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .comment-form-box {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .comment-form-box h4 {
+            margin-top: 0;
+            margin-bottom: 14px;
+            color: #0f172a;
+        }
+
+        .comment-form-box .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        @media (max-width: 576px) {
+            .comment-form-box .form-row {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* Sidebar Widgets */
+        .blog-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .sidebar-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .sidebar-card h3 {
+            font-size: 1.2rem;
+            color: #003366;
+            margin-top: 0;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .topic-pill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #334155;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .topic-pill:hover {
+            background: #003366;
+            color: #ffffff;
+        }
+
+        .recent-activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .recent-activity-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .recent-activity-item i {
+            color: #003366;
+            margin-top: 3px;
+        }
+
+        .recent-activity-item p {
+            margin: 0;
+            font-size: 0.88rem;
+            color: #1e293b;
+        }
+
+        .recent-activity-item span {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Reading Progress Bar -->
+    <div id="readingProgressBar" class="reading-progress-bar"></div>
+
+    <!-- Modular Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Single Post Content -->
+    <main class="single-post-page">
+        <div class="container">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumbs" style="margin-bottom: 24px;">
+                <a href="index.html">Home</a> &gt;
+                <a href="single.html">News &amp; Stories</a> &gt;
+                <span id="breadcrumbPostTitle">Article</span>
+            </nav>
+
+            <div class="blog-grid-layout">
+                <!-- Left: Post Content & Comments -->
+                <div class="blog-main-content">
+                    <!-- Post Card Container -->
+                    <article class="article-card" id="singlePostContainer">
+                        <div class="loading-state" style="text-align: center; padding: 60px 0;">
+                            <i class="fas fa-spinner fa-spin fa-2x" style="color: #003366;"></i>
+                            <p style="margin-top: 14px; color: #64748b;">Loading story...</p>
+                        </div>
+                    </article>
+
+                    <!-- Navigation Bar between posts -->
+                    <div class="post-nav-bar" id="postNavBar" style="display: none;">
+                        <button id="prevBtn" class="post-nav-btn">
+                            <i class="fas fa-arrow-left"></i> Previous Post
+                        </button>
+                        <div style="font-size: 0.9rem; color: #64748b;">
+                            Post <span id="currentPostNumber">1</span> of <span id="totalPostsNumber">1</span>
+                        </div>
+                        <button id="nextBtn" class="post-nav-btn">
+                            Next Post <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Post Comments Section -->
+                    <section class="comments-section" id="postCommentsSection">
+                        <div class="comments-header">
+                            <h3><i class="fas fa-comments"></i> Community Comments (<span id="commentsCount">0</span>)</h3>
+                        </div>
+
+                        <!-- Approved Comments List -->
+                        <div id="approvedCommentsList">
+                            <p style="color: #64748b; font-size: 0.95rem;">Be the first to share your thoughts!</p>
+                        </div>
+
+                        <!-- Comment Submission Form -->
+                        <div class="comment-form-box">
+                            <h4>Leave a Comment</h4>
+                            <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 16px;">
+                                Your email address will not be published. Comments are reviewed before appearing publicly.
+                            </p>
+                            <form id="postCommentForm">
+                                <div class="form-row">
+                                    <div>
+                                        <label for="commentAuthorName" style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Your Name *</label>
+                                        <input type="text" id="commentAuthorName" required placeholder="Jane Doe" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px;">
+                                    </div>
+                                    <div>
+                                        <label for="commentAuthorEmail" style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Your Email *</label>
+                                        <input type="email" id="commentAuthorEmail" required placeholder="jane@example.com" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px;">
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <label for="commentContent" style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Comment *</label>
+                                    <textarea id="commentContent" rows="4" required placeholder="Share your perspective or encouragement..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px; font-family:inherit;"></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary" id="submitCommentBtn">
+                                    <i class="fas fa-paper-plane"></i> Submit Comment
+                                </button>
+                                <div id="commentFormAlert" style="display: none; margin-top: 14px; padding: 10px 14px; border-radius: 6px; font-size: 0.9rem;"></div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right: Responsive Sidebar -->
+                <aside class="blog-sidebar">
+                    <!-- Popular Categories / Topics -->
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-tags"></i> Topics</h3>
+                        <div class="topic-pill-list">
+                            <a href="single.html?category=education" class="topic-pill"><i class="fas fa-graduation-cap"></i> Education</a>
+                            <a href="single.html?category=empowerment" class="topic-pill"><i class="fas fa-fist-raised"></i> Empowerment</a>
+                            <a href="single.html?category=health" class="topic-pill"><i class="fas fa-heartbeat"></i> Health &amp; SRHR</a>
+                            <a href="single.html?category=stories" class="topic-pill"><i class="fas fa-star"></i> Success Stories</a>
+                            <a href="single.html?category=advocacy" class="topic-pill"><i class="fas fa-bullhorn"></i> Advocacy</a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity / Impact -->
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-bolt"></i> Recent Activity</h3>
+                        <div id="sidebarActivitiesList">
+                            <p style="color: #64748b; font-size: 0.88rem;">Loading recent initiatives...</p>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Newsletter Card -->
+                    <div class="sidebar-card" style="background: linear-gradient(135deg, #003366, #002244); color: #ffffff;">
+                        <h3 style="color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.2);">Stay Informed</h3>
+                        <p style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 16px;">
+                            Get quarterly impact reports and field updates delivered directly to your inbox.
+                        </p>
+                        <form class="newsletter-form stacked" id="sidebarNewsletterForm">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i> Subscribe Now
+                            </button>
+                        </form>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modular Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/single-post.js"></script>
+    <script src="js/load.js"></script>
+</body>
+</html>

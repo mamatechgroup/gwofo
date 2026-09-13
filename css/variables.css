@@ -12,6 +12,9 @@
     --secondary-dark: #276749;
 
     --accent-color: #B22234;         /* Accent red */
+    --danger-red: #dc2626;           /* Close / danger red */
+    --danger-red-dark: #b91c1c;      /* Dark red hover */
+    --danger-red-light: #fef2f2;     /* Light red background */
 
     /* =========================
        NEUTRALS & TEXT

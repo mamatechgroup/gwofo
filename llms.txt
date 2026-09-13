@@ -1,0 +1,60 @@
+# Girls & Women Foundation Liberia (GWOFO)
+
+> Empowering the next generation of Liberian women leaders through education, economic opportunity, land ownership, and policy advocacy.
+
+## About Organization
+Girls and Women Foundation Liberia (GWOFO) is a grassroots non-governmental, non-profit organization established in 2016 and operating primarily across Grand Gedeh County and South-Eastern Liberia. GWOFO's headquarters is situated in Zwedru, Grand Gedeh County, Republic of Liberia.
+
+- **Founding Year**: 2016
+- **Headquarters**: Zwedru, Grand Gedeh County, Liberia
+- **Executive Leadership**:
+  - Amelia Williams Kar (Executive Director)
+  - Pastor Rosetta Williams (Board Member & Strategic Advisor)
+  - Rev. S. Robert Kar (Community Liaison & Advisor)
+  - Joyce Favour Kar (Senior Program Lead)
+  - Joycelyn Blayee (Field Coordinator)
+  - Julia Zeon Rue (Administrative Lead)
+  - William Beallah (Financial Coordinator)
+  - George A. Paye (Field Mobilizer)
+- **Primary Website**: https://gwfoliberia.org
+- **Contact Email**: info@gwfoliberia.org / gwofo.liberia@gmail.com
+- **Phone**: +231 88 888 0698 / +231 770 409 441
+
+## Core Strategic Pillars
+1. **Economic Empowerment & Liveskills Training**: Home economy, small business incubation, vocational micro-grants, and cooperative development for rural women.
+2. **Women and Youth Land Ownership**: Protecting customary land rights, ensuring women participate equally in community land development management committees (CLDMCs), and legal education in partnership with international donors.
+3. **Sexual and Reproductive Health & Rights (SRHR) & SGBV Eradication**: Community-based advocacy, psycho-social support, school health clubs, and grassroots legal accompaniment to eliminate violence against women.
+4. **Inclusive Girls' Education**: Retention scholarships, mentoring circles, and literacy classes for young mothers and out-of-school girls.
+
+## Verified Impact Milestones
+- **Women Empowered**: 30+ through intensive business incubation and skills programs
+- **Community Volunteers Trained**: 20+ actively serving local communities
+- **Counties Reached**: 2 (Grand Gedeh & Nimba Counties)
+- **Direct Grant Mobilization**: $146,481.93 across key grant partnerships
+- **Major Active Projects**: 3 flagship community projects
+
+## Primary Web Pages
+- [Home Page](https://gwfoliberia.org/)
+- [About Us & Mission](https://gwfoliberia.org/about.html)
+- [All Projects](https://gwfoliberia.org/projects.html)
+- [Education Programs](https://gwfoliberia.org/projects-education.html)
+- [Empowerment Initiatives](https://gwfoliberia.org/projects-empowerment.html)
+- [Health & SRHR Access](https://gwfoliberia.org/projects-health.html)
+- [News & Stories](https://gwfoliberia.org/single.html)
+- [Partners & Donors](https://gwfoliberia.org/partners.html)
+- [Leadership & Team](https://gwfoliberia.org/team.html)
+- [Governing Board](https://gwfoliberia.org/board.html)
+- [Impact Metrics](https://gwfoliberia.org/impact.html)
+- [Get Involved & Volunteer](https://gwfoliberia.org/get-involved.html)
+- [Become a Partner](https://gwfoliberia.org/become-partner.html)
+- [Contact](https://gwfoliberia.org/contact.html)
+
+## Public API Endpoints
+- `GET /api/stats/public`: Real-time computed impact metrics (women empowered, funding mobilized, volunteers, active projects).
+- `GET /api/slides/status/active`: Homepage hero slides and campaign announcements.
+- `GET /api/posts`: Published news articles, field journals, and stories.
+- `GET /api/projects`: Catalog of community projects and progress milestones.
+- `POST /api/inquiries/contact`: Public contact message submission.
+- `POST /api/inquiries/partner`: Partnership proposals submission.
+- `POST /api/inquiries/volunteer`: Community and virtual volunteer applications.
+- `POST /api/newsletter/subscribe`: Public newsletter subscription.

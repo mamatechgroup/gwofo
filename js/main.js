@@ -14,6 +14,7 @@ function initializeAllFunctionality() {
     initInteractiveElements();
     initAnimations();
     initDropdowns();
+    loadSocialMediaLinks();
     
     // Setup event listeners
     setupEventListeners();
@@ -33,62 +34,106 @@ function initNavigation() {
 function initMobileNavigation() {
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.querySelector('.nav-menu');
+    const navOverlay = document.getElementById('navOverlay');
+    const docEl = document.documentElement;
     const body = document.body;
     
     if (navToggle && navMenu) {
         if (navToggle.dataset.navInitialized) return;
         navToggle.dataset.navInitialized = 'true';
+
+        function updateToggleIcon(isOpen) {
+            let icon = navToggle.querySelector('i');
+            if (!icon) {
+                icon = document.createElement('i');
+                navToggle.appendChild(icon);
+            }
+            if (isOpen) {
+                icon.className = 'fas fa-times fa-xmark';
+                navToggle.setAttribute('aria-label', 'Close navigation menu');
+                navToggle.setAttribute('aria-expanded', 'true');
+            } else {
+                icon.className = 'fas fa-bars';
+                navToggle.setAttribute('aria-label', 'Open navigation menu');
+                navToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function closeDrawer() {
+            navMenu.classList.remove('active');
+            navToggle.classList.remove('active');
+            docEl.classList.remove('nav-open');
+            body.classList.remove('nav-open');
+            if (navOverlay) navOverlay.classList.remove('active');
+            
+            updateToggleIcon(false);
+
+            // Restore scrolling
+            docEl.style.overflow = '';
+            body.style.overflow = '';
+            body.style.touchAction = '';
+        }
+
+        function openDrawer() {
+            navMenu.classList.add('active');
+            navToggle.classList.add('active');
+            docEl.classList.add('nav-open');
+            body.classList.add('nav-open');
+            if (navOverlay) navOverlay.classList.add('active');
+
+            updateToggleIcon(true);
+
+            // Lock scrolling strictly
+            docEl.style.overflow = 'hidden';
+            body.style.overflow = 'hidden';
+            body.style.touchAction = 'none';
+        }
+
         navToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
-            navMenu.classList.toggle('active');
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-            
-            // Toggle body overflow to prevent scrolling when menu is open
             if (navMenu.classList.contains('active')) {
-                body.style.overflow = 'hidden';
+                closeDrawer();
             } else {
-                body.style.overflow = '';
+                openDrawer();
             }
         });
         
-        // Close mobile menu when clicking on a link
+        // Close mobile menu when clicking on overlay and prevent scroll passing through
+        if (navOverlay) {
+            navOverlay.addEventListener('click', closeDrawer);
+            navOverlay.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            navOverlay.addEventListener('wheel', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+        }
+
+        // Close mobile menu when clicking on a destination link (not a dropdown toggle)
         document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                const icon = navToggle.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-                body.style.overflow = ''; // Restore scrolling
+            link.addEventListener('click', (e) => {
+                const isDropdownTrigger = link.classList.contains('dropdown-trigger') || 
+                                          (link.parentElement && link.parentElement.classList.contains('dropdown') && 
+                                           link.nextElementSibling && link.nextElementSibling.classList.contains('dropdown-menu'));
+                if (isDropdownTrigger && window.innerWidth <= 991.98) {
+                    return; // Allow dropdown submenu to toggle open/close
+                }
+                closeDrawer();
             });
         });
         
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (window.innerWidth <= 992) { // Only on mobile
-                if (!navToggle.contains(event.target) && 
-                    !navMenu.contains(event.target) && 
-                    navMenu.classList.contains('active')) {
-                    navMenu.classList.remove('active');
-                    const icon = navToggle.querySelector('i');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    body.style.overflow = ''; // Restore scrolling
-                }
-            }
-        });
-        
-        // Also close on escape key
+        // Close on escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-                const icon = navToggle.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-                body.style.overflow = '';
+                closeDrawer();
+            }
+        });
+
+        // Auto close if viewport resized to desktop width
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 991.98 && navMenu.classList.contains('active')) {
+                closeDrawer();
             }
         });
     }
@@ -241,32 +286,291 @@ function highlightActiveNav() {
 // FORM FUNCTIONS
 // ==========================================================================
 
+// ==========================================================================
+// FORM FUNCTIONS & REAL-TIME PUBLIC STATS
+// ==========================================================================
+
 function initForms() {
     initContactForm();
+    initVolunteerForm();
+    initPartnershipForm();
     initNewsletterForms();
     initFormFieldEffects();
+    loadPublicStats();
 }
 
+// 1. Live Public Stats (Zero Mock Data)
+async function loadPublicStats() {
+    try {
+        const apiBase = window.API_BASE_URL || '/api';
+        const res = await fetch(`${apiBase}/stats/public`);
+        const result = await res.json();
+        if (!result.success || !result.data) return;
+
+        const data = result.data;
+
+        // Homepage: .mission-stats .stat-item
+        const statItems = document.querySelectorAll('.mission-stats .stat-item');
+        if (statItems.length >= 4) {
+            const el1 = statItems[0].querySelector('h3');
+            if (el1) animateCounter(el1, data.women_empowered, '+', '<i class="fas fa-user-graduate"></i> ');
+            
+            const el2 = statItems[1].querySelector('h3');
+            if (el2) animateCounter(el2, data.volunteers_trained, '+', '<i class="fas fa-fist-raised"></i> ');
+            
+            const el3 = statItems[2].querySelector('h3');
+            if (el3) animateCounter(el3, data.counties_reached, '', '<i class="fas fa-map-marker-alt"></i> ');
+            
+            const el4 = statItems[3].querySelector('h3');
+            if (el4) animateCounter(el4, data.active_projects, '+', '<i class="fas fa-project-diagram"></i> ');
+        }
+
+        // Impact Page: .impact-stat-large
+        const impactStats = document.querySelectorAll('.impact-stat-large');
+        if (impactStats.length >= 4) {
+            const num1 = impactStats[0].querySelector('.stat-number');
+            if (num1) animateCounter(num1, data.women_empowered, '+');
+
+            const num2 = impactStats[1].querySelector('.stat-number');
+            if (num2) animateCounter(num2, data.volunteers_trained, '');
+
+            const num3 = impactStats[2].querySelector('.stat-number');
+            if (num3) animateCounter(num3, data.counties_reached, '');
+
+            const num4 = impactStats[3].querySelector('.stat-number');
+            if (num4) {
+                num4.textContent = '$' + Number(data.funding_mobilized || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+    } catch (err) {
+        console.warn('Public stats live sync deferred:', err.message);
+    }
+}
+
+function animateCounter(element, targetValue, suffix = '', prefixHtml = '') {
+    const target = parseInt(targetValue, 10);
+    if (isNaN(target)) {
+        element.innerHTML = prefixHtml + targetValue + suffix;
+        return;
+    }
+    let current = 0;
+    const duration = 1200;
+    const stepTime = 30;
+    const steps = duration / stepTime;
+    const increment = Math.max(1, Math.ceil(target / steps));
+
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        element.innerHTML = prefixHtml + current + suffix;
+    }, stepTime);
+}
+
+// 2. Contact Form
 function initContactForm() {
     const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
     if (contactForm.dataset.formInitialized) return;
     contactForm.dataset.formInitialized = 'true';
     
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Get form data
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
         
-        // Validate form
         if (validateContactForm(this)) {
-            // In a real application, this would send to a server
-            console.log('Contact form submitted:', data);
-            
-            // Show success message
-            showFormSuccess(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Send Message';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            }
+
+            try {
+                const apiBase = window.API_BASE_URL || '/api';
+                const response = await fetch(`${apiBase}/inquiries/contact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showFormSuccess(contactForm);
+                    contactForm.reset();
+                } else {
+                    alert(result.error || 'Failed to send inquiry. Please try again.');
+                }
+            } catch (err) {
+                console.error('Contact error:', err);
+                alert('Connection error. Please try again later.');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+        }
+    });
+}
+
+// 3. Volunteer Application Form
+function initVolunteerForm() {
+    const volunteerForm = document.getElementById('volunteerApplicationForm');
+    if (!volunteerForm || volunteerForm.dataset.volunteerInitialized) return;
+    volunteerForm.dataset.volunteerInitialized = 'true';
+
+    volunteerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('volunteer-name')?.value.trim();
+        const email = document.getElementById('volunteer-email')?.value.trim();
+        const phone = document.getElementById('volunteer-phone')?.value.trim();
+        const location = document.getElementById('volunteer-location')?.value.trim();
+        const volunteerType = document.querySelector('input[name="volunteer-type"]:checked')?.value || 'local';
+        const skills = document.getElementById('volunteer-skills')?.value.trim();
+        const availability = document.getElementById('volunteer-availability')?.value.trim();
+        const motivation = document.getElementById('volunteer-motivation')?.value.trim();
+
+        if (!name || !email || !skills || !motivation) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const origText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        }
+
+        try {
+            const apiBase = window.API_BASE_URL || '/api';
+            const response = await fetch(`${apiBase}/inquiries/volunteer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    full_name: name,
+                    email,
+                    phone,
+                    location,
+                    volunteer_type: volunteerType,
+                    skills,
+                    availability,
+                    motivation
+                })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showAppreciationModal({
+                    title: 'Thank You for Stepping Forward!',
+                    message: 'Your volunteer application has been received with sincere gratitude. Our volunteer coordination team will review your profile and contact you within 3–5 business days.',
+                    subtext: 'Volunteers are the heartbeat of our grassroots empowerment, education, and advocacy initiatives across Liberia.',
+                    icon: 'fa-hands-helping',
+                    buttonText: 'Continue Exploring'
+                });
+                volunteerForm.reset();
+            } else {
+                alert(result.error || 'Failed to submit volunteer application.');
+            }
+        } catch (err) {
+            console.error('Volunteer error:', err);
+            alert('Connection error. Please try again.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origText;
+            }
+        }
+    });
+}
+
+// 4. Partnership Inquiry Form
+function initPartnershipForm() {
+    const partnershipForm = document.getElementById('partnershipForm');
+    if (!partnershipForm || partnershipForm.dataset.partnershipInitialized) return;
+    partnershipForm.dataset.partnershipInitialized = 'true';
+
+    partnershipForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const orgName = document.getElementById('org-name')?.value.trim() || document.getElementById('organization-name')?.value.trim();
+        const contactName = document.getElementById('contact-name')?.value.trim();
+        const email = document.getElementById('email')?.value.trim() || document.getElementById('contact-email')?.value.trim();
+        const phone = document.getElementById('phone')?.value.trim();
+        const website = document.getElementById('website')?.value.trim();
+        const partnershipType = document.getElementById('partnership-type')?.value || 'strategic';
+        const proposedCollab = document.getElementById('collaboration-areas')?.value.trim() || document.getElementById('collaboration')?.value.trim();
+        const message = document.getElementById('additional-info')?.value.trim() || document.getElementById('message')?.value.trim();
+
+        if (!orgName || !contactName || !email) {
+            alert('Please complete Organization Name, Contact Person, and Email.');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const origText = submitBtn ? submitBtn.innerHTML : 'Submit Proposal';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        }
+
+        try {
+            const apiBase = window.API_BASE_URL || '/api';
+            const response = await fetch(`${apiBase}/inquiries/partner`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    organization_name: orgName,
+                    contact_name: contactName,
+                    email,
+                    phone,
+                    website,
+                    partnership_type: partnershipType,
+                    proposed_collaboration: proposedCollab,
+                    message
+                })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showAppreciationModal({
+                    title: 'Partnership Proposal Received!',
+                    message: 'Thank you for proposing collaboration with GWOFO. Our Partnerships Directorate has received your submission and will contact you within 3 business days.',
+                    subtext: 'Strategic alliances empower us to build sustainable livelihood and literacy interventions across Liberia.',
+                    icon: 'fa-handshake',
+                    buttonText: 'Done'
+                });
+                partnershipForm.reset();
+                
+                // Reset multi-step form if present
+                const formSteps = document.querySelectorAll('.form-step');
+                if (formSteps.length > 0) {
+                    formSteps.forEach(step => step.classList.remove('active'));
+                    const step1 = document.getElementById('step1');
+                    if (step1) step1.classList.add('active');
+                    const stepDots = document.querySelectorAll('.step-dot');
+                    stepDots.forEach((dot, index) => {
+                        dot.classList.remove('active');
+                        if (index === 0) dot.classList.add('active');
+                    });
+                }
+            } else {
+                alert(result.error || 'Failed to submit partnership proposal.');
+            }
+        } catch (err) {
+            console.error('Partnership error:', err);
+            alert('Connection error. Please try again.');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origText;
+            }
         }
     });
 }
@@ -275,7 +579,6 @@ function validateContactForm(form) {
     let isValid = true;
     const requiredFields = form.querySelectorAll('[required]');
     
-    // Validate required fields
     requiredFields.forEach(field => {
         if (!field.value.trim()) {
             showFieldError(field, 'This field is required');
@@ -285,7 +588,6 @@ function validateContactForm(form) {
         }
     });
     
-    // Email validation
     const emailField = form.querySelector('#email');
     if (emailField && emailField.value.trim()) {
         if (!validateEmail(emailField.value.trim())) {
@@ -294,10 +596,9 @@ function validateContactForm(form) {
         }
     }
     
-    // Message validation (if it exists)
     const messageField = form.querySelector('#message');
-    if (messageField && messageField.value.trim().length < 10) {
-        showFieldError(messageField, 'Please enter a message of at least 10 characters');
+    if (messageField && messageField.value.trim().length < 5) {
+        showFieldError(messageField, 'Please enter a message of at least 5 characters');
         isValid = false;
     }
     
@@ -307,7 +608,7 @@ function validateContactForm(form) {
 function initNewsletterForms() {
     if (window.newsletterInitialized) return;
     window.newsletterInitialized = true;
-    // Use event delegation to handle all newsletter form submissions dynamically (including header/footer)
+    
     document.addEventListener('submit', async function(e) {
         const form = e.target.closest('.newsletter-form');
         if (!form) return;
@@ -322,15 +623,14 @@ function initNewsletterForms() {
             return;
         }
 
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+
         try {
-            const apiBase = window.location.hostname.includes('netlify.app')
-                ? 'https://gwofo.onrender.com/api'
-                : 'http://localhost:3000/api';
+            const apiBase = window.API_BASE_URL || '/api';
             const response = await fetch(`${apiBase}/newsletter/subscribe`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
 
@@ -340,183 +640,25 @@ function initNewsletterForms() {
                 showThankYouPopup(email);
                 form.reset();
             } else {
-                alert(data.error || 'Failed to subscribe to newsletter. Please try again.');
+                alert(data.error || data.message || 'Email already subscribed or invalid.');
             }
         } catch (error) {
             console.error('Newsletter subscription error:', error);
-            alert('Error connecting to subscription server. Please try again later.');
+            alert('Unable to connect to newsletter service.');
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
         }
     });
 }
 
 function showThankYouPopup(email) {
-    if (!document.getElementById('sub-thank-styles')) {
-        const style = document.createElement('style');
-        style.id = 'sub-thank-styles';
-        style.textContent = `
-            .sub-thank-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(15, 23, 42, 0.6);
-                backdrop-filter: blur(8px);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 99999;
-                opacity: 0;
-                transition: opacity 0.4s ease;
-            }
-            .sub-thank-overlay.show {
-                opacity: 1;
-            }
-            .sub-thank-card {
-                background: #ffffff;
-                border-radius: 20px;
-                padding: 40px;
-                max-width: 480px;
-                width: 90%;
-                box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-                text-align: center;
-                transform: scale(0.8) translateY(20px);
-                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                position: relative;
-                border: 1px solid rgba(99, 102, 241, 0.1);
-            }
-            .sub-thank-overlay.show .sub-thank-card {
-                transform: scale(1) translateY(0);
-            }
-            .sub-thank-icon-container {
-                width: 80px;
-                height: 80px;
-                background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 24px;
-            }
-            .sub-thank-icon {
-                font-size: 2.2rem;
-                color: #6366f1;
-                animation: sub-icon-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
-            }
-            @keyframes sub-icon-pop {
-                0% { transform: scale(0); rotate: -45deg; }
-                100% { transform: scale(1); rotate: 0deg; }
-            }
-            .sub-thank-title {
-                font-family: 'Playfair Display', serif;
-                font-size: 1.8rem;
-                font-weight: 700;
-                color: #1e1b4b;
-                margin-bottom: 12px;
-            }
-            .sub-thank-message {
-                font-family: 'Poppins', sans-serif;
-                font-size: 1rem;
-                color: #4b5563;
-                line-height: 1.6;
-                margin-bottom: 28px;
-            }
-            .sub-thank-btn {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
-                color: #ffffff;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 30px;
-                font-family: 'Poppins', sans-serif;
-                font-weight: 600;
-                font-size: 0.95rem;
-                cursor: pointer;
-                box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
-                transition: all 0.3s ease;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .sub-thank-btn:hover {
-                background: linear-gradient(135deg, #4f46e5, #7c3aed);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-            }
-            .sub-thank-close-x {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: none;
-                border: none;
-                color: #9ca3af;
-                font-size: 1.2rem;
-                cursor: pointer;
-                transition: color 0.2s ease;
-            }
-            .sub-thank-close-x:hover {
-                color: #4b5563;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    const overlay = document.createElement('div');
-    overlay.className = 'sub-thank-overlay';
-    overlay.innerHTML = `
-        <div class="sub-thank-card">
-            <button class="sub-thank-close-x" aria-label="Close dialog">&times;</button>
-            <div class="sub-thank-icon-container">
-                <i class="fas fa-check-circle sub-thank-icon"></i>
-            </div>
-            <h3 class="sub-thank-title">Thank You!</h3>
-            <p class="sub-thank-message">
-                You have successfully subscribed to the GWOFO newsletter with <strong>${(email || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>.<br>
-                Stay tuned for our latest stories, updates, and community impact events!
-            </p>
-            <button class="sub-thank-btn">
-                Awesome <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-        overlay.classList.add('show');
-    }, 10);
-
-    function closePopup() {
-        overlay.classList.remove('show');
-        setTimeout(() => {
-            overlay.remove();
-        }, 400);
-    }
-
-    const autoCloseTimer = setTimeout(closePopup, 5000);
-    const closeBtn = overlay.querySelector('.sub-thank-btn');
-    const closeX = overlay.querySelector('.sub-thank-close-x');
-
-    const handleCloseClick = () => {
-        clearTimeout(autoCloseTimer);
-        closePopup();
-    };
-
-    closeBtn.addEventListener('click', handleCloseClick);
-    closeX.addEventListener('click', handleCloseClick);
-
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) {
-            handleCloseClick();
-        }
+    showAppreciationModal({
+        title: 'Thank You for Subscribing!',
+        message: `You have successfully subscribed to the GWOFO community newsletter with <strong>${(email || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>.`,
+        subtext: 'Stay tuned for our latest grassroots stories, community reports, and program milestones!',
+        icon: 'fa-envelope-circle-check',
+        buttonText: 'Awesome'
     });
-
-    const escListener = function(e) {
-        if (e.key === 'Escape') {
-            document.removeEventListener('keydown', escListener);
-            handleCloseClick();
-        }
-    };
-    document.addEventListener('keydown', escListener);
 }
 
 function initFormFieldEffects() {
@@ -539,20 +681,86 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function showAppreciationModal(options = {}) {
+    const title = options.title || 'Thank You for Your Support!';
+    const message = options.message || 'Your submission has been received with sincere appreciation.';
+    const subtext = options.subtext || 'Together, we are making a meaningful difference in the lives of women and girls across Liberia.';
+    const icon = options.icon || 'fa-heart';
+    const buttonText = options.buttonText || 'Continue';
+    const onClose = typeof options.onClose === 'function' ? options.onClose : null;
+
+    const existing = document.getElementById('gwAppreciationModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'gwAppreciationModal';
+    overlay.className = 'appreciation-modal-overlay';
+    overlay.innerHTML = `
+        <div class="appreciation-modal-card" role="dialog" aria-modal="true" aria-labelledby="gwModalTitle">
+            <button class="appreciation-close-btn" id="gwModalCloseBtn" aria-label="Close message">&times;</button>
+            <div class="appreciation-icon-badge">
+                <i class="fas ${icon}"></i>
+            </div>
+            <h3 id="gwModalTitle">${title}</h3>
+            <p class="appreciation-message">${message}</p>
+            <p class="appreciation-subtext">${subtext}</p>
+            <button class="btn-continue" id="gwModalContinueBtn">${buttonText}</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+        overlay.classList.add('active');
+    });
+
+    const closeModal = () => {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            if (onClose) onClose();
+        }, 300);
+    };
+
+    const closeBtn = overlay.querySelector('#gwModalCloseBtn');
+    const contBtn = overlay.querySelector('#gwModalContinueBtn');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (contBtn) contBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    const keyHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+            document.removeEventListener('keydown', keyHandler);
+        }
+    };
+    document.addEventListener('keydown', keyHandler);
+}
+window.showAppreciationModal = showAppreciationModal;
+
 function showFormSuccess(form) {
-    // Show success message
-    alert('Thank you for your message! We will get back to you within 24-48 hours.');
+    showAppreciationModal({
+        title: 'Thank You for Your Message!',
+        message: 'Your inquiry has been received with warm appreciation. Our team will review your message and get back to you within 24–48 hours.',
+        subtext: 'Your voice and interest strengthen our mission to uplift women and girls across Liberia.',
+        icon: 'fa-envelope-open-text',
+        buttonText: 'Continue Exploring'
+    });
     
     // Reset form
-    form.reset();
+    if (form && typeof form.reset === 'function') {
+        form.reset();
+    }
     
     // Show confirmation animation
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
     if (submitBtn) {
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
         submitBtn.disabled = true;
-        submitBtn.style.background = '#4CAF50';
+        submitBtn.style.background = '#2E8B57';
         
         setTimeout(() => {
             submitBtn.innerHTML = originalText;
@@ -1112,8 +1320,8 @@ class Slider {
     init() {
         if (this.slides.length === 0) return;
         
-        // Show first slide
-        this.showSlide(this.currentSlide);
+        // Show initial slide smoothly
+        this.showSlide(this.currentSlide, true);
         
         // Initialize controls
         this.initControls();
@@ -1129,24 +1337,83 @@ class Slider {
         
         // Touch support for mobile
         this.initTouchEvents();
+
+        // Sync with live backend active slides
+        this.syncWithBackend();
+    }
+
+    async syncWithBackend() {
+        try {
+            const apiBase = window.API_BASE_URL || '/api';
+            const res = await fetch(`${apiBase}/slides/status/active`);
+            const data = await res.json();
+
+            if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+                const sliderEl = this.container.querySelector('.slider');
+                if (!sliderEl) return;
+
+                const sortedSlides = data.data.sort((a, b) => (a.position || 0) - (b.position || 0));
+                
+                // Render live slides
+                sliderEl.innerHTML = sortedSlides.map((s, idx) => {
+                    const bgImage = s.image_url ? `url('${s.image_url}')` : '';
+                    const inlineStyle = bgImage ? `style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), ${bgImage};"` : '';
+                    const btnLink = s.button_link || 'projects.html';
+                    const btnText = s.button_text || 'Learn More';
+                    return `
+                        <div class="slide slide-db ${idx === 0 ? 'active' : ''}" ${inlineStyle}>
+                            <div class="slide-content">
+                                <h1>${(s.title || '').replace(/</g, '&lt;')}</h1>
+                                <p>${(s.description || '').replace(/</g, '&lt;')}</p>
+                                <a href="${btnLink}" class="btn-primary"><i class="fas fa-arrow-right"></i> ${btnText}</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                this.slides = this.container.querySelectorAll('.slide');
+                this.currentSlide = 0;
+            }
+        } catch (err) {
+            console.warn('Hero slider backend sync fallback:', err.message);
+        }
     }
     
-    showSlide(index) {
-        // Hide all slides
-        this.slides.forEach(slide => {
-            slide.classList.remove('active');
-            slide.style.opacity = '0';
-        });
-        
-        // Show current slide
-        const currentSlide = this.slides[index];
-        currentSlide.classList.add('active');
-        
-        // Use a small delay to ensure CSS transitions work properly
+    showSlide(index, immediate = false) {
+        if (!this.slides || this.slides.length === 0) return;
+        if (index < 0 || index >= this.slides.length) index = 0;
+
+        const current = this.slides[this.currentSlide];
+        const incoming = this.slides[index];
+
+        if (!incoming) return;
+
+        if (immediate || !current || current === incoming) {
+            this.slides.forEach(s => {
+                s.classList.remove('active', 'incoming');
+                s.style.opacity = '0';
+            });
+            incoming.classList.add('active');
+            incoming.style.opacity = '1';
+            this.currentSlide = index;
+            return;
+        }
+
+        // Double-buffered crossfade: incoming slide fades in on top
+        incoming.classList.add('incoming');
+        incoming.style.opacity = '0';
+        void incoming.offsetWidth; // force browser reflow
+        incoming.classList.add('active');
+        incoming.style.opacity = '1';
+
         setTimeout(() => {
-            currentSlide.style.opacity = '1';
-        }, 10);
-        
+            if (current && current !== incoming) {
+                current.classList.remove('active');
+                current.style.opacity = '0';
+            }
+            incoming.classList.remove('incoming');
+        }, 650);
+
         this.currentSlide = index;
     }
     
@@ -1390,30 +1657,32 @@ function initAnimations() {
 }
 
 function initScrollAnimations() {
-    // Create a single observer for all animated elements
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll('.reveal-on-scroll, .project-card, .team-card, .category-card, .stat-item, .value-card, .office-card').forEach(el => {
+            el.classList.add('revealed');
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+        return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
     
-    // Observe all elements that should animate on scroll
-    const animatedElements = [
-        ...document.querySelectorAll('.project-card'),
-        ...document.querySelectorAll('.team-card'),
-        ...document.querySelectorAll('.category-card'),
-        ...document.querySelectorAll('.stat-item'),
-        ...document.querySelectorAll('.value-card'),
-        ...document.querySelectorAll('.office-card')
-    ];
+    const animatedElements = document.querySelectorAll(
+        '.reveal-on-scroll, .project-card, .team-card, .category-card, .stat-item, .value-card, .office-card, .section-header'
+    );
     
     animatedElements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        element.classList.add('reveal-on-scroll');
         observer.observe(element);
     });
 }
@@ -1752,34 +2021,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Partnership form submission
-    const partnershipForm = document.getElementById('partnershipForm');
-    if (partnershipForm) {
-        partnershipForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                organization: document.getElementById('org-name')?.value,
-                type: document.getElementById('org-type')?.value,
-                contact: document.getElementById('contact-name')?.value,
-                email: document.getElementById('contact-email')?.value,
-                interest: document.querySelector('input[name="interest"]:checked')?.value,
-                partnershipType: document.getElementById('partnership-type')?.value
-            };
-            
-            alert('Thank you for your partnership inquiry! Our partnerships team will contact you within 3 business days to discuss next steps.');
-            
-            this.reset();
-            formSteps.forEach(step => step.classList.remove('active'));
-            document.getElementById('step1').classList.add('active');
-            
-            const stepDots = document.querySelectorAll('.step-dot');
-            stepDots.forEach((dot, index) => {
-                dot.classList.remove('active');
-                if (index === 0) dot.classList.add('active');
-            });
-        });
-    }
     
     // FAQ functionality
     const faqQuestions = document.querySelectorAll('.faq-question');
@@ -1964,32 +2205,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Volunteer application
-        const volunteerForm = document.getElementById('volunteerApplicationForm');
-        if (volunteerForm) {
-            volunteerForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const requiredFields = this.querySelectorAll('[required]');
-                let isValid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        isValid = false;
-                        field.style.borderColor = '#B22234';
-                    } else {
-                        field.style.borderColor = '';
-                    }
-                });
-                
-                if (isValid) {
-                    alert('Thank you for your volunteer application! We will review your application and contact you within 5-7 business days.');
-                    this.reset();
-                } else {
-                    alert('Please fill in all required fields.');
-                }
-            });
-        }
         
         // Apply volunteer buttons
         const applyButtons = document.querySelectorAll('.apply-volunteer');
@@ -2198,3 +2413,79 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// ==========================================================================
+// DYNAMIC SOCIAL MEDIA LINKS LOADER (Site-wide)
+// ==========================================================================
+async function loadSocialMediaLinks() {
+    try {
+        let links = [];
+        if (window.SocialLinks && typeof window.SocialLinks.getPublic === 'function') {
+            const res = await window.SocialLinks.getPublic();
+            if (res && res.success && Array.isArray(res.data)) {
+                links = res.data;
+            }
+        } else {
+            const apiBase = window.API_BASE_URL || '/api';
+            const res = await fetch(`${apiBase}/social-links`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.success && Array.isArray(data.data)) {
+                    links = data.data;
+                }
+            }
+        }
+
+        if (!links || links.length === 0) return;
+
+        window._cachedSocialLinks = links;
+        renderSocialLinksAcrossDOM(links);
+    } catch (err) {
+        console.warn('Could not dynamically load social links:', err);
+    }
+}
+
+function renderSocialLinksAcrossDOM(links) {
+    if (!links || !Array.isArray(links)) return;
+
+    function safeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // 1. Update large social media cards (e.g. Contact page)
+    const largeContainers = document.querySelectorAll('.social-links-large');
+    largeContainers.forEach(container => {
+        container.innerHTML = links.map(link => {
+            const colorClass = safeAttr(link.color_class || link.platform);
+            const iconClass = safeAttr(link.icon_class || ('fab fa-' + link.platform));
+            const displayName = safeAttr(link.display_name);
+            const url = safeAttr(link.url);
+            return `
+                <a href="${url}" target="_blank" rel="noopener noreferrer" class="social-link ${colorClass}" title="${displayName}">
+                    <i class="${iconClass}"></i>
+                    <span>${displayName}</span>
+                </a>
+            `;
+        }).join('');
+    });
+
+    // 2. Update footer social media icons
+    const footerContainers = document.querySelectorAll('.social-links:not(.team-social)');
+    footerContainers.forEach(container => {
+        if (container.classList.contains('social-links-large')) return;
+        container.innerHTML = links.map(link => {
+            const iconClass = safeAttr(link.icon_class || ('fab fa-' + link.platform));
+            const displayName = safeAttr(link.display_name);
+            const url = safeAttr(link.url);
+            return `
+                <a href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${displayName}" title="${displayName}">
+                    <i class="${iconClass}"></i>
+                </a>
+            `;
+        }).join('');
+    });
+}
+
+window.loadSocialMediaLinks = loadSocialMediaLinks;
+window.renderSocialLinksAcrossDOM = renderSocialLinksAcrossDOM;

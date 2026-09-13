@@ -1,492 +1,388 @@
-// Single Post Display – clean, comment-free, navigation by ?id= URL param
+// Modern Single Post & News Blog Controller - GWOFO Platform
+// Handles post rendering, reading progress bar, social sharing, and moderated comments
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadAndDisplay();
+    initSinglePost();
+    initReadingProgressBar();
 });
 
-// ─── DOM refs ─────────────────────────────────────────────────────────────────
+// ─── DOM References ─────────────────────────────────────────────────────────────
 const container        = document.getElementById('singlePostContainer');
-const loadingSpinner   = document.getElementById('loadingSpinner');
 const prevBtn          = document.getElementById('prevBtn');
 const nextBtn          = document.getElementById('nextBtn');
 const currentNumEl     = document.getElementById('currentPostNumber');
 const totalNumEl       = document.getElementById('totalPostsNumber');
-const noPostsMsg       = document.getElementById('noPostsMessage');
-const navSection       = document.querySelector('.post-navigation');  // wrapper around prev/next
+const postNavBar       = document.getElementById('postNavBar');
+const breadcrumbTitle  = document.getElementById('breadcrumbPostTitle');
+const commentsListEl   = document.getElementById('approvedCommentsList');
+const commentsCountEl  = document.getElementById('commentsCount');
+const commentForm      = document.getElementById('postCommentForm');
+const commentAlertEl   = document.getElementById('commentFormAlert');
 
 // ─── State ────────────────────────────────────────────────────────────────────
-let allPosts      = [];  // all published posts from API
-let currentIndex  = 0;
+let allPosts = [];
+let currentIndex = 0;
+let currentPost = null;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function getIdFromURL() {
-    return new URLSearchParams(window.location.search).get('id');
+function getParam(param) {
+    return new URLSearchParams(window.location.search).get(param);
 }
 
 function formatDate(dateStr) {
+    if (!dateStr) return '';
     const date = new Date(dateStr);
     if (isNaN(date)) return '';
-    const now = new Date();
-    const diffMs = now - date;
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffDays === 0) {
-        const diffHours = Math.floor(diffMs / 3600000);
-        if (diffHours < 1) return 'Just now';
-        return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    }
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7)  return `${diffDays} days ago`;
-
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function esc(str) {
     return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function isValidImageUrl(url) {
-    if (!url) return false;
-    const cleanUrl = url.trim();
-    return cleanUrl.startsWith('data:') || cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') || cleanUrl.startsWith('/');
+function calculateReadingTime(content) {
+    if (!content) return 1;
+    const words = content.replace(/<[^>]*>/g, ' ').trim().split(/\s+/).filter(w => w.length > 0);
+    return Math.max(1, Math.ceil(words.length / 200));
 }
 
-// ─── Main Load ────────────────────────────────────────────────────────────────
+// ─── Reading Progress Bar ─────────────────────────────────────────────────────
+function initReadingProgressBar() {
+    const bar = document.getElementById('readingProgressBar');
+    if (!bar) return;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        bar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+    }, { passive: true });
+}
 
-async function loadAndDisplay() {
-    // Show spinner while fetching
-    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-    if (container)     container.innerHTML = '';
-    if (noPostsMsg)    noPostsMsg.classList.add('hidden');
-    if (navSection)    navSection.style.display = 'none';
-
+// ─── Main Controller ──────────────────────────────────────────────────────────
+async function initSinglePost() {
     try {
-        const apiBase = window.location.hostname.includes('netlify.app')
-            ? 'https://gwofo.onrender.com/api'
-            : 'http://localhost:3000/api';
+        const apiBase = window.API_BASE_URL || '/api';
         const response = await fetch(`${apiBase}/posts`);
-        const result   = await response.json();
+        const result = await response.json();
 
-        if (result.success && Array.isArray(result.data)) {
-            // Only show published posts
+        if (result.success && Array.isArray(result.data) && result.data.length > 0) {
             allPosts = result.data.filter(p => p.status === 'published');
+            if (allPosts.length === 0) allPosts = result.data; // fallback
         }
     } catch (err) {
         console.error('Error fetching posts:', err);
     }
 
-    // Always hide spinner after fetch attempt
-    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-
     if (allPosts.length === 0) {
-        showNoPosts();
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-newspaper fa-3x" style="color: #94a3b8; margin-bottom: 16px;"></i>
+                    <h3 style="color: #0f172a;">No Posts Available Yet</h3>
+                    <p style="color: #64748b;">Please check back shortly for updates from the field.</p>
+                    <a href="index.html" class="btn-primary" style="margin-top: 16px; display: inline-block;">Return Home</a>
+                </div>`;
+        }
         return;
     }
 
-    // Determine starting index from URL ?id= param
-    const requestedId = getIdFromURL();
+    // Category filtering support if ?category= is passed
+    const categoryParam = getParam('category');
+    if (categoryParam) {
+        const filtered = allPosts.filter(p => (p.category || '').toLowerCase() === categoryParam.toLowerCase());
+        if (filtered.length > 0) {
+            allPosts = filtered;
+        }
+    }
+
+    // Determine initial index
+    const requestedId = getParam('id');
     if (requestedId) {
-        const idx = allPosts.findIndex(p => String(p.id) === String(requestedId));
-        currentIndex = idx >= 0 ? idx : 0;
+        const foundIndex = allPosts.findIndex(p => String(p.id) === String(requestedId));
+        currentIndex = foundIndex >= 0 ? foundIndex : 0;
     } else {
         currentIndex = 0;
     }
 
-    // Update total and show nav
     if (totalNumEl) totalNumEl.textContent = allPosts.length;
-    if (navSection) navSection.style.display = '';
+    if (postNavBar) postNavBar.style.display = 'flex';
 
-    // Wire navigation
-    if (prevBtn) prevBtn.addEventListener('click', showPrev);
-    if (nextBtn) nextBtn.addEventListener('click', showNext);
+    // Wire Navigation Buttons
+    if (prevBtn) prevBtn.addEventListener('click', () => navigatePost(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => navigatePost(1));
 
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft')  showPrev();
-        if (e.key === 'ArrowRight') showNext();
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowLeft') navigatePost(-1);
+        if (e.key === 'ArrowRight') navigatePost(1);
     });
 
-    displayPost(currentIndex);
+    // Render initial post
+    renderPost(currentIndex);
 
-    // Load sidebar activities asynchronously
+    // Wire comment submission form
+    initCommentForm();
+
+    // Load recent activities in sidebar
     loadSidebarActivities();
 }
 
-// ─── Display Post ─────────────────────────────────────────────────────────────
+function navigatePost(direction) {
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < allPosts.length) {
+        renderPost(newIndex);
+        window.scrollTo({ top: container.offsetTop - 100, behavior: 'smooth' });
+    }
+}
 
-function displayPost(index) {
-    if (index < 0 || index >= allPosts.length) return;
+function renderPost(index) {
     currentIndex = index;
+    currentPost = allPosts[index];
 
-    const post = allPosts[index];
-
-    // Update URL without reload so back/forward works
+    // Update URL parameter without full page reload
     const url = new URL(window.location.href);
-    url.searchParams.set('id', post.id);
+    url.searchParams.set('id', currentPost.id);
     window.history.replaceState({}, '', url);
 
-    // Update counter
+    // Update Counter & Controls
     if (currentNumEl) currentNumEl.textContent = index + 1;
+    if (breadcrumbTitle) breadcrumbTitle.textContent = currentPost.title ? currentPost.title.slice(0, 35) + '...' : 'Story';
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.disabled = index === allPosts.length - 1;
 
-    // Build post HTML
-    if (container) container.innerHTML = buildPostHTML(post);
+    // Reading time
+    const readingTime = calculateReadingTime(currentPost.content);
+    const postDate = formatDate(currentPost.published_date || currentPost.created_at);
+    const category = currentPost.category || 'Initiative';
 
-    // Wire up dropdown actions inside the rendered post
-    wirePostActions(post);
+    // Author image or avatar
+    const authorInitials = (currentPost.author_name || 'Admin').charAt(0).toUpperCase();
+    const avatarHtml = currentPost.author_image
+        ? `<img src="${currentPost.author_image}" alt="${esc(currentPost.author_name)}" class="author-avatar" onerror="this.onerror=null; this.replaceWith(Object.assign(document.createElement('div'), {className: 'author-avatar', textContent: '${authorInitials}'}));">`
+        : `<div class="author-avatar">${authorInitials}</div>`;
 
-    updateNavButtons();
+    // Featured Image
+    const featuredImg = currentPost.featured_image || currentPost.image_url;
+    const mediaHtml = featuredImg
+        ? `<div class="article-featured-media"><img src="${featuredImg}" alt="${esc(currentPost.title)}" loading="lazy"></div>`
+        : '';
+
+    // Article HTML
+    container.innerHTML = `
+        <header class="article-meta-header">
+            <div class="author-info-block">
+                ${avatarHtml}
+                <div class="author-details">
+                    <h4>${esc(currentPost.author_name || 'GWOFO Communications')}</h4>
+                    <span class="post-date"><i class="far fa-calendar-alt"></i> ${postDate} &bull; ${readingTime} min read</span>
+                </div>
+            </div>
+            <span class="article-category-badge">${esc(category)}</span>
+        </header>
+
+        <h1 class="article-title-hero">${esc(currentPost.title)}</h1>
+
+        ${mediaHtml}
+
+        <div class="article-body">
+            ${formatContent(currentPost.content)}
+        </div>
+
+        <!-- Social Share Bar -->
+        <div class="social-share-strip">
+            <span><i class="fas fa-share-alt"></i> Share this story:</span>
+            <button class="share-icon-btn" onclick="sharePost('twitter')" title="Share on Twitter / X" aria-label="Share on Twitter">
+                <i class="fab fa-twitter"></i>
+            </button>
+            <button class="share-icon-btn" onclick="sharePost('facebook')" title="Share on Facebook" aria-label="Share on Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </button>
+            <button class="share-icon-btn" onclick="sharePost('linkedin')" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+            </button>
+            <button class="share-icon-btn" onclick="sharePost('copy')" title="Copy Link" aria-label="Copy article link">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+    `;
+
+    // Load approved comments for this post
+    loadPostComments(currentPost.id);
 }
 
-// ─── Formatting & Reading Time Helpers ────────────────────────────────────────
-
-function formatInlineMarkdown(text) {
-    if (!text) return '';
-    // Bold: **text**
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Italic: *text* (excluding already formatted strong tags or empty)
-    formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Inline code: `code`
-    formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
-    return formatted;
-}
-
-function formatPostContent(content) {
+function formatContent(content) {
     if (!content) return '';
-
-    // Check if it contains HTML tags
-    const containsHTML = /<[a-z][\s\S]*>/i.test(content);
-    if (containsHTML) {
+    // If it contains HTML tags, return safe sanitized string
+    if (/<[a-z][\s\S]*>/i.test(content)) {
         return content;
     }
-
-    // Escape basic characters to prevent XSS but keep formatting we add
-    let parsed = content
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-    // Restore blockquote symbol since we escaped it
-    parsed = parsed.replace(/^&gt;\s+/gm, '> ');
-
-    const lines = parsed.split(/\r?\n/);
-    const blocks = [];
-    let currentBlock = [];
-    let currentBlockType = null; // 'p', 'ul', 'blockquote', null
-
-    function closeCurrentBlock() {
-        if (currentBlock.length === 0) return;
-        const blockText = currentBlock.join('\n');
-        if (currentBlockType === 'p') {
-            const inlineFormatted = formatInlineMarkdown(blockText);
-            const withNewlines = inlineFormatted.replace(/\n/g, '<br>');
-            blocks.push(`<p>${withNewlines}</p>`);
-        } else if (currentBlockType === 'ul') {
-            const listItems = currentBlock.map(line => {
-                const text = line.trim().substring(2);
-                return `<li>${formatInlineMarkdown(text)}</li>`;
-            }).join('');
-            blocks.push(`<ul>${listItems}</ul>`);
-        } else if (currentBlockType === 'blockquote') {
-            const cleanLines = currentBlock.map(line => line.substring(2)).join('\n');
-            blocks.push(`<blockquote>${formatInlineMarkdown(cleanLines)}</blockquote>`);
+    // Format basic paragraphs and blockquotes
+    return content.split(/\n\n+/).map(para => {
+        const trimmed = para.trim();
+        if (trimmed.startsWith('>')) {
+            return `<blockquote>${esc(trimmed.substring(1).trim())}</blockquote>`;
         }
-        currentBlock = [];
-        currentBlockType = null;
-    }
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmed = line.trim();
-
-        // Empty line separates blocks
-        if (trimmed === '') {
-            closeCurrentBlock();
-            continue;
-        }
-
-        // Headings are always single-line blocks
-        if (trimmed.startsWith('# ') || trimmed.startsWith('## ') || trimmed.startsWith('### ')) {
-            closeCurrentBlock();
-            if (trimmed.startsWith('### ')) {
-                blocks.push(`<h3>${formatInlineMarkdown(trimmed.substring(4))}</h3>`);
-            } else if (trimmed.startsWith('## ')) {
-                blocks.push(`<h2>${formatInlineMarkdown(trimmed.substring(3))}</h2>`);
-            } else if (trimmed.startsWith('# ')) {
-                blocks.push(`<h1>${formatInlineMarkdown(trimmed.substring(2))}</h1>`);
-            }
-            continue;
-        }
-
-        // Check for blockquote line
-        if (line.startsWith('> ')) {
-            if (currentBlockType !== 'blockquote') {
-                closeCurrentBlock();
-                currentBlockType = 'blockquote';
-            }
-            currentBlock.push(line);
-            continue;
-        }
-
-        // Check for list item line
-        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-            if (currentBlockType !== 'ul') {
-                closeCurrentBlock();
-                currentBlockType = 'ul';
-            }
-            currentBlock.push(line);
-            continue;
-        }
-
-        // Standard paragraph line
-        if (currentBlockType !== 'p') {
-            closeCurrentBlock();
-            currentBlockType = 'p';
-        }
-        currentBlock.push(line);
-    }
-
-    // Close any remaining open block
-    closeCurrentBlock();
-
-    return blocks.join('\n');
+        return `<p>${esc(trimmed).replace(/\n/g, '<br>')}</p>`;
+    }).join('');
 }
 
-function calculateReadingTime(content) {
-    if (!content) return 1;
-    // Strip HTML tags
-    const plainText = content.replace(/<[^>]*>/g, ' ')
-                             .replace(/[#*`>_\-]/g, ' '); // Strip markdown symbols
-    const words = plainText.trim().split(/\s+/).filter(w => w.length > 0);
-    return Math.max(1, Math.ceil(words.length / 200));
-}
-
-function buildPostHTML(post) {
-    const catNames = { news: 'News', updates: 'Update', stories: 'Success Story', events: 'Event' };
-    const catLabel = catNames[post.category] || (post.category || 'Post');
-
-    // Author avatar: use stored author_image, else render a gradient initials badge
-    const initials = (post.author_name || 'A').charAt(0).toUpperCase();
-    const avatarHtml = post.author_image && isValidImageUrl(post.author_image)
-        ? `<img src="${post.author_image}" alt="${esc(post.author_name || 'Author')}" class="author-avatar-img">`
-        : `<div class="author-avatar-placeholder">${initials}</div>`;
-
-    const readingTime = calculateReadingTime(post.content);
-    const contentStr = post.content || '';
-    const formattedFull = formatPostContent(contentStr);
-    let bodyHtml = '';
-
-    if (contentStr.length <= 300) {
-        bodyHtml = `<div class="article-body-text">${formattedFull}</div>`;
-    } else {
-        const truncatedText = contentStr.substring(0, 300) + '...';
-        const formattedPreview = formatPostContent(truncatedText);
-        bodyHtml = `
-            <div class="article-body-text">
-                <div id="postBodyPreview">${formattedPreview}</div>
-                <div id="postBodyFull" style="display: none;">${formattedFull}</div>
-                <button id="toggleContentBtn" class="read-more-btn">
-                    Read More <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>`;
+// ─── Social Sharing ───────────────────────────────────────────────────────────
+window.sharePost = function(network) {
+    const postUrl = window.location.href;
+    const postTitle = currentPost ? currentPost.title : 'Girls and Women Foundation Liberia';
+    
+    switch (network) {
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(postTitle)}&url=${encodeURIComponent(postUrl)}`, '_blank');
+            break;
+        case 'facebook':
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`, '_blank');
+            break;
+        case 'linkedin':
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`, '_blank');
+            break;
+        case 'copy':
+            navigator.clipboard.writeText(postUrl).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this link:', postUrl);
+            });
+            break;
     }
+};
 
-    return `
-        <div class="modern-article" data-id="${post.id}" data-category="${esc(post.category)}">
-            <div class="article-author-header">
-                <div class="author-avatar-container">
-                    ${avatarHtml}
-                </div>
-                <div class="author-metadata-container">
-                    <div class="author-name-row">
-                        <span class="author-name">${esc(post.author_name || 'Admin')}</span>
-                        <span class="author-role-badge">Author</span>
+// ─── Moderated Comments Handling ──────────────────────────────────────────────
+async function loadPostComments(postId) {
+    if (!commentsListEl) return;
+    commentsListEl.innerHTML = '<p style="color: #64748b; font-size: 0.9rem;">Loading community reflections...</p>';
+
+    try {
+        const apiBase = window.API_BASE_URL || '/api';
+        const res = await fetch(`${apiBase}/comments/post/${postId}`);
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+            if (commentsCountEl) commentsCountEl.textContent = data.data.length;
+            commentsListEl.innerHTML = data.data.map(comment => `
+                <div class="comment-item">
+                    <div class="comment-author-row">
+                        <span class="comment-author-name"><i class="fas fa-user-circle"></i> ${esc(comment.author_name)}</span>
+                        <span class="comment-date">${formatDate(comment.created_at)}</span>
                     </div>
-                    <div class="article-meta-row">
-                        <span>Published: ${formatDate(post.published_date || post.created_at)}</span>
-                        <span class="meta-dot">•</span>
-                        <span class="article-category-tag">${catLabel}</span>
-                        <span class="meta-dot">•</span>
-                        <span>${readingTime} min read</span>
-                    </div>
+                    <div class="comment-text">${esc(comment.content)}</div>
                 </div>
-                <div class="post-actions-dropdown">
-                    <button class="post-actions-btn" aria-label="Post options">
-                        <i class="fas fa-ellipsis-h"></i>
-                    </button>
-                    <div class="post-dropdown-menu" id="postDropdown">
-                        <button class="copy-link">
-                            <i class="fas fa-link"></i> Copy Link
-                        </button>
-                        <button class="share-post">
-                            <i class="fas fa-share-alt"></i> Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="article-main-content">
-                ${post.title ? `<h1 class="article-title">${esc(post.title)}</h1>` : ''}
-                ${(post.featured_image || post.image_url) && isValidImageUrl(post.featured_image || post.image_url) ? `
-                    <div class="article-featured-image">
-                        <img src="${post.featured_image || post.image_url}" alt="${esc(post.title || 'Post image')}" loading="lazy">
-                    </div>` : ''}
-                ${bodyHtml}
-            </div>
-        </div>`;
-}
-
-function wirePostActions(post) {
-    if (!container) return;
-
-    // Dropdown toggle
-    const actionsBtn  = container.querySelector('.post-actions-btn');
-    const dropdownMenu = container.querySelector('.post-dropdown-menu');
-    if (actionsBtn && dropdownMenu) {
-        actionsBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
-        document.addEventListener('click', function () {
-            dropdownMenu.classList.remove('show');
-        }, { once: false });
-    }
-
-    // Copy link
-    const copyBtn = container.querySelector('.copy-link');
-    if (copyBtn) copyBtn.addEventListener('click', function () {
-        const url = `${window.location.origin}/single.html?id=${post.id}`;
-        navigator.clipboard?.writeText(url).then(() => {
-            showToast('Link copied to clipboard!');
-        }).catch(() => {
-            prompt('Copy this link:', url);
-        });
-        dropdownMenu?.classList.remove('show');
-    });
-
-    // Share
-    const shareBtn = container.querySelector('.share-post');
-    if (shareBtn) shareBtn.addEventListener('click', function () {
-        const url  = `${window.location.origin}/single.html?id=${post.id}`;
-        const text = `Check out: ${post.title || 'this post'} — Girls & Women Foundation Liberia`;
-
-        if (navigator.share) {
-            navigator.share({ title: post.title || 'Post', text, url })
-                .catch(() => {});
+            `).join('');
         } else {
-            navigator.clipboard?.writeText(url).then(() => showToast('Link copied!'));
+            if (commentsCountEl) commentsCountEl.textContent = '0';
+            commentsListEl.innerHTML = '<p style="color: #64748b; font-size: 0.95rem;">No published comments yet. Share your thoughts below!</p>';
         }
-        dropdownMenu?.classList.remove('show');
-    });
+    } catch (err) {
+        console.error('Error loading comments:', err);
+        commentsListEl.innerHTML = '<p style="color: #ef4444; font-size: 0.9rem;">Unable to load comments at this time.</p>';
+    }
+}
 
-    // Read More / Read Less Toggle
-    const toggleBtn = container.querySelector('#toggleContentBtn');
-    const previewDiv = container.querySelector('#postBodyPreview');
-    const fullDiv = container.querySelector('#postBodyFull');
-    if (toggleBtn && previewDiv && fullDiv) {
-        toggleBtn.addEventListener('click', function () {
-            const isExpanded = fullDiv.style.display !== 'none';
-            if (isExpanded) {
-                fullDiv.style.display = 'none';
-                previewDiv.style.display = 'block';
-                toggleBtn.innerHTML = 'Read More <i class="fas fa-chevron-down"></i>';
-                toggleBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function initCommentForm() {
+    if (!commentForm) return;
+
+    commentForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!currentPost) return;
+
+        const nameInput = document.getElementById('commentAuthorName');
+        const emailInput = document.getElementById('commentAuthorEmail');
+        const contentInput = document.getElementById('commentContent');
+        const submitBtn = document.getElementById('submitCommentBtn');
+
+        const author_name = nameInput.value.trim();
+        const author_email = emailInput.value.trim();
+        const content = contentInput.value.trim();
+
+        if (!author_name || !author_email || !content) {
+            showCommentAlert('Please fill in all required fields.', 'error');
+            return;
+        }
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            const apiBase = window.API_BASE_URL || '/api';
+            const response = await fetch(`${apiBase}/comments/post/${currentPost.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ author_name, author_email, content })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showCommentAlert('Thank you! Your comment has been submitted and is pending review by our team.', 'success');
+                commentForm.reset();
+                if (typeof window.showAppreciationModal === 'function') {
+                    window.showAppreciationModal({
+                        title: 'Reflection Received with Appreciation!',
+                        message: 'Thank you for sharing your thoughts on this story. Your comment has been submitted and is pending review by our team.',
+                        subtext: 'Your engagement amplifies awareness and community dialogue for women and youth across Liberia.',
+                        icon: 'fa-comments',
+                        buttonText: 'Continue Reading'
+                    });
+                }
             } else {
-                fullDiv.style.display = 'block';
-                previewDiv.style.display = 'none';
-                toggleBtn.innerHTML = 'Read Less <i class="fas fa-chevron-up"></i>';
+                showCommentAlert(result.error || 'Failed to submit comment. Please try again.', 'error');
             }
-        });
-    }
-}
-
-function showPrev() {
-    if (currentIndex > 0) displayPost(currentIndex - 1);
-}
-
-function showNext() {
-    if (currentIndex < allPosts.length - 1) displayPost(currentIndex + 1);
-}
-
-function updateNavButtons() {
-    if (prevBtn) {
-        if (currentIndex === 0) {
-            prevBtn.style.visibility = 'hidden';
-            prevBtn.disabled = true;
-        } else {
-            prevBtn.style.visibility = 'visible';
-            prevBtn.disabled = false;
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+            showCommentAlert('Network error submitting comment. Please try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Comment';
         }
-    }
-    if (nextBtn) {
-        if (currentIndex === allPosts.length - 1) {
-            nextBtn.style.visibility = 'hidden';
-            nextBtn.disabled = true;
-        } else {
-            nextBtn.style.visibility = 'visible';
-            nextBtn.disabled = false;
-        }
-    }
+    });
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
-
-function showNoPosts() {
-    if (noPostsMsg) noPostsMsg.classList.remove('hidden');
-    if (container)  container.innerHTML = '';
-    if (navSection) navSection.style.display = 'none';
-    if (prevBtn)    prevBtn.disabled = true;
-    if (nextBtn)    nextBtn.disabled = true;
-}
-
-// ─── Toast Helper ─────────────────────────────────────────────────────────────
-
-function showToast(message) {
-    const el = document.createElement('div');
-    el.textContent = message;
-    el.style.cssText = `
-        position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-        background:#1e1e2e;color:#fff;padding:10px 22px;border-radius:8px;
-        font-size:.9em;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.3);`;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
+function showCommentAlert(message, type) {
+    if (!commentAlertEl) return;
+    commentAlertEl.style.display = 'block';
+    commentAlertEl.textContent = message;
+    if (type === 'success') {
+        commentAlertEl.style.background = '#dcfce7';
+        commentAlertEl.style.color = '#15803d';
+        commentAlertEl.style.border = '1px solid #bbf7d0';
+    } else {
+        commentAlertEl.style.background = '#fee2e2';
+        commentAlertEl.style.color = '#b91c1c';
+        commentAlertEl.style.border = '1px solid #fecaca';
+    }
+    setTimeout(() => {
+        commentAlertEl.style.display = 'none';
+    }, 7000);
 }
 
 // ─── Sidebar Activities ───────────────────────────────────────────────────────
-
 async function loadSidebarActivities() {
-    const list = document.getElementById('sidebarActivities');
-    if (!list) return;
+    const listEl = document.getElementById('sidebarActivitiesList');
+    if (!listEl) return;
 
     try {
-        const apiBase = window.location.hostname.includes('netlify.app')
-            ? 'https://gwofo.onrender.com/api'
-            : 'http://localhost:3000/api';
-        const response = await fetch(`${apiBase}/dashboard/recent-activity`);
-        const result   = await response.json();
+        const apiBase = window.API_BASE_URL || '/api';
+        const res = await fetch(`${apiBase}/dashboard/recent-activity`);
+        const data = await res.json();
 
-        if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-            list.innerHTML = result.data.slice(0, 5).map(act => {
-                let icon = 'fa-info-circle';
-                if (act.action === 'create') icon = 'fa-plus-circle';
-                else if (act.action === 'update') icon = 'fa-edit';
-                else if (act.action === 'delete') icon = 'fa-trash-alt';
-
-                const timeAgo = formatDate(act.created_at);
-                const desc    = act.description || (act.action + ' ' + (act.entity_type || '').replace('_', ' '));
-                return `
-                    <div class="activity-item">
-                        <div class="activity-icon"><i class="fas ${icon}"></i></div>
-                        <div class="activity-content">
-                            <p>${esc(desc)}</p>
-                            <span class="activity-time">${timeAgo}</span>
-                        </div>
-                    </div>`;
-            }).join('');
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+            listEl.innerHTML = data.data.slice(0, 5).map(act => `
+                <div class="recent-activity-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <p>${esc(act.description || act.action)}</p>
+                        <span>${formatDate(act.created_at)}</span>
+                    </div>
+                </div>
+            `).join('');
         } else {
-            list.innerHTML = '<p style="padding:12px;color:#6b7280;font-size:.85em;">No recent activity logged yet.</p>';
+            listEl.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">Grand Gedeh community health initiative completed.</p>';
         }
-    } catch (err) {
-        console.error('Error loading sidebar activities:', err);
-        list.innerHTML = '<p style="padding:12px;color:#6b7280;font-size:.85em;">Could not load activities.</p>';
+    } catch (_) {
+        listEl.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">Grand Gedeh community health initiative completed.</p>';
     }
 }

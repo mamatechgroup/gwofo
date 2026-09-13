@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Girls and Women Foundation Liberia</title>
+    <!-- Favicon / Browser Tab Logo -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/gwofo-logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="css/style.css">
-     <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
@@ -19,7 +25,7 @@
     <section class="page-hero">
         <div class="container">
             <h1>Contact Us</h1>
-            <p>Get in touch with us. We'd love to hear from you</p>
+            <p>Get in touch with our team in Zwedru and across Liberia. We'd love to hear from you.</p>
         </div>
     </section>
 
@@ -27,145 +33,239 @@
     <section class="contact-section">
         <div class="container">
             <div class="contact-grid">
-                <!-- Contact Form -->
-                <div class="contact-form-container">
-                    <div class="section-header">
-                        <h2>Send Us a Message</h2>
-                        <div class="underline"></div>
-                        <p>Fill out the form below and we'll get back to you as soon as possible</p>
-                    </div>
-                    
-                    <form id="contactForm" class="contact-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="name">Full Name *</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email Address *</label>
-                                <input type="email" id="email" name="email" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone">
-                            </div>
-                            <div class="form-group">
-                                <label for="subject">Subject *</label>
-                                <select id="subject" name="subject" required>
-                                    <option value="">Select a subject</option>
-                                    <option value="general">General Inquiry</option>
-                                    <option value="donation">Donation Information</option>
-                                    <option value="volunteer">Volunteer Opportunity</option>
-                                    <option value="partnership">Partnership Inquiry</option>
-                                    <option value="media">Media Request</option>
-                                    <option value="project">Project Information</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Message *</label>
-                            <textarea id="message" name="message" rows="6" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="newsletter" name="newsletter">
-                                <label for="newsletter">Subscribe to our newsletter for updates</label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-paper-plane"></i> Send Message
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Contact Info & Map -->
+                <!-- Contact Information (Get in Touch) -->
                 <div class="contact-info-container">
-                    <!-- Contact Information -->
-                    <div class="contact-info-section">
-                        <div class="section-header">
+                    <div class="contact-card info-card">
+                        <div class="card-header">
+                            <span class="card-badge"><i class="fas fa-headset"></i> Direct Channels</span>
                             <h2>Get in Touch</h2>
-                            <div class="underline"></div>
+                            <div class="underline-left"></div>
+                            <p class="card-lead">Have questions about our grassroots programs, partnerships, or need support? Reach out directly through any of our channels.</p>
                         </div>
-                        
-                        <div class="contact-info-grid">
-                            <div class="contact-info-item">
-                                <div class="contact-icon">
+
+                        <div class="contact-channels-list">
+                            <!-- Headquarters -->
+                            <div class="channel-item">
+                                <div class="channel-icon location-icon">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                <div class="contact-details">
+                                <div class="channel-body">
                                     <h4>Our Headquarters</h4>
-                                    <p>Zwedru, Grand Gedeh County<br>Republic of Liberia</p>
+                                    <p>Zwedru, Grand Gedeh County, Republic of Liberia</p>
+                                    <a href="#findUsSection" class="channel-link"><i class="fas fa-compass"></i> View location guide below</a>
                                 </div>
                             </div>
-                            
-                            <div class="contact-info-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-phone"></i>
+
+                            <!-- Phone Lines -->
+                            <div class="channel-item">
+                                <div class="channel-icon phone-icon">
+                                    <i class="fas fa-phone-alt"></i>
                                 </div>
-                                <div class="contact-details">
-                                    <h4>Phone Numbers</h4>
-                                    <p>General: +231 770 409 441<br>Executive Director: +231 888 880 698<br>Alternate: +231 886 303 141 / 776 536 819</p>
+                                <div class="channel-body">
+                                    <h4>Phone Lines</h4>
+                                    <div class="channel-links-group">
+                                        <a href="tel:+231770409441" class="contact-chip" title="Call Main Office">
+                                            <i class="fas fa-phone"></i> +231 770 409 441 <span class="chip-label">General</span>
+                                        </a>
+                                        <a href="tel:+231888880698" class="contact-chip" title="Call Executive Director">
+                                            <i class="fas fa-user-tie"></i> +231 888 880 698 <span class="chip-label">Exec Director</span>
+                                        </a>
+                                        <a href="tel:+231886303141" class="contact-chip" title="Call Alternate Line">
+                                            <i class="fas fa-phone-volume"></i> +231 886 303 141 <span class="chip-label">Alternate</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="contact-info-item">
-                                <div class="contact-icon">
+
+                            <!-- Email Inquiries -->
+                            <div class="channel-item">
+                                <div class="channel-icon email-icon">
                                     <i class="fas fa-envelope"></i>
                                 </div>
-                                <div class="contact-details">
-                                    <h4>Email Addresses</h4>
-                                    <p>General: gwofo.liberia@gmail.com<br>Executive Director: ameliakar27@gmail.com</p>
+                                <div class="channel-body">
+                                    <h4>Email Inquiries</h4>
+                                    <div class="channel-links-group">
+                                        <a href="mailto:gwofo.liberia@gmail.com" class="contact-chip" title="Send General Email">
+                                            <i class="fas fa-envelope"></i> gwofo.liberia@gmail.com <span class="chip-label">General</span>
+                                        </a>
+                                        <a href="mailto:ameliakar27@gmail.com" class="contact-chip" title="Send Direct Email">
+                                            <i class="fas fa-paper-plane"></i> ameliakar27@gmail.com <span class="chip-label">Direct</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <div class="contact-info-item">
-                                <div class="contact-icon">
+
+                            <!-- Working Hours -->
+                            <div class="channel-item">
+                                <div class="channel-icon clock-icon">
                                     <i class="fas fa-clock"></i>
                                 </div>
-                                <div class="contact-details">
-                                    <h4>Office Hours</h4>
-                                    <p>Monday - Friday: 8:00 AM - 5:00 PM<br>Saturday: 9:00 AM - 1:00 PM<br>Sunday: Closed</p>
+                                <div class="channel-body">
+                                    <h4>Working Hours</h4>
+                                    <ul class="hours-list">
+                                        <li><span>Monday – Friday:</span> <strong>8:00 AM – 5:00 PM</strong></li>
+                                        <li><span>Saturday:</span> <strong>9:00 AM – 1:00 PM</strong></li>
+                                        <li><span>Sunday:</span> <strong class="text-muted">Closed</strong></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="emergency-contact">
-                            <h4><i class="fas fa-exclamation-circle"></i> Emergency Contact</h4>
-                            <p>For urgent matters outside office hours, please call: <strong>+231 770 409 441</strong></p>
-                        </div>
-                    </div>
-                    
-                    <!-- Google Map -->
-                    <div class="map-section">
-                        <div class="section-header">
-                            <h2>Find Us</h2>
-                            <div class="underline"></div>
-                        </div>
-                        
-                        <div class="map-container">
-                            <div id="map" class="map-placeholder">
-                                <!-- Google Map will be embedded here -->
-                                <div class="map-fallback">
-                                    <i class="fas fa-map-marked-alt"></i>
-                                    <h4>Our Headquarters</h4>
-                                    <p>Zwedru, Grand Gedeh County, Liberia</p>
-                                    <a href="https://maps.google.com/?q=Zwedru,+Grand+Gedeh+County,+Liberia" 
-                                       target="_blank" 
-                                       rel="noopener noreferrer"
-                                       class="btn-secondary">
-                                        <i class="fas fa-directions"></i> Get Directions
-                                    </a>
-                                </div>
+
+                        <!-- Emergency Contact Banner -->
+                        <div class="emergency-card">
+                            <div class="emergency-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="emergency-content">
+                                <h4>24/7 Urgent Response</h4>
+                                <p>For critical grassroots emergencies or protection alerts outside office hours:</p>
+                                <a href="tel:+231770409441" class="emergency-phone"><i class="fas fa-phone"></i> +231 770 409 441</a>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Contact Form (Send Us a Message) -->
+                <div class="contact-form-container">
+                    <div class="contact-card form-card">
+                        <div class="card-header">
+                            <span class="card-badge"><i class="fas fa-paper-plane"></i> Online Inquiry</span>
+                            <h2>Send Us a Message</h2>
+                            <div class="underline-left"></div>
+                            <p class="card-lead">Fill out the form below and our team will get back to you promptly within 24–48 hours.</p>
+                        </div>
+
+                        <form id="contactForm" class="contact-form" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name"><i class="fas fa-user"></i> Full Name <span class="required">*</span></label>
+                                    <input type="text" id="name" name="name" required placeholder="e.g. Mary Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email"><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+                                    <input type="email" id="email" name="email" required placeholder="name@example.com">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" placeholder="+231 ...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject"><i class="fas fa-tag"></i> Inquiry Subject <span class="required">*</span></label>
+                                    <div class="select-wrapper">
+                                        <select id="subject" name="subject" required>
+                                            <option value="">Select a subject...</option>
+                                            <option value="general">General Inquiry</option>
+                                            <option value="donation">Donation & Support</option>
+                                            <option value="volunteer">Volunteer Opportunity</option>
+                                            <option value="partnership">Partnership & Collaboration</option>
+                                            <option value="media">Media Request</option>
+                                            <option value="project">Project Information</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message"><i class="fas fa-comment-alt"></i> Message <span class="required">*</span></label>
+                                <textarea id="message" name="message" rows="5" required placeholder="How can we help or collaborate? Please describe your inquiry..."></textarea>
+                            </div>
+
+                            <div class="form-group newsletter-check-group">
+                                <label class="custom-checkbox-label">
+                                    <input type="checkbox" id="newsletter" name="newsletter">
+                                    <span class="checkbox-text">Subscribe to our newsletter for quarterly impact reports and field updates</span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-submit-message">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+
+                            <div class="form-privacy-note">
+                                <i class="fas fa-shield-alt"></i> We respect your privacy. Inquiries are handled confidentially by our team.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Find Us / Map Section -->
+    <section class="find-us-section" id="findUsSection">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-map-marked-alt"></i> Physical Presence</span>
+                <h2>Find Us in Zwedru</h2>
+                <div class="underline"></div>
+                <p>Visit our national headquarters in Grand Gedeh County or connect with our teams across Liberia</p>
+            </div>
+
+            <div class="find-us-wrapper">
+                <!-- Location Details Card -->
+                <div class="location-details-card">
+                    <div class="location-header">
+                        <div class="location-icon-badge">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <h3>National Headquarters</h3>
+                            <span class="location-tag">Grand Gedeh County</span>
+                        </div>
+                    </div>
+
+                    <div class="location-meta-list">
+                        <div class="meta-item">
+                            <i class="fas fa-map-pin"></i>
+                            <div>
+                                <strong>Physical Address</strong>
+                                <p>Zwedru City, Grand Gedeh County, Republic of Liberia</p>
+                            </div>
+                        </div>
+
+                        <div class="meta-item">
+                            <i class="fas fa-door-open"></i>
+                            <div>
+                                <strong>Visitor Guidelines</strong>
+                                <p>Community members, partner delegations, and visitors are welcome during regular office hours.</p>
+                            </div>
+                        </div>
+
+                        <div class="meta-item">
+                            <i class="fas fa-road"></i>
+                            <div>
+                                <strong>Transportation & Access</strong>
+                                <p>Accessible along the central transit corridor in Zwedru with easy vehicular and pedestrian access.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="location-actions">
+                        <a href="https://maps.google.com/?q=Zwedru,+Grand+Gedeh+County,+Liberia" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="btn-primary btn-directions">
+                            <i class="fas fa-directions"></i> Get Directions on Google Maps
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Google Map Live Embed -->
+                <div class="map-frame-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63428.16912440875!2d-8.163836774652253!3d6.066497554988775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfa8974a95e0c52f%3A0x1dcb143e1d6199b0!2sZwedru%2C%20Liberia!5e0!3m2!1sen!2sus!4v1710000000000!5m2!1sen!2sus" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade" 
+                        title="GWOFO National Headquarters Location in Zwedru, Liberia">
+                    </iframe>
                 </div>
             </div>
         </div>
@@ -315,8 +415,9 @@
     </section>
 
     <!-- Footer -->
-   <div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
    
+    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/load.js"></script>
 </body>

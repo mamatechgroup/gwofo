@@ -15,10 +15,13 @@ const TABLES = [
     'projects',
     'posts',
     'project_comments',
-    'activity_logs'
+    'activity_logs',
+    'social_links'
 ];
 
 let lastRunDate = null;
+let schedulerInterval = null;
+let startupTimeout = null;
 
 async function checkAndRunBackup() {
     try {
@@ -101,9 +104,21 @@ async function checkAndRunBackup() {
 function startBackupScheduler() {
     console.log('⏰ Backup scheduler initialized (checking every 15 minutes)');
     // Check every 15 minutes
-    setInterval(checkAndRunBackup, 15 * 60 * 1000);
+    schedulerInterval = setInterval(checkAndRunBackup, 15 * 60 * 1000);
     // Also run a check shortly after startup
-    setTimeout(checkAndRunBackup, 10000);
+    startupTimeout = setTimeout(checkAndRunBackup, 10000);
 }
 
-module.exports = { startBackupScheduler };
+function stopBackupScheduler() {
+    if (schedulerInterval) {
+        clearInterval(schedulerInterval);
+        schedulerInterval = null;
+    }
+    if (startupTimeout) {
+        clearTimeout(startupTimeout);
+        startupTimeout = null;
+    }
+    console.log('⏹️ Backup scheduler stopped');
+}
+
+module.exports = { startBackupScheduler, stopBackupScheduler };

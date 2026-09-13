@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const pool = require('../config/database');
+const { requireAuth } = require('./auth');
 
 const BACKUP_DIR = path.join(__dirname, '../backups');
 
@@ -25,6 +26,10 @@ const TABLES = [
     'projects',
     'posts',
     'project_comments',
+    'post_comments',
+    'contact_messages',
+    'partnership_inquiries',
+    'volunteer_applications',
     'activity_logs'
 ];
 
@@ -40,6 +45,9 @@ function getSchedule() {
     return { frequency: 'weekly', day: 'sunday', time: '02:00', retention: '30' };
 }
 
+// All backup endpoints are strictly admin protected
+router.use(requireAuth);
+
 // 1. Get List of Backups
 router.get('/', (req, res) => {
     try {
@@ -50,7 +58,6 @@ router.get('/', (req, res) => {
                 const filePath = path.join(BACKUP_DIR, file);
                 const stats = fs.statSync(filePath);
                 
-                // Read type from backup file metadata if possible
                 let type = 'Full';
                 try {
                     const content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -85,8 +92,13 @@ router.post('/', async (req, res) => {
 
         // Query all tables
         for (const table of TABLES) {
-            const result = await pool.query(`SELECT * FROM ${table}`);
-            backupData.tables[table] = result.rows;
+            try {
+                const result = await pool.query(`SELECT * FROM ${table}`);
+                backupData.tables[table] = result.rows;
+            } catch (tblErr) {
+                console.warn(`Table ${table} not queried:`, tblErr.message);
+                backupData.tables[table] = [];
+            }
         }
 
         const dateStr = new Date().toISOString().slice(0, 10);
@@ -115,7 +127,6 @@ router.post('/upload', (req, res) => {
             return res.status(400).json({ success: false, error: 'Filename and content are required' });
         }
 
-        // Validate content structure
         let parsedContent = content;
         if (typeof content === 'string') {
             parsedContent = JSON.parse(content);
@@ -125,7 +136,8 @@ router.post('/upload', (req, res) => {
             return res.status(400).json({ success: false, error: 'Invalid backup file format' });
         }
 
-        const safeFilename = filename.replace(/[^a-zA-Z0-9_\.-]/g, '_');
+        const cleanFilename = path.basename(filename).replace(/[^a-zA-Z0-9_.-]/g, '_');
+        const safeFilename = cleanFilename.endsWith('.json') ? cleanFilename : `${cleanFilename}.json`;
         const filePath = path.join(BACKUP_DIR, safeFilename);
 
         fs.writeFileSync(filePath, JSON.stringify(parsedContent, null, 2), 'utf8');
@@ -143,10 +155,10 @@ router.post('/upload', (req, res) => {
 
 // 4. Download Backup
 router.get('/download/:filename', (req, res) => {
-    const filename = req.params.filename;
+    const filename = path.basename(req.params.filename);
     const filePath = path.join(BACKUP_DIR, filename);
 
-    if (!fs.existsSync(filePath) || path.relative(BACKUP_DIR, filePath).includes('..')) {
+    if (!fs.existsSync(filePath)) {
         return res.status(404).json({ success: false, error: 'Backup file not found' });
     }
 
@@ -156,10 +168,10 @@ router.get('/download/:filename', (req, res) => {
 // 5. Delete Backup
 router.delete('/:filename', (req, res) => {
     try {
-        const filename = req.params.filename;
+        const filename = path.basename(req.params.filename);
         const filePath = path.join(BACKUP_DIR, filename);
 
-        if (!fs.existsSync(filePath) || path.relative(BACKUP_DIR, filePath).includes('..')) {
+        if (!fs.existsSync(filePath)) {
             return res.status(404).json({ success: false, error: 'Backup file not found' });
         }
 
@@ -173,10 +185,10 @@ router.delete('/:filename', (req, res) => {
 
 // 6. Restore Backup
 router.post('/restore/:filename', async (req, res) => {
-    const filename = req.params.filename;
+    const filename = path.basename(req.params.filename);
     const filePath = path.join(BACKUP_DIR, filename);
 
-    if (!fs.existsSync(filePath) || path.relative(BACKUP_DIR, filePath).includes('..')) {
+    if (!fs.existsSync(filePath)) {
         return res.status(404).json({ success: false, error: 'Backup file not found' });
     }
 
@@ -189,10 +201,15 @@ router.post('/restore/:filename', async (req, res) => {
 
         await client.query('BEGIN');
 
-        // Truncate all tables in CASCADE mode
-        const truncateQuery = `TRUNCATE TABLE ${TABLES.reverse().join(', ')} RESTART IDENTITY CASCADE`;
-        await client.query(truncateQuery);
-        TABLES.reverse(); // Restore original order
+        // Truncate tables present in TABLES in reverse order
+        const reverseTables = [...TABLES].reverse();
+        for (const table of reverseTables) {
+            try {
+                await client.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`);
+            } catch (trErr) {
+                console.warn(`Could not truncate ${table}:`, trErr.message);
+            }
+        }
 
         // Restore tables in forward order
         for (const table of TABLES) {
@@ -206,7 +223,7 @@ router.post('/restore/:filename', async (req, res) => {
                 const valPlaceholders = columns.map((_, i) => `$${i + 1}`).join(', ');
                 const values = columns.map(col => row[col]);
 
-                const insertQuery = `INSERT INTO ${table} (${colNames}) VALUES (${valPlaceholders})`;
+                const insertQuery = `INSERT INTO ${table} (${colNames}) VALUES (${valPlaceholders}) ON CONFLICT DO NOTHING`;
                 await client.query(insertQuery, values);
             }
 

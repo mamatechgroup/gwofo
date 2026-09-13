@@ -3,8 +3,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 const { logActivity } = require('../utils/logger');
+const { requireAuth } = require('./auth');
 
-// Subscribe to newsletter
+// Subscribe to newsletter (Public)
 router.post('/subscribe', async (req, res) => {
     try {
         const { email, fullName } = req.body;
@@ -54,8 +55,8 @@ router.post('/subscribe', async (req, res) => {
     }
 });
 
-// Get all subscriptions (admin only)
-router.get('/subscriptions', async (req, res) => {
+// Get all subscriptions (admin only - Protected)
+router.get('/subscriptions', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT id, email, full_name, status, subscribe_date, unsubscribe_date, created_at
@@ -77,8 +78,8 @@ router.get('/subscriptions', async (req, res) => {
     }
 });
 
-// Get subscription stats
-router.get('/stats', async (req, res) => {
+// Get subscription stats (admin only - Protected)
+router.get('/stats', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT 
@@ -101,7 +102,7 @@ router.get('/stats', async (req, res) => {
     }
 });
 
-// Unsubscribe from newsletter
+// Unsubscribe from newsletter (Public with ID or email)
 router.post('/unsubscribe/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -137,8 +138,8 @@ router.post('/unsubscribe/:id', async (req, res) => {
     }
 });
 
-// Delete subscription (admin)
-router.delete('/subscriptions/:id', async (req, res) => {
+// Delete subscription (admin only - Protected)
+router.delete('/subscriptions/:id', requireAuth, async (req, res) => {
     try {
         const { id } = req.params;
 

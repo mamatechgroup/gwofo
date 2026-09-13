@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Admin Dashboard</title>
+    <!-- Favicon / Browser Tab Logo -->
+    <link rel="icon" type="image/svg+xml" href="../assets/images/gwofo-logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/responsive.css">
@@ -51,6 +57,14 @@
                 <i class="fas fa-envelope"></i>
                 <span>Subscriptions</span>
             </a>
+            <a href="manage-comments.html" class="menu-item">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            <a href="manage-inquiries.html" class="menu-item">
+                <i class="fas fa-inbox"></i>
+                <span>Inquiries & Volunteers</span>
+            </a>
             
             <a href="settings.html" class="menu-item active">
                 <i class="fas fa-cog"></i>
@@ -85,70 +99,152 @@
                         <span class="profile-role">Administrator</span>
                     </div>
                 </div>
-                
-                <button class="btn-primary" id="saveAllSettings">
-                    <i class="fas fa-save"></i> Save All Changes
-                </button>
             </div>
         </div>
 
         <!-- Settings Tabs -->
         <div class="settings-tabs">
             <button class="tab-btn active" data-tab="profile">Account Settings</button>
+            <button class="tab-btn" data-tab="social">Social Media Links</button>
             <button class="tab-btn" data-tab="backup">Backup</button>
         </div>
 
-         <!-- Profile Settings -->
-         <div class="content-section tab-content active" id="profileTab">
-             <div class="section-header">
-                 <h2>Account Settings</h2>
-                 <span class="section-subtitle">Update your admin profile details and password</span>
-             </div>
-             
-             <form id="profileForm" class="crud-form">
-                 <div class="form-group">
-                     <label for="profileUsername">Username *</label>
-                     <div class="input-with-icon">
-                         <input type="text" id="profileUsername" name="username" required placeholder="Enter username">
-                         <i class="fas fa-user"></i>
-                     </div>
-                 </div>
-                 
-                 <div class="form-group">
-                     <label for="profileEmail">Email Address *</label>
-                     <div class="input-with-icon">
-                         <input type="email" id="profileEmail" name="email" required placeholder="admin@gwofo.org">
-                         <i class="fas fa-envelope"></i>
-                     </div>
-                 </div>
-                 
-                 <div class="form-row">
-                     <div class="form-group">
-                         <label for="profilePassword">New Password</label>
-                         <div class="input-with-icon">
-                             <input type="password" id="profilePassword" name="password" placeholder="Leave blank to keep current">
-                             <i class="fas fa-lock"></i>
-                         </div>
-                     </div>
-                     
-                     <div class="form-group">
-                         <label for="profileConfirmPassword">Confirm New Password</label>
-                         <div class="input-with-icon">
-                             <input type="password" id="profileConfirmPassword" name="confirm_password" placeholder="Confirm new password">
-                             <i class="fas fa-lock"></i>
-                         </div>
-                     </div>
-                 </div>
-                 
-                 <div class="form-actions">
-                     <button type="submit" class="btn-primary">
-                         <i class="fas fa-save"></i> Save Profile
-                     </button>
-                 </div>
-             </form>
-         </div>
+        <!-- Profile Settings -->
+        <div class="content-section tab-content active" id="profileTab">
+            <div class="section-header">
+                <h2>Account Settings</h2>
+                <span class="section-subtitle">Update your admin profile details and password</span>
+            </div>
+            
+            <form id="profileForm" class="crud-form">
+                <div class="form-group">
+                    <label for="profileUsername">Username *</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="profileUsername" name="username" required placeholder="Enter username">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profileEmail">Email Address *</label>
+                    <div class="input-with-icon">
+                        <input type="email" id="profileEmail" name="email" required placeholder="admin@gwofo.org">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profilePassword">New Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="profilePassword" name="password" placeholder="Leave blank to keep current">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profileConfirmPassword">Confirm New Password</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="profileConfirmPassword" name="confirm_password" placeholder="Confirm new password">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
 
-         <!-- Backup Settings -->
+        <!-- Social Media Settings -->
+        <div class="content-section tab-content" id="socialTab">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2>Social Media Links</h2>
+                    <span class="section-subtitle">Manage all social media accounts displayed across the entire website</span>
+                </div>
+                <button class="btn-primary" id="addNewSocialBtn">
+                    <i class="fas fa-plus"></i> Add New Platform
+                </button>
+            </div>
+
+            <!-- Add / Edit Social Form Card -->
+            <div id="socialFormCard" style="display: none; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h3 id="socialFormTitle" style="margin-bottom: 1rem;"><i class="fas fa-plus-circle"></i> Add Social Link</h3>
+                <form id="socialLinkForm" class="crud-form">
+                    <input type="hidden" id="socialLinkId" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="socialPlatform">Platform Key * <small>(e.g. facebook, twitter, tiktok, instagram)</small></label>
+                            <input type="text" id="socialPlatform" required placeholder="facebook">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialDisplayName">Display Name * <small>(e.g. Facebook, Twitter/X, Instagram)</small></label>
+                            <input type="text" id="socialDisplayName" required placeholder="Facebook">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="socialUrl">Profile / Page URL * <small>(Full link e.g. https://facebook.com/gwfoliberia)</small></label>
+                        <input type="url" id="socialUrl" required placeholder="https://facebook.com/gwfoliberia">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="socialIconClass">FontAwesome Icon Class <small>(e.g. fab fa-facebook-f)</small></label>
+                            <input type="text" id="socialIconClass" placeholder="fab fa-facebook-f">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialColorClass">CSS Color Class <small>(e.g. facebook, twitter, instagram)</small></label>
+                            <input type="text" id="socialColorClass" placeholder="facebook">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialDisplayOrder">Display Order</label>
+                            <input type="number" id="socialDisplayOrder" value="0" min="0">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: 28px;">
+                            <input type="checkbox" id="socialIsActive" checked style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="socialIsActive" style="margin-bottom: 0; cursor: pointer;">Active (Visible)</label>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="display: flex; gap: 10px; margin-top: 1rem;">
+                        <button type="submit" class="btn-primary" id="saveSocialBtn">
+                            <i class="fas fa-save"></i> Save Link
+                        </button>
+                        <button type="button" class="btn-secondary" id="cancelSocialBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Social Links Table -->
+            <div class="table-responsive">
+                <table class="data-table" id="socialLinksTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">Icon</th>
+                            <th>Platform</th>
+                            <th>Display Name</th>
+                            <th>URL</th>
+                            <th style="width: 70px; text-align: center;">Order</th>
+                            <th style="width: 100px; text-align: center;">Status</th>
+                            <th style="width: 140px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="socialLinksTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-spinner fa-spin"></i> Loading social links...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Backup Settings -->
         <div class="content-section tab-content" id="backupTab">
             <div class="section-header">
                 <h2>Backup & Restore</h2>
@@ -283,6 +379,7 @@
     <script src="../js/admin.js"></script>
     <script src="../js/manage-backups.js"></script>
     <script src="../js/manage-profile.js"></script>
+    <script src="../js/manage-social.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Tab switching
@@ -300,63 +397,24 @@
                     
                     // Show corresponding content
                     const tabId = btn.getAttribute('data-tab');
-                    document.getElementById(`${tabId}Tab`).classList.add('active');
+                    const targetTab = document.getElementById(`${tabId}Tab`);
+                    if (targetTab) {
+                        targetTab.classList.add('active');
+                    }
                 });
             });
             
-            // Maintenance mode toggle
-            const maintenanceToggle = document.getElementById('maintenanceToggle');
-            const maintenanceSettings = document.getElementById('maintenanceSettings');
-            
-            if (maintenanceToggle) {
-                maintenanceToggle.addEventListener('change', function() {
-                    if (this.checked) {
-                        maintenanceSettings.style.display = 'block';
-                    } else {
-                        maintenanceSettings.style.display = 'none';
-                    }
-                });
-            }
-            
-            // Import method toggle
-            const importFileRadio = document.getElementById('importFile');
-            const importJsonRadio = document.getElementById('importJson');
-            const importFileContent = document.getElementById('importFileContent');
-            const importJsonContent = document.getElementById('importJsonContent');
-            
-            if (importFileRadio && importJsonRadio) {
-                importFileRadio.addEventListener('change', function() {
-                    if (this.checked) {
-                        importFileContent.style.display = 'block';
-                        importJsonContent.style.display = 'none';
-                    }
-                });
-                
-                importJsonRadio.addEventListener('change', function() {
-                    if (this.checked) {
-                        importFileContent.style.display = 'none';
-                        importJsonContent.style.display = 'block';
-                    }
-                });
-            }
-            
-            // Save all settings
-            const saveAllBtn = document.getElementById('saveAllSettings');
+            // Save all settings button
+            const saveAllBtn = document.getElementById('saveSettingsBtn');
             if (saveAllBtn) {
                 saveAllBtn.addEventListener('click', function() {
-                    // Show saving indicator
                     this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-                    
-                    // Simulate save process
                     setTimeout(() => {
                         this.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                        this.classList.add('success');
-                        
                         setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
-                            this.classList.remove('success');
+                            this.innerHTML = '<i class="fas fa-save"></i> Save All Settings';
                         }, 2000);
-                    }, 1000);
+                    }, 800);
                 });
             }
         });

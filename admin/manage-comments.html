@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Comments - Admin Dashboard</title>
+    <!-- Favicon / Browser Tab Logo -->
+    <link rel="icon" type="image/svg+xml" href="../assets/images/gwofo-logo.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png">
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-hands-helping"></i> Foundation Admin</h2>
+        </div>
+        
+        <nav class="admin-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="manage-posts.html" class="menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Posts</span>
+            </a>
+            <a href="manage-projects.html" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projects</span>
+            </a>
+            <a href="manage-team.html" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Team</span>
+            </a>
+            <a href="manage-partners.html" class="menu-item">
+                <i class="fas fa-handshake"></i>
+                <span>Partners</span>
+            </a>
+            <a href="manage-slides.html" class="menu-item">
+                <i class="fas fa-images"></i>
+                <span>Homepage Slides</span>
+            </a>
+            <a href="manage-subscriptions.html" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span>Subscriptions</span>
+            </a>
+            <a href="manage-comments.html" class="menu-item active">
+                <i class="fas fa-comments"></i>
+                <span>Comments</span>
+            </a>
+            <a href="manage-inquiries.html" class="menu-item">
+                <i class="fas fa-inbox"></i>
+                <span>Inquiries &amp; Volunteers</span>
+            </a>
+            <a href="settings.html" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <button class="logout-btn" title="Logout from Admin Dashboard" onclick="Auth.logout().then(() => window.location.href='login.html')">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Top Bar -->
+        <div class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" title="Toggle Navigation Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Manage Comments &amp; Moderation</h1>
+            </div>
+            
+            <div class="topbar-right">
+                <div class="admin-profile">
+                    <div class="profile-img"><span>A</span></div>
+                    <div class="profile-info">
+                        <span class="profile-name">Administrator</span>
+                        <span class="profile-role">Moderator</span>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search comments, author, content...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Summary Stats -->
+        <div class="content-section" style="margin-bottom: 20px;">
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#64748b; font-size:0.85rem; font-weight:600;">TOTAL COMMENTS</div>
+                    <div id="statTotalComments" style="font-size:1.8rem; font-weight:700; color:#0f172a; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#d97706; font-size:0.85rem; font-weight:600;">PENDING REVIEW</div>
+                    <div id="statPendingComments" style="font-size:1.8rem; font-weight:700; color:#d97706; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#16a34a; font-size:0.85rem; font-weight:600;">APPROVED / LIVE</div>
+                    <div id="statApprovedComments" style="font-size:1.8rem; font-weight:700; color:#16a34a; margin-top:6px;">0</div>
+                </div>
+                <div class="stat-card" style="background:#fff; padding:18px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <div style="color:#dc2626; font-size:0.85rem; font-weight:600;">REJECTED</div>
+                    <div id="statRejectedComments" style="font-size:1.8rem; font-weight:700; color:#dc2626; margin-top:6px;">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Table -->
+        <div class="content-section">
+            <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+                <div class="filters" style="display:flex; gap:12px;">
+                    <select id="filterStatus" class="filter-select" title="Filter by Status">
+                        <option value="all">All Statuses</option>
+                        <option value="pending" selected>Pending Review</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select id="filterType" class="filter-select" title="Filter by Content Type">
+                        <option value="all">All Types (Projects &amp; Posts)</option>
+                        <option value="project">Projects Only</option>
+                        <option value="post">Posts Only</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="manageComments.loadComments()" title="Refresh List">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container" style="background:#fff; border-radius:10px; border:1px solid #e2e8f0; overflow-x:auto;">
+                <table class="data-table" style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
+                            <th style="padding:14px 16px;">Type</th>
+                            <th style="padding:14px 16px;">Target</th>
+                            <th style="padding:14px 16px;">Author</th>
+                            <th style="padding:14px 16px;">Comment Content</th>
+                            <th style="padding:14px 16px;">Submitted</th>
+                            <th style="padding:14px 16px;">Status</th>
+                            <th style="padding:14px 16px; text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="commentsTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p style="margin-top:10px;">Loading comments...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/manage-comments.js"></script>
+</body>
+</html>

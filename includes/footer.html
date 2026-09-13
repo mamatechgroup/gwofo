@@ -4,16 +4,16 @@
             
             <!-- Organization Info -->
             <div class="footer-col">
-                <h3>Girls & Women Foundation Liberia</h3>
+                <h3>Girls &amp; Women Foundation Liberia</h3>
                 <p>
                     A non-profit organization empowering the next generation of Liberian women leaders 
                     through education, opportunity, and advocacy.
                 </p>
                 <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
 
@@ -25,6 +25,7 @@
                     <li><a href="/about.html"><i class="fas fa-info-circle"></i> About Us</a></li>
                     <li><a href="/projects.html"><i class="fas fa-project-diagram"></i> Projects</a></li>
                     <li><a href="/partners.html"><i class="fas fa-handshake"></i> Partners</a></li>
+                    <li><a href="/single.html"><i class="fas fa-newspaper"></i> News Blog</a></li>
                     <li><a href="/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
                 </ul>
             </div>
@@ -35,7 +36,7 @@
                 <ul class="contact-info">
                     <li><i class="fas fa-map-marker-alt"></i> Zwedru, Grand Gedeh County, Liberia</li>
                     <li><i class="fas fa-phone"></i> +231 88 888 0698</li>
-                    <li><i class="fas fa-envelope"></i> gwofo.liberia@gmail.com</li>
+                    <li><i class="fas fa-envelope"></i> info@gwfoliberia.org</li>
                 </ul>
             </div>
 
@@ -44,12 +45,14 @@
                 <h3><i class="fas fa-newspaper"></i> Newsletter</h3>
                 <p>Subscribe to receive updates on our programs and advocacy work.</p>
                 <form class="newsletter-form" id="newsletterForm">
-                    <input type="email" id="newsletterEmail" placeholder="Your Email Address" required>
-                    <button type="submit">
-                        <i class="fas fa-paper-plane"></i> Subscribe
-                    </button>
+                    <div class="newsletter-input-group">
+                        <input type="email" id="newsletterEmail" placeholder="Your Email Address" required autocomplete="email">
+                        <button type="submit" aria-label="Subscribe to newsletter">
+                            <i class="fas fa-paper-plane"></i> Subscribe
+                        </button>
+                    </div>
                 </form>
-                <div id="newsletterMessage" class="form-message hidden"></div>
+                <div id="newsletterMessage" class="form-message" style="display: none; margin-top: 10px; padding: 8px 12px; border-radius: 4px; font-size: 0.9rem;"></div>
             </div>
 
         </div>
@@ -58,7 +61,7 @@
         <div class="footer-bottom">
             <p>
                 <i class="far fa-copyright"></i>
-                2024 Girls & Women Foundation Liberia. All rights reserved.
+                <span id="footerYear">2025</span> Girls &amp; Women Foundation Liberia. All rights reserved.
             </p>
             <p class="developer-credit">
                 Developed by <strong>Mama TechGroup</strong>
@@ -66,66 +69,3 @@
         </div>
     </div>
 </footer>
-
-<script>
-// Newsletter Form Handler
-document.addEventListener('DOMContentLoaded', function() {
-    const newsletterForm = document.getElementById('newsletterForm');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('newsletterEmail').value;
-            const messageDiv = document.getElementById('newsletterMessage');
-            const submitBtn = newsletterForm.querySelector('button[type="submit"]');
-            
-            try {
-                submitBtn.disabled = true;
-                messageDiv.style.display = 'block';
-                messageDiv.style.background = '#e3f2fd';
-                messageDiv.style.color = '#1976d2';
-                messageDiv.textContent = 'Subscribing...';
-                
-                const apiBase = window.location.hostname.includes('netlify.app')
-                    ? 'https://gwofo.onrender.com/api'
-                    : 'http://localhost:3000/api';
-                const response = await fetch(`${apiBase}/newsletter/subscribe`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        full_name: ''
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    messageDiv.style.background = '#c8e6c9';
-                    messageDiv.style.color = '#2e7d32';
-                    messageDiv.textContent = 'Thank you for subscribing!';
-                    newsletterForm.reset();
-                    
-                    setTimeout(() => {
-                        messageDiv.style.display = 'none';
-                        submitBtn.disabled = false;
-                    }, 5000);
-                } else {
-                    messageDiv.style.background = '#ffcdd2';
-                    messageDiv.style.color = '#c62828';
-                    messageDiv.textContent = result.message || 'This email is already subscribed.';
-                    submitBtn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error subscribing to newsletter:', error);
-                messageDiv.style.background = '#ffcdd2';
-                messageDiv.style.color = '#c62828';
-                messageDiv.textContent = 'Error subscribing. Please try again.';
-                submitBtn.disabled = false;
-            }
-        });
-    }
-});
-</script>

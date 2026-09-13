@@ -24,7 +24,7 @@ class AdminDashboard {
         const token = localStorage.getItem('adminToken');
         
         if (currentPage.includes('login.html')) {
-            if (token && token.startsWith('token-')) {
+            if (token) {
                 window.location.href = 'dashboard.html';
             }
             return;
@@ -48,7 +48,7 @@ class AdminDashboard {
     
     setupLoginRedirect() {
         const token = localStorage.getItem('adminToken');
-        if (token && token.startsWith('token-')) {
+        if (token) {
             window.location.href = 'dashboard.html';
         }
     }
@@ -107,14 +107,41 @@ class AdminDashboard {
         
         if (!mobileToggle || !sidebar) return;
         
-        mobileToggle.addEventListener('click', () => {
+        let overlay = document.querySelector('.admin-sidebar-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'admin-sidebar-overlay';
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.documentElement.classList.remove('nav-open');
+                document.body.classList.remove('nav-open');
+            });
+            overlay.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+        }
+        
+        mobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) {
+                overlay.classList.add('active');
+                document.documentElement.classList.add('nav-open');
+                document.body.classList.add('nav-open');
+            } else {
+                overlay.classList.remove('active');
+                document.documentElement.classList.remove('nav-open');
+                document.body.classList.remove('nav-open');
+            }
         });
         
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 992 && sidebar.classList.contains('active')) {
                 if (!e.target.closest('.admin-sidebar') && !e.target.closest('.mobile-toggle')) {
                     sidebar.classList.remove('active');
+                    if (overlay) overlay.classList.remove('active');
+                    document.documentElement.classList.remove('nav-open');
+                    document.body.classList.remove('nav-open');
                 }
             }
         });

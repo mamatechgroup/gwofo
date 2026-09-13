@@ -1,26 +1,24 @@
-// API Service Utility for Frontend Integration
+// API Service Utility for Frontend Integration - GWOFO Platform
 // Save as: js/api.js
 
-// Determine API base URL based on environment
+// Determine API base URL dynamically based on environment
 const API_BASE_URL = (() => {
+    if (typeof window === 'undefined') return 'http://localhost:10000/api';
     const hostname = window.location.hostname;
     
-    // Production (Netlify + Render)
+    // Remote Netlify / Render deployments
     if (hostname.includes('netlify.app')) {
         return 'https://gwofo.onrender.com/api';
     }
     
-    // Staging/Preview
-    if (hostname.includes('netlify-preview')) {
-        return 'https://gwofo.onrender.com/api';
-    }
-    
-    // Local development
-    return 'http://localhost:3000/api';
+    // Current host / local / custom domain
+    return `${window.location.protocol}//${window.location.host}/api`;
 })();
 
+window.API_BASE_URL = API_BASE_URL;
+
 /**
- * Generic fetch wrapper with error handling
+ * Generic fetch wrapper with token management and error handling
  */
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -42,21 +40,20 @@ async function apiCall(endpoint, options = {}) {
     
     try {
         const response = await fetch(url, config);
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         
         if (!response.ok) {
-            throw new Error(data.error || 'API Error');
+            throw new Error(data.error || `HTTP ${response.status}: API Error`);
         }
         
         return data;
     } catch (error) {
-        console.error(`API Error (${endpoint}):`, error);
+        console.error(`API Error (${endpoint}):`, error.message || error);
         throw error;
     }
 }
 
 // ==================== AUTHENTICATION ====================
-
 const Auth = {
     async login(username, password) {
         return apiCall('/auth/login', {
@@ -66,7 +63,9 @@ const Auth = {
     },
     
     async logout() {
-        return apiCall('/auth/logout', { method: 'POST' });
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('currentUser');
+        return apiCall('/auth/logout', { method: 'POST' }).catch(() => ({ success: true }));
     },
     
     async getCurrentUser() {
@@ -85,50 +84,122 @@ const Auth = {
             method: 'PUT',
             body: JSON.stringify(data)
         });
+    },
+
+    async changePassword(currentPassword, newPassword) {
+        return apiCall('/auth/change-password', {
+            method: 'POST',
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
     }
 };
 
-// ==================== DASHBOARD ====================
+// ==================== STATS (PUBLIC & ZERO MOCK DATA) ====================
+const Stats = {
+    async getPublic() {
+        return apiCall('/stats/public');
+    },
 
-const Dashboard = {
-    async getStats() {
-        return apiCall('/dashboard/stats');
-    },
-    
-    async getSummary() {
-        return apiCall('/dashboard/summary');
-    },
-    
-    async getPostsStats() {
-        return apiCall('/dashboard/posts-stats');
-    },
-    
-    async getProjectsStats() {
-        return apiCall('/dashboard/projects-stats');
-    },
-    
-    async getTeamStats() {
-        return apiCall('/dashboard/team-stats');
-    },
-    
-    async getPartnersStats() {
-        return apiCall('/dashboard/partners-stats');
-    },
-    
-    async getRecentActivity() {
-        return apiCall('/dashboard/recent-activity');
-    },
-    
-    async logActivity(activity) {
-        return apiCall('/dashboard/log-activity', {
+    async updateImpact(data) {
+        return apiCall('/stats/impact', {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+};
+
+// ==================== INQUIRIES & FORMS ====================
+const Inquiries = {
+    async submitContact(data) {
+        return apiCall('/inquiries/contact', {
             method: 'POST',
-            body: JSON.stringify(activity)
+            body: JSON.stringify(data)
+        });
+    },
+
+    async submitPartner(data) {
+        return apiCall('/inquiries/partner', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async submitVolunteer(data) {
+        return apiCall('/inquiries/volunteer', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async getAll(type = 'contact', status = null) {
+        const query = status ? `?status=${encodeURIComponent(status)}` : '';
+        return apiCall(`/inquiries/${type}${query}`);
+    },
+
+    async updateStatus(type, id, status) {
+        return apiCall(`/inquiries/${type}/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+    },
+
+    async delete(type, id) {
+        return apiCall(`/inquiries/${type}/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getStats() {
+        return apiCall('/inquiries/stats/summary');
+    }
+};
+
+// ==================== COMMENTS ====================
+const Comments = {
+    async getForProject(projectId) {
+        return apiCall(`/comments/project/${projectId}`);
+    },
+
+    async getForPost(postId) {
+        return apiCall(`/comments/post/${postId}`);
+    },
+
+    async submitProjectComment(projectId, data) {
+        return apiCall(`/comments/project/${projectId}`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async submitPostComment(postId, data) {
+        return apiCall(`/comments/post/${postId}`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async getAllAdmin(status = null, type = 'all') {
+        const params = new URLSearchParams();
+        if (status) params.append('status', status);
+        if (type) params.append('type', type);
+        return apiCall(`/comments/admin/all?${params.toString()}`);
+    },
+
+    async updateStatus(type, id, status) {
+        return apiCall(`/comments/admin/${type}/${id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+    },
+
+    async delete(type, id) {
+        return apiCall(`/comments/admin/${type}/${id}`, {
+            method: 'DELETE'
         });
     }
 };
 
 // ==================== POSTS ====================
-
 const Posts = {
     async getAll() {
         return apiCall('/posts');
@@ -170,7 +241,6 @@ const Posts = {
 };
 
 // ==================== PROJECTS ====================
-
 const Projects = {
     async getAll() {
         return apiCall('/projects');
@@ -219,7 +289,6 @@ const Projects = {
 };
 
 // ==================== TEAM ====================
-
 const Team = {
     async getAll() {
         return apiCall('/team');
@@ -261,7 +330,6 @@ const Team = {
 };
 
 // ==================== PARTNERS ====================
-
 const Partners = {
     async getAll() {
         return apiCall('/partners');
@@ -307,7 +375,6 @@ const Partners = {
 };
 
 // ==================== SLIDES ====================
-
 const Slides = {
     async getAll() {
         return apiCall('/slides');
@@ -351,8 +418,7 @@ const Slides = {
     }
 };
 
-// ==================== NEWSLETTER / SUBSCRIPTIONS ====================
-
+// ==================== NEWSLETTER ====================
 const Newsletter = {
     async getAll() {
         return apiCall('/newsletter/subscriptions');
@@ -374,7 +440,103 @@ const Newsletter = {
     }
 };
 
-// Export all modules
+// ==================== DASHBOARD & BACKUPS ====================
+const Dashboard = {
+    async getStats() {
+        return apiCall('/dashboard/stats');
+    },
+    
+    async getSummary() {
+        return apiCall('/dashboard/summary');
+    },
+    
+    async getRecentActivity() {
+        return apiCall('/dashboard/recent-activity');
+    }
+};
+
+const Backups = {
+    async getAll() {
+        return apiCall('/backups');
+    },
+
+    async create(type = 'Full') {
+        return apiCall('/backups', {
+            method: 'POST',
+            body: JSON.stringify({ type })
+        });
+    },
+
+    async restore(filename) {
+        return apiCall(`/backups/restore/${encodeURIComponent(filename)}`, {
+            method: 'POST'
+        });
+    },
+
+    async delete(filename) {
+        return apiCall(`/backups/${encodeURIComponent(filename)}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getSchedule() {
+        return apiCall('/backups/schedule');
+    },
+
+    async saveSchedule(data) {
+        return apiCall('/backups/schedule', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+};
+
+// ==================== SOCIAL LINKS ====================
+const SocialLinks = {
+    async getPublic() {
+        return apiCall('/social-links');
+    },
+    async getAllAdmin() {
+        return apiCall('/social-links/admin');
+    },
+    async getById(id) {
+        return apiCall(`/social-links/${id}`);
+    },
+    async create(data) {
+        return apiCall('/social-links', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+    async update(id, data) {
+        return apiCall(`/social-links/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    async delete(id) {
+        return apiCall(`/social-links/${id}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+// Export to window
+window.Auth = Auth;
+window.Stats = Stats;
+window.Inquiries = Inquiries;
+window.Comments = Comments;
+window.Posts = Posts;
+window.Projects = Projects;
+window.Team = Team;
+window.Partners = Partners;
+window.Slides = Slides;
+window.Newsletter = Newsletter;
+window.Dashboard = Dashboard;
+window.Backups = Backups;
+window.SocialLinks = SocialLinks;
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { apiCall, Auth, Dashboard, Posts, Projects, Team, Partners, Slides, Newsletter };
+    module.exports = { apiCall, Auth, Stats, Inquiries, Comments, Posts, Projects, Team, Partners, Slides, Newsletter, Dashboard, Backups, SocialLinks };
 }
+
