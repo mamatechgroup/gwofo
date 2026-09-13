@@ -105,6 +105,11 @@ function rateLimiter(windowMs = 60 * 1000, maxRequests = 30) {
     };
 }
 
+// Canonical Homepage 301 Redirect: /index.html -> /
+app.get('/index.html', (req, res) => {
+    res.redirect(301, '/');
+});
+
 // Static files (serves root website files)
 app.use(express.static(path.join(__dirname, '../')));
 
@@ -158,26 +163,25 @@ app.get(['/health/ready', '/api/health/ready'], async (req, res) => {
     }
 });
 
-// Dynamic Sitemap Generator with real PostgreSQL published post dates
+// Dynamic Sitemap Generator with automated filesystem mtime & PostgreSQL published post dates
 app.get('/sitemap.xml', async (req, res) => {
     const canonicalHost = 'https://gwofoliberia.org';
     const staticPages = [
-        { loc: '/', changefreq: 'weekly', priority: '1.0' },
-        { loc: '/about.html', changefreq: 'monthly', priority: '0.9' },
-        { loc: '/projects.html', changefreq: 'weekly', priority: '0.9' },
-        { loc: '/projects-education.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/projects-empowerment.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/projects-health.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/single.html', changefreq: 'daily', priority: '0.9' },
-        { loc: '/partners.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/ngo-partners.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/team.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/board.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/impact.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/get-involved.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/become-partner.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/report.html', changefreq: 'monthly', priority: '0.8' },
-        { loc: '/contact.html', changefreq: 'monthly', priority: '0.8' }
+        { loc: '/', file: 'index.html' },
+        { loc: '/about.html', file: 'about.html' },
+        { loc: '/projects.html', file: 'projects.html' },
+        { loc: '/projects-education.html', file: 'projects-education.html' },
+        { loc: '/projects-empowerment.html', file: 'projects-empowerment.html' },
+        { loc: '/projects-health.html', file: 'projects-health.html' },
+        { loc: '/partners.html', file: 'partners.html' },
+        { loc: '/ngo-partners.html', file: 'ngo-partners.html' },
+        { loc: '/team.html', file: 'team.html' },
+        { loc: '/board.html', file: 'board.html' },
+        { loc: '/impact.html', file: 'impact.html' },
+        { loc: '/get-involved.html', file: 'get-involved.html' },
+        { loc: '/become-partner.html', file: 'become-partner.html' },
+        { loc: '/report.html', file: 'report.html' },
+        { loc: '/contact.html', file: 'contact.html' }
     ];
 
     try {
@@ -191,18 +195,27 @@ app.get('/sitemap.xml', async (req, res) => {
             console.warn('⚠️ Dynamic sitemap DB query fallback:', dbErr.message);
         }
 
-        const nowIso = new Date().toISOString().split('T')[0];
         let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
         xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
         for (const page of staticPages) {
-            xml += `  <url>\n    <loc>${canonicalHost}${page.loc}</loc>\n    <lastmod>${nowIso}</lastmod>\n    <changefreq>${page.changefreq}</changefreq>\n    <priority>${page.priority}</priority>\n  </url>\n`;
+            const filePath = path.join(__dirname, '..', page.file);
+            let lastMod = '2026-09-13';
+            try {
+                if (fs.existsSync(filePath)) {
+                    lastMod = fs.statSync(filePath).mtime.toISOString().split('T')[0];
+                }
+            } catch (statErr) {
+                console.warn(`⚠️ Could not read mtime for ${page.file}:`, statErr.message);
+            }
+            xml += `  <url>\n    <loc>${canonicalHost}${page.loc}</loc>\n    <lastmod>${lastMod}</lastmod>\n  </url>\n`;
         }
 
         for (const post of postRows) {
-            const lastMod = (post.updated_at || post.created_at || new Date()).toISOString().split('T')[0];
+            const lastModDate = post.updated_at || post.created_at || new Date();
+            const lastMod = (lastModDate instanceof Date ? lastModDate : new Date(lastModDate)).toISOString().split('T')[0];
             const postSlug = encodeURIComponent(post.slug || '');
-            xml += `  <url>\n    <loc>${canonicalHost}/single.html?slug=${postSlug}</loc>\n    <lastmod>${lastMod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+            xml += `  <url>\n    <loc>${canonicalHost}/single.html?slug=${postSlug}</loc>\n    <lastmod>${lastMod}</lastmod>\n  </url>\n`;
         }
 
         xml += '</urlset>';

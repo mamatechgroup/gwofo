@@ -352,6 +352,30 @@ async function runTests() {
         assert('Dynamic Canonical: single-post.js synchronizes canonical link dynamically', singlePostJs.includes('canonicalLink.href = canonicalUrl'));
         assert('Social Canonical: single-post.js shares canonical URL on social networks', singlePostJs.includes('https://gwofoliberia.org/single.html?id='));
 
+        // 31. Automated Sitemap Architecture & Canonical 301 Redirects
+        const indexHtmlRes = await makeRequest('GET', '/index.html');
+        assert('Homepage Canonical: GET /index.html returns HTTP 301 redirect', indexHtmlRes.status === 301);
+        assert('Homepage Canonical: GET /index.html redirect location is /', indexHtmlRes.headers.location === '/');
+
+        const sitemapAuditRes = await makeRequest('GET', '/sitemap.xml');
+        assert('Sitemap: GET /sitemap.xml returns HTTP 200', sitemapAuditRes.status === 200);
+        assert('Sitemap: Content-Type is application/xml', (sitemapAuditRes.headers['content-type'] || '').includes('xml'));
+        assert('Sitemap: contains apex canonical domain https://gwofoliberia.org', sitemapAuditRes.raw.includes('https://gwofoliberia.org/'));
+        assert('Sitemap: does NOT contain duplicate /index.html', !sitemapAuditRes.raw.includes('https://gwofoliberia.org/index.html'));
+        assert('Sitemap: does NOT contain generic /single.html template shell', !sitemapAuditRes.raw.includes('<loc>https://gwofoliberia.org/single.html</loc>'));
+        assert('Sitemap: includes published dynamic story URLs', sitemapAuditRes.raw.includes('/single.html?slug='));
+        assert('Sitemap: does NOT contain obsolete changefreq tags', !sitemapAuditRes.raw.includes('<changefreq>'));
+        assert('Sitemap: does NOT contain obsolete priority tags', !sitemapAuditRes.raw.includes('<priority>'));
+
+        // Validate all lastmod dates in sitemap match ISO YYYY-MM-DD
+        const lastmodMatches = [...sitemapAuditRes.raw.matchAll(/<lastmod>(.*?)<\/lastmod>/g)];
+        const allLastmodValid = lastmodMatches.length > 0 && lastmodMatches.every(m => /^\d{4}-\d{2}-\d{2}$/.test(m[1]));
+        assert('Sitemap: all <lastmod> timestamps are automated ISO YYYY-MM-DD dates', allLastmodValid);
+
+        // Netlify configuration tests
+        assert('Netlify: contains canonical 301 redirect for /index.html', netlifyToml.includes('from = "/index.html"'));
+        assert('Netlify: contains dynamic proxy 200 rewrite for /sitemap.xml', netlifyToml.includes('from = "/sitemap.xml"') && netlifyToml.includes('https://api.gwofoliberia.org/sitemap.xml'));
+
 
     } catch (err) {
         console.error('Test Suite encountered unhandled error:', err);

@@ -16,6 +16,20 @@
   status = 301
   force = true
 
+# Canonical 301 Redirect: /index.html -> /
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
+# Dynamic Sitemap Proxy: Route Netlify /sitemap.xml to Render backend
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://api.gwofoliberia.org/sitemap.xml"
+  status = 200
+  force = true
+
 # Dedicated 404 handler for missing pages (Prevents Soft 404)
 [[redirects]]
   from = "/*"
