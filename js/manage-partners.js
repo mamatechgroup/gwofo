@@ -69,6 +69,16 @@ class ManagePartners {
         // Form submit
         this.form?.addEventListener('submit', e => { e.preventDefault(); this.savePartner(); });
 
+        // Select All Checkbox
+        const selectAll = document.querySelector('.select-all');
+        if (selectAll) {
+            selectAll.addEventListener('change', e => {
+                document.querySelectorAll('.partner-checkbox').forEach(cb => {
+                    cb.checked = e.target.checked;
+                });
+            });
+        }
+
         // Pagination
         document.querySelector('.pagination-btn[aria-label="Previous page"]')?.addEventListener('click', () => {
             if (this.currentPage > 1) { this.currentPage--; this.render(); }
@@ -129,27 +139,74 @@ class ManagePartners {
         this.updatePagination();
     }
 
+    getInitialsAndGradient(name) {
+        if (!name) return { initials: 'PT', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' };
+        const cleanWords = name.replace(/[^\w\s]/g, '').split(/\s+/).filter(w => !['of', 'and', 'the', 'for', 'in'].includes(w.toLowerCase()));
+        let initials = '';
+        if (cleanWords.length >= 2) {
+            initials = (cleanWords[0][0] + cleanWords[1][0]).toUpperCase();
+        } else if (cleanWords.length === 1 && cleanWords[0].length >= 2) {
+            initials = cleanWords[0].substring(0, 2).toUpperCase();
+        } else {
+            initials = (name.substring(0, 2) || 'PT').toUpperCase();
+        }
+
+        const gradients = [
+            'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+            'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+            'linear-gradient(135deg, #10b981, #047857)',
+            'linear-gradient(135deg, #ec4899, #be185d)',
+            'linear-gradient(135deg, #f59e0b, #b45309)',
+            'linear-gradient(135deg, #06b6d4, #0e7490)',
+            'linear-gradient(135deg, #6366f1, #4338ca)'
+        ];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        const gradient = gradients[Math.abs(hash) % gradients.length];
+        return { initials, gradient };
+    }
+
+    renderPartnerLogo(p) {
+        const { initials, gradient } = this.getInitialsAndGradient(p.name);
+        if (p.logo_url) {
+            const norm = this.normalizeImageUrl(p.logo_url);
+            return `
+                <img src="${norm}" alt="${this.esc(p.name)}" class="partner-logo" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="partner-logo-avatar" style="display:none;background:${gradient};">${initials}</div>`;
+        }
+        return `<div class="partner-logo-avatar" style="background:${gradient};">${initials}</div>`;
+    }
+
     createRow(p) {
-        const logo = p.logo_url
-            ? `<img src="${p.logo_url}" alt="${this.esc(p.name)}" class="partner-logo">`
-            : `<div class="partner-logo-placeholder"><i class="fas fa-image"></i></div>`;
+        const logo = this.renderPartnerLogo(p);
+        const startDate = p.start_date ? String(p.start_date).substring(0, 10) : '—';
+        const levelKey = (p.level || 'bronze').toLowerCase();
 
         return `
             <tr>
+                <td class="select-checkbox-col-50">
+                    <input type="checkbox" class="partner-checkbox" data-id="${p.id}" aria-label="Select ${this.esc(p.name)}">
+                </td>
                 <td>
                     <div class="partner-info">
                         ${logo}
                         <div>
-                            <strong>${this.esc(p.name)}</strong>
-                            <small>${this.esc(p.contact_person || '—')}</small>
+                            <strong style="display:block;color:var(--dark-color);">${this.esc(p.name)}</strong>
+                            <small style="color:var(--text-light);">${this.esc(p.contact_person || '—')}</small>
                         </div>
                     </div>
                 </td>
-                <td>${this.esc(p.type || '—')}</td>
-                <td><span class="badge badge-${p.level}">${p.level || '—'}</span></td>
-                <td>${this.esc(p.email || '—')}</td>
-                <td>${this.esc(p.phone || '—')}</td>
-                <td><span class="status-badge status-${p.status}">${p.status}</span></td>
+                <td><span class="partner-type-badge">${this.esc(p.type || '—')}</span></td>
+                <td>
+                    <div class="contact-cell">
+                        ${p.email ? `<div><i class="fas fa-envelope"></i> <span>${this.esc(p.email)}</span></div>` : ''}
+                        ${p.phone ? `<div><i class="fas fa-phone"></i> <span>${this.esc(p.phone)}</span></div>` : ''}
+                        ${!p.email && !p.phone ? '<span style="color:var(--text-light);">—</span>' : ''}
+                    </div>
+                </td>
+                <td><span class="badge badge-${levelKey}">${this.esc(p.level || '—')}</span></td>
+                <td><span style="color:var(--text-light);font-size:0.85rem;">${startDate}</span></td>
+                <td><span class="status-badge status-${p.status}">${this.esc(p.status)}</span></td>
                 <td class="action-buttons">
                     <button class="btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-edit"></i></button>
                     <button class="btn-delete" data-id="${p.id}" title="Delete"><i class="fas fa-trash"></i></button>
@@ -382,7 +439,7 @@ class ManagePartners {
     showLoading() {
         const tbody = document.querySelector('#partnersTable tbody');
         if (tbody) tbody.innerHTML = `
-            <tr><td colspan="7" style="padding:40px;text-align:center;">
+            <tr><td colspan="8" style="padding:40px;text-align:center;">
                 <div class="loading-spinner"></div><p>Loading partners…</p>
             </td></tr>`;
     }
@@ -390,7 +447,7 @@ class ManagePartners {
     showError(message) {
         const tbody = document.querySelector('#partnersTable tbody');
         if (tbody) tbody.innerHTML = `
-            <tr><td colspan="7" style="padding:40px;text-align:center;color:#ef4444;">
+            <tr><td colspan="8" style="padding:40px;text-align:center;color:#ef4444;">
                 <i class="fas fa-exclamation-circle" style="font-size:2em;display:block;margin-bottom:8px;"></i>
                 <p>${message}</p>
                 <button class="btn-secondary" onclick="location.reload()">Retry</button>
@@ -407,6 +464,18 @@ class ManagePartners {
             background:${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
+    }
+
+    normalizeImageUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        const trimmed = url.trim();
+        if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) {
+            return trimmed;
+        }
+        if (trimmed.startsWith('../')) {
+            return trimmed;
+        }
+        return '../' + trimmed;
     }
 
     esc(str) {

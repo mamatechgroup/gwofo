@@ -226,49 +226,91 @@ class ManageProjects {
     }
 
     createCard(p) {
-        const pct    = p.progress_percentage || 0;
-        const catMap = { education: 'Education', economic: 'Economic Empowerment', healthcare: 'Healthcare', advocacy: 'Advocacy' };
-        const cat    = catMap[p.category] || p.category || 'General';
+        const pct      = p.progress_percentage || 0;
+        const catMap   = { education: 'Education & Advocacy', economic: 'Economic Empowerment', healthcare: 'Health & Rights', advocacy: 'Advocacy & Human Rights' };
+        const iconMap  = { education: 'fas fa-graduation-cap', economic: 'fas fa-hands-helping', healthcare: 'fas fa-heartbeat', advocacy: 'fas fa-bullhorn' };
+        const catKey   = (p.category || 'education').toLowerCase();
+        const catName  = catMap[catKey] || p.category || 'General';
+        const catIcon  = iconMap[catKey] || 'fas fa-project-diagram';
+        const hasImg   = p.image_url && this.isValidImageUrl(p.image_url);
+        const normImg  = hasImg ? this.normalizeImageUrl(p.image_url) : '';
+
+        const headerMarkup = hasImg ? `
+            <div class="project-header">
+                <div class="project-image">
+                    <img src="${normImg}" alt="${this.esc(p.name)}" onerror="this.onerror=null; this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';">
+                </div>
+                <div class="project-image-placeholder ${catKey}" style="display:none;">
+                    <i class="${catIcon}"></i>
+                </div>
+                <span class="project-status ${p.status}">${p.status}</span>
+            </div>` : `
+            <div class="project-header">
+                <div class="project-image-placeholder ${catKey}">
+                    <i class="${catIcon}"></i>
+                </div>
+                <span class="project-status ${p.status}">${p.status}</span>
+            </div>`;
 
         return `
             <div class="project-card">
-                ${p.image_url && this.isValidImageUrl(p.image_url) ? `<div class="project-card-image"><img src="${p.image_url}" alt="${this.esc(p.name)}"></div>` : ''}
-                <div class="project-card-body">
-                    <div class="project-card-header">
-                        <span class="category-badge ${p.category}">${cat}</span>
-                        <span class="status-badge status-${p.status}">${p.status}</span>
-                    </div>
-                    <h3 class="project-card-title">${this.esc(p.name)}</h3>
-                    <p class="project-card-desc">${this.esc((p.description || '').substring(0, 100))}…</p>
-                    ${p.location ? `<p class="project-card-location"><i class="fas fa-map-marker-alt"></i> ${this.esc(p.location)}</p>` : ''}
-                    <div class="project-progress-bar">
-                        <div class="progress-fill" style="width:${pct}%"></div>
-                    </div>
-                    <div class="project-progress-label">
-                        <span>${pct}% complete</span>
-                        ${p.goal_amount ? `<span>Goal: $${Number(p.goal_amount).toLocaleString()}</span>` : ''}
-                    </div>
+                ${headerMarkup}
+                <div class="project-meta">
+                    <span class="project-category ${catKey}">${catName}</span>
+                    ${p.location ? `<span class="project-location"><i class="fas fa-map-marker-alt"></i> ${this.esc(p.location)}</span>` : ''}
                 </div>
-                <div class="project-card-actions">
-                    <button class="btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn-delete" data-id="${p.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                <div class="project-content">
+                    <h3>${this.esc(p.name)}</h3>
+                    <p class="project-description">${this.esc((p.description || '').substring(0, 110))}…</p>
+                    <div class="project-progress">
+                        <div class="progress-info">
+                            <span class="progress-label">Progress</span>
+                            <span class="progress-percent">${pct}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:${pct}%"></div>
+                        </div>
+                        ${p.goal_amount ? `<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.82rem;color:var(--text-light);"><span>Raised: $${Number(p.raised_amount || 0).toLocaleString()}</span><span>Goal: $${Number(p.goal_amount).toLocaleString()}</span></div>` : ''}
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" data-id="${p.id}" title="Delete"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
                 </div>
             </div>`;
     }
 
     createRow(p) {
-        const pct    = p.progress_percentage || 0;
-        const catMap = { education: 'Education', economic: 'Economic Empowerment', healthcare: 'Healthcare', advocacy: 'Advocacy' };
-        const cat    = catMap[p.category] || p.category || 'General';
+        const pct      = p.progress_percentage || 0;
+        const catMap   = { education: 'Education & Advocacy', economic: 'Economic Empowerment', healthcare: 'Health & Rights', advocacy: 'Advocacy & Human Rights' };
+        const iconMap  = { education: 'fas fa-graduation-cap', economic: 'fas fa-hands-helping', healthcare: 'fas fa-heartbeat', advocacy: 'fas fa-bullhorn' };
+        const catKey   = (p.category || 'education').toLowerCase();
+        const catName  = catMap[catKey] || p.category || 'General';
+        const catIcon  = iconMap[catKey] || 'fas fa-project-diagram';
+        const hasImg   = p.image_url && this.isValidImageUrl(p.image_url);
+        const normImg  = hasImg ? this.normalizeImageUrl(p.image_url) : '';
+
+        const thumb = hasImg ? `
+            <img src="${normImg}" alt="${this.esc(p.name)}" class="project-list-thumb" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="project-list-thumb-placeholder project-image-placeholder ${catKey}" style="display:none;"><i class="${catIcon}"></i></div>` : `
+            <div class="project-list-thumb-placeholder project-image-placeholder ${catKey}"><i class="${catIcon}"></i></div>`;
 
         return `
             <tr>
-                <td><strong>${this.esc(p.name)}</strong></td>
-                <td>${cat}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        ${thumb}
+                        <div>
+                            <strong>${this.esc(p.name)}</strong>
+                            ${p.manager_name ? `<br><small style="color:var(--text-light);">Lead: ${this.esc(p.manager_name)}</small>` : ''}
+                        </div>
+                    </div>
+                </td>
+                <td><span class="project-category ${catKey}">${catName}</span></td>
                 <td>${this.esc(p.location || '—')}</td>
                 <td>
-                    <div class="progress-bar" style="min-width:80px;">
-                        <div class="progress" style="width:${pct}%"></div>
+                    <div class="progress-bar" style="min-width:90px;">
+                        <div class="progress-fill" style="width:${pct}%"></div>
                     </div>
                     <small>${pct}%</small>
                 </td>
@@ -454,10 +496,22 @@ class ManageProjects {
         setTimeout(() => el.remove(), 3500);
     }
 
+    normalizeImageUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        const trimmed = url.trim();
+        if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) {
+            return trimmed;
+        }
+        if (trimmed.startsWith('../')) {
+            return trimmed;
+        }
+        return '../' + trimmed;
+    }
+
     isValidImageUrl(url) {
-        if (!url) return false;
+        if (!url || typeof url !== 'string') return false;
         const clean = url.trim();
-        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/');
+        return clean.startsWith('data:') || clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('/') || clean.startsWith('assets/') || clean.startsWith('../');
     }
 
     esc(str) {

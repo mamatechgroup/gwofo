@@ -131,39 +131,62 @@ class ManageTeam {
     }
 
     createCard(m) {
-        const name   = `${this.esc(m.first_name)} ${this.esc(m.last_name)}`;
+        const name     = `${this.esc(m.first_name)} ${this.esc(m.last_name)}`;
         const initials = `${(m.first_name || ' ')[0]}${(m.last_name || ' ')[0]}`.toUpperCase();
-        const avatar  = m.profile_image
-            ? `<img src="${m.profile_image}" alt="${name}" class="member-card-avatar">`
-            : `<div class="member-card-avatar-initials">${initials}</div>`;
+        const normImg  = m.profile_image ? this.normalizeImageUrl(m.profile_image) : '';
 
-        const deptColors = { leadership: 'purple', programs: 'pink', operations: 'cyan', volunteers: 'green' };
-        const deptColor  = deptColors[(m.department || '').toLowerCase()] || 'blue';
+        const deptMap = {
+            'executive leadership': 'executive',
+            'leadership': 'executive',
+            'board of directors': 'executive',
+            'programs': 'coordinator',
+            'finance & administration': 'manager',
+            'operations': 'manager',
+            'volunteers': 'volunteer'
+        };
+        const deptKey   = (m.department || '').toLowerCase();
+        const badgeRole = deptMap[deptKey] || 'executive';
+
+        const headerMarkup = normImg ? `
+            <div class="team-member-header">
+                <div class="team-member-image">
+                    <img src="${normImg}" alt="${name}" onerror="this.onerror=null; this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';">
+                </div>
+                <div class="team-image-placeholder" style="display:none;">
+                    <span>${initials}</span>
+                </div>
+                <span class="team-member-badge ${badgeRole}"><i class="fas fa-circle" style="font-size:0.5rem;"></i> ${this.esc(m.status || 'active')}</span>
+            </div>` : `
+            <div class="team-member-header">
+                <div class="team-image-placeholder">
+                    <span>${initials}</span>
+                </div>
+                <span class="team-member-badge ${badgeRole}"><i class="fas fa-circle" style="font-size:0.5rem;"></i> ${this.esc(m.status || 'active')}</span>
+            </div>`;
 
         const socials = [
-            m.linkedin_url && `<a href="${m.linkedin_url}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`,
-            m.twitter_url  && `<a href="${m.twitter_url}"  target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>`,
-            m.facebook_url && `<a href="${m.facebook_url}" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>`
+            m.linkedin_url && `<a href="${m.linkedin_url}" class="social-link" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>`,
+            m.twitter_url  && `<a href="${m.twitter_url}"  class="social-link" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>`,
+            m.facebook_url && `<a href="${m.facebook_url}" class="social-link" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>`
         ].filter(Boolean).join('');
 
         return `
             <div class="team-member-card">
-                <div class="member-card-top">
-                    ${avatar}
-                    <span class="status-badge status-${m.status}" style="position:absolute;top:12px;right:12px;">${m.status}</span>
-                </div>
-                <div class="member-card-body">
-                    <h4 class="member-name">${name}</h4>
-                    <p class="member-position">${this.esc(m.position || '')}</p>
-                    <span class="dept-badge dept-${deptColor}">${this.esc(m.department || 'General')}</span>
-                    ${m.email ? `<p class="member-email"><i class="fas fa-envelope"></i> ${this.esc(m.email)}</p>` : ''}
-                    ${m.phone ? `<p class="member-phone"><i class="fas fa-phone"></i> ${this.esc(m.phone)}</p>` : ''}
-                    ${m.bio ? `<p class="member-bio">${this.esc(m.bio.substring(0, 80))}…</p>` : ''}
-                    ${socials ? `<div class="member-socials">${socials}</div>` : ''}
-                </div>
-                <div class="member-card-actions">
-                    <button class="btn-edit" data-id="${m.id}" title="Edit"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn-delete" data-id="${m.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                ${headerMarkup}
+                <div class="team-member-content">
+                    <h3>${name}</h3>
+                    <p class="team-position">${this.esc(m.position || 'Team Member')}</p>
+                    <p class="team-department">${this.esc(m.department || 'General')}</p>
+                    <div class="team-contact">
+                        ${m.email ? `<div class="contact-item"><i class="fas fa-envelope"></i> <span>${this.esc(m.email)}</span></div>` : ''}
+                        ${m.phone ? `<div class="contact-item"><i class="fas fa-phone"></i> <span>${this.esc(m.phone)}</span></div>` : ''}
+                    </div>
+                    ${m.bio ? `<p class="team-bio" style="font-size:0.85rem;color:var(--text-light);margin:10px 0;line-height:1.4;">${this.esc(m.bio.substring(0, 95))}…</p>` : ''}
+                    ${socials ? `<div class="team-social">${socials}</div>` : ''}
+                    <div class="team-actions">
+                        <button class="btn-edit" data-id="${m.id}" title="Edit"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" data-id="${m.id}" title="Delete"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
                 </div>
             </div>`;
     }
@@ -363,6 +386,18 @@ class ManageTeam {
             background:${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 3500);
+    }
+
+    normalizeImageUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        const trimmed = url.trim();
+        if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/')) {
+            return trimmed;
+        }
+        if (trimmed.startsWith('../')) {
+            return trimmed;
+        }
+        return '../' + trimmed;
     }
 
     esc(str) {
