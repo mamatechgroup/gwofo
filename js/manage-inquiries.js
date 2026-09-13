@@ -5,6 +5,7 @@ class ManageInquiries {
         this.currentTab = 'contact'; // 'contact' | 'partner' | 'volunteer'
         this.records = [];
         this.filtered = [];
+        this.selectedIds = new Set();
         this.init();
     }
 
@@ -80,36 +81,50 @@ class ManageInquiries {
             const res = await Inquiries.getStats();
             if (res.success && res.data) {
                 const d = res.data;
+                const totalContacts = d.total_contacts ?? d.contacts?.total ?? 0;
+                const totalPartners = d.total_partnerships ?? d.partners?.total ?? 0;
+                const totalVolunteers = d.total_volunteers ?? d.volunteers?.total ?? 0;
+                const pendingContacts = d.new_contacts ?? d.contacts?.pending ?? 0;
+                const pendingPartners = d.pending_partners ?? d.partners?.pending ?? 0;
+                const pendingVolunteers = d.pending_volunteers ?? d.volunteers?.pending ?? 0;
+                const totalPending = d.totalPending ?? (pendingContacts + pendingPartners + pendingVolunteers);
+
                 const contactCount = document.getElementById('statContactCount');
                 const partnerCount = document.getElementById('statPartnerCount');
                 const volunteerCount = document.getElementById('statVolunteerCount');
                 const pendingAction = document.getElementById('statPendingAction');
 
-                if (contactCount) contactCount.textContent = d.total_contacts || 0;
-                if (partnerCount) partnerCount.textContent = d.total_partnerships || 0;
-                if (volunteerCount) volunteerCount.textContent = d.total_volunteers || 0;
-                if (pendingAction) pendingAction.textContent = (d.new_contacts || 0) + (d.pending_volunteers || 0);
+                if (contactCount) contactCount.textContent = totalContacts;
+                if (partnerCount) partnerCount.textContent = totalPartners;
+                if (volunteerCount) volunteerCount.textContent = totalVolunteers;
+                if (pendingAction) pendingAction.textContent = totalPending;
 
                 const badgeC = document.getElementById('badgeContact');
                 const badgeP = document.getElementById('badgePartner');
                 const badgeV = document.getElementById('badgeVolunteer');
-                if (badgeC) badgeC.textContent = d.total_contacts || 0;
-                if (badgeP) badgeP.textContent = d.total_partnerships || 0;
-                if (badgeV) badgeV.textContent = d.total_volunteers || 0;
+                if (badgeC) badgeC.textContent = totalContacts;
+                if (badgeP) badgeP.textContent = totalPartners;
+                if (badgeV) badgeV.textContent = totalVolunteers;
             }
-            window.updateSidebarBadges?.();
+            if (window.adminDashboard && typeof window.adminDashboard.updateSidebarBadges === 'function') {
+                window.adminDashboard.updateSidebarBadges();
+            } else if (typeof window.updateSidebarBadges === 'function') {
+                window.updateSidebarBadges();
+            }
         } catch (err) {
             console.warn('Error loading inquiries stats:', err);
         }
     }
 
     async loadCurrentTab() {
+        this.selectedIds.clear();
+        this.updateSelectionUI();
         this.renderHeader();
         const tbody = document.getElementById('inquiryTableBody');
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
                         <i class="fas fa-spinner fa-spin fa-2x"></i>
                         <p style="margin-top:10px;">Loading ${this.currentTab} records...</p>
                     </td>
@@ -140,9 +155,15 @@ class ManageInquiries {
         const thead = document.getElementById('inquiryTableHeader');
         if (!thead) return;
 
+        const selectAllTh = `
+            <th style="padding:14px 16px; width:44px; text-align:center;">
+                <input type="checkbox" id="selectAllInquiries" title="Select All" style="cursor:pointer; width:16px; height:16px;">
+            </th>`;
+
         if (this.currentTab === 'contact') {
             thead.innerHTML = `
                 <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
+                    ${selectAllTh}
                     <th style="padding:14px 16px;">Sender Name</th>
                     <th style="padding:14px 16px;">Email &amp; Phone</th>
                     <th style="padding:14px 16px;">Subject</th>
@@ -154,6 +175,7 @@ class ManageInquiries {
         } else if (this.currentTab === 'partner') {
             thead.innerHTML = `
                 <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
+                    ${selectAllTh}
                     <th style="padding:14px 16px;">Organization</th>
                     <th style="padding:14px 16px;">Contact Person</th>
                     <th style="padding:14px 16px;">Partnership Type</th>
@@ -165,6 +187,7 @@ class ManageInquiries {
         } else {
             thead.innerHTML = `
                 <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
+                    ${selectAllTh}
                     <th style="padding:14px 16px;">Applicant Name</th>
                     <th style="padding:14px 16px;">Location &amp; Contact</th>
                     <th style="padding:14px 16px;">Volunteer Track</th>
@@ -173,6 +196,23 @@ class ManageInquiries {
                     <th style="padding:14px 16px;">Status</th>
                     <th style="padding:14px 16px; text-align:center;">Actions</th>
                 </tr>`;
+        }
+
+        const selectAll = document.getElementById('selectAllInquiries');
+        if (selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                const checked = e.target.checked;
+                this.filtered.forEach(r => {
+                    if (checked) this.selectedIds.add(r.id);
+                    else this.selectedIds.delete(r.id);
+                });
+                document.querySelectorAll('.select-inquiry-item').forEach(cb => {
+                    cb.checked = checked;
+                    if (checked) cb.closest('tr')?.style.setProperty('background', '#f8fafc');
+                    else cb.closest('tr')?.style.removeProperty('background');
+                });
+                this.updateSelectionUI();
+            });
         }
     }
 
@@ -207,11 +247,12 @@ class ManageInquiries {
         if (this.filtered.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#64748b;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#64748b;">
                         <i class="fas fa-inbox fa-2x" style="margin-bottom:10px; opacity:0.5;"></i>
                         <p>No records found in ${this.currentTab}.</p>
                     </td>
                 </tr>`;
+            this.updateSelectionUI();
             return;
         }
 
@@ -220,12 +261,18 @@ class ManageInquiries {
                 month: 'short', day: 'numeric', year: 'numeric'
             });
 
+            const isChecked = this.selectedIds.has(r.id);
+            const selectTd = `
+                <td style="padding:14px 16px; text-align:center;">
+                    <input type="checkbox" class="select-inquiry-item" data-id="${r.id}" ${isChecked ? 'checked' : ''} style="cursor:pointer; width:16px; height:16px;">
+                </td>`;
+
             const status = r.status || 'new';
             let badgeBg = '#f1f5f9';
             let badgeColor = '#475569';
-            if (status === 'new' || status === 'pending') {
+            if (status === 'new' || status === 'pending' || status === 'unread') {
                 badgeBg = '#fef3c7'; badgeColor = '#d97706';
-            } else if (status === 'responded' || status === 'approved') {
+            } else if (status === 'responded' || status === 'approved' || status === 'read') {
                 badgeBg = '#dcfce7'; badgeColor = '#16a34a';
             } else if (status === 'rejected' || status === 'archived') {
                 badgeBg = '#fee2e2'; badgeColor = '#dc2626';
@@ -233,7 +280,8 @@ class ManageInquiries {
 
             if (this.currentTab === 'contact') {
                 return `
-                    <tr style="border-bottom:1px solid #f1f5f9;">
+                    <tr style="border-bottom:1px solid #f1f5f9; ${isChecked ? 'background:#f8fafc;' : ''}">
+                        ${selectTd}
                         <td style="padding:14px 16px; font-weight:600; color:#0f172a;">${this.escapeHtml(r.name)}</td>
                         <td style="padding:14px 16px;">
                             <div><a href="mailto:${this.escapeHtml(r.email)}" style="color:#003366;">${this.escapeHtml(r.email)}</a></div>
@@ -263,7 +311,8 @@ class ManageInquiries {
                     </tr>`;
             } else if (this.currentTab === 'partner') {
                 return `
-                    <tr style="border-bottom:1px solid #f1f5f9;">
+                    <tr style="border-bottom:1px solid #f1f5f9; ${isChecked ? 'background:#f8fafc;' : ''}">
+                        ${selectTd}
                         <td style="padding:14px 16px; font-weight:600; color:#0f172a;">
                             ${this.escapeHtml(r.organization_name)}
                             ${r.website ? `<br><a href="${this.escapeHtml(r.website)}" target="_blank" style="font-size:0.75rem; color:#003366;">${this.escapeHtml(r.website)}</a>` : ''}
@@ -298,7 +347,8 @@ class ManageInquiries {
                     </tr>`;
             } else {
                 return `
-                    <tr style="border-bottom:1px solid #f1f5f9;">
+                    <tr style="border-bottom:1px solid #f1f5f9; ${isChecked ? 'background:#f8fafc;' : ''}">
+                        ${selectTd}
                         <td style="padding:14px 16px; font-weight:600; color:#0f172a;">${this.escapeHtml(r.full_name)}</td>
                         <td style="padding:14px 16px;">
                             <div><i class="fas fa-map-marker-alt" style="color:#64748b;"></i> ${this.escapeHtml(r.location || 'Liberia')}</div>
@@ -333,6 +383,9 @@ class ManageInquiries {
                     </tr>`;
             }
         }).join('');
+
+        this.bindRowSelection();
+        this.updateSelectionUI();
     }
 
     viewRecord(type, id) {
@@ -523,6 +576,105 @@ class ManageInquiries {
         }
     }
 
+    bindRowSelection() {
+        document.querySelectorAll('.select-inquiry-item').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const id = parseInt(e.target.dataset.id, 10);
+                if (e.target.checked) {
+                    this.selectedIds.add(id);
+                    e.target.closest('tr')?.style.setProperty('background', '#f8fafc');
+                } else {
+                    this.selectedIds.delete(id);
+                    e.target.closest('tr')?.style.removeProperty('background');
+                }
+                this.updateSelectionUI();
+            });
+        });
+    }
+
+    updateSelectionUI() {
+        const count = this.selectedIds.size;
+        const countEl = document.getElementById('selectedCount');
+        if (countEl) countEl.textContent = count;
+
+        const btn = document.getElementById('btnBulkDelete');
+        if (btn) {
+            btn.style.display = count > 0 ? 'inline-flex' : 'none';
+        }
+
+        const selectAll = document.getElementById('selectAllInquiries');
+        if (selectAll && this.filtered.length > 0) {
+            const allSelected = this.filtered.every(r => this.selectedIds.has(r.id));
+            const someSelected = this.filtered.some(r => this.selectedIds.has(r.id));
+            selectAll.checked = allSelected;
+            selectAll.indeterminate = !allSelected && someSelected;
+        } else if (selectAll) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        }
+    }
+
+    async bulkDeleteSelected() {
+        const count = this.selectedIds.size;
+        if (count === 0) {
+            this.showNotification('No inquiries selected', 'error');
+            return;
+        }
+
+        const confirmed = await window.confirmDelete({
+            title: 'Delete Selected Inquiries',
+            message: `Are you sure you want to permanently delete ${count} selected ${this.currentTab} inquiry record(s)? This action cannot be undone.`
+        });
+        if (!confirmed) return;
+
+        const btn = document.getElementById('btnBulkDelete');
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Deleting (${count})...`;
+        }
+
+        const idsToDelete = Array.from(this.selectedIds);
+        try {
+            let res = null;
+            if (Inquiries && typeof Inquiries.bulkDelete === 'function') {
+                res = await Inquiries.bulkDelete(this.currentTab, idsToDelete);
+            }
+
+            if (res && res.success) {
+                const deletedSet = new Set(res.deletedIds || idsToDelete);
+                this.records = this.records.filter(r => !deletedSet.has(r.id));
+                this.selectedIds.clear();
+                this.applyFilters();
+                await this.loadStats();
+                this.showNotification(`Successfully deleted ${res.deletedCount || count} inquiry record(s)`, 'success');
+            } else {
+                // Fallback: delete sequentially
+                let successCount = 0;
+                for (const id of idsToDelete) {
+                    try {
+                        const delRes = await Inquiries.delete(this.currentTab, id);
+                        if (delRes.success) successCount++;
+                    } catch (_) {}
+                }
+                this.records = this.records.filter(r => !this.selectedIds.has(r.id));
+                this.selectedIds.clear();
+                this.applyFilters();
+                await this.loadStats();
+                this.showNotification(`${successCount}/${count} inquiry record(s) deleted`, 'success');
+            }
+        } catch (err) {
+            console.error('Bulk delete error:', err);
+            this.showNotification('Failed to bulk delete: ' + err.message, 'error');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+            this.updateSelectionUI();
+        }
+    }
+
     async deleteRecord(type, id) {
         const confirmed = await window.confirmDelete({
             title: 'Delete Inquiry Record',
@@ -534,16 +686,53 @@ class ManageInquiries {
             const res = await Inquiries.delete(type, id);
             if (res.success) {
                 this.records = this.records.filter(r => r.id !== id);
+                this.selectedIds.delete(id);
                 this.applyFilters();
-                this.loadStats();
-                window.updateSidebarBadges?.();
+                await this.loadStats();
+                this.updateSelectionUI();
+                this.showNotification('Inquiry record deleted successfully', 'success');
             } else {
-                alert(res.error || 'Failed to delete record');
+                this.showNotification(res.error || 'Failed to delete record', 'error');
             }
         } catch (err) {
             console.error('Delete error:', err);
-            alert('Failed to delete record: ' + err.message);
+            this.showNotification('Failed to delete record: ' + err.message, 'error');
         }
+    }
+
+    showNotification(message, type = 'info') {
+        if (window.adminDashboard && typeof window.adminDashboard.showNotification === 'function') {
+            window.adminDashboard.showNotification(message, type);
+            return;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `admin-toast ${type}`;
+        toast.style.cssText = `
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 14px 22px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 500;
+            z-index: 99999;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            background: ${type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : '#003366'};
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        `;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${this.escapeHtml(message)}</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
     }
 
     showError(msg) {
@@ -551,7 +740,7 @@ class ManageInquiries {
         if (tbody) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:40px; color:#dc2626;">
+                    <td colspan="8" style="text-align:center; padding:40px; color:#dc2626;">
                         <i class="fas fa-exclamation-triangle fa-2x" style="margin-bottom:10px;"></i>
                         <p>${this.escapeHtml(msg)}</p>
                     </td>

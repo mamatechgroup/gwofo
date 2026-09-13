@@ -404,6 +404,60 @@ async function runTests() {
         assert('Admin Controller: isolates login page from unauthenticated API calls', adminJsContent.includes('isLoginPage'));
         assert('Admin Controller: updates badges safely without unhandled JSON parse error', adminJsContent.includes("if (this.isLoginPage()) return;"));
 
+        // 35. Inquiries Stats Summary Endpoint (Counts Display)
+        const unauthInqStats = await makeRequest('GET', '/api/inquiries/stats/summary');
+        assert('Inquiries Stats: unauthenticated access returns 401', unauthInqStats.status === 401);
+
+        const authInqStats = await makeRequest('GET', '/api/inquiries/stats/summary', null, {
+            'Authorization': `Bearer ${token}`
+        });
+        assert('Inquiries Stats: authenticated returns HTTP 200', authInqStats.status === 200);
+        assert('Inquiries Stats: data contains total_contacts', typeof authInqStats.data?.data?.total_contacts === 'number');
+        assert('Inquiries Stats: data contains total_partnerships', typeof authInqStats.data?.data?.total_partnerships === 'number');
+        assert('Inquiries Stats: data contains total_volunteers', typeof authInqStats.data?.data?.total_volunteers === 'number');
+        assert('Inquiries Stats: nested contacts.total matches total_contacts', authInqStats.data?.data?.contacts?.total === authInqStats.data?.data?.total_contacts);
+        assert('Inquiries Stats: counts are non-zero numbers', authInqStats.data?.data?.total_contacts > 0);
+
+        // 36. Bulk Delete Inquiries Endpoint
+        const unauthBulkDel = await makeRequest('POST', '/api/inquiries/contact/bulk-delete', { ids: [99999] });
+        assert('Bulk Delete: unauthenticated access returns 401', unauthBulkDel.status === 401);
+
+        // Create two temporary test contact messages for bulk deletion
+        const testMsg1 = await makeRequest('POST', '/api/inquiries/contact', {
+            name: 'Bulk Test One',
+            email: 'bulk1@example.com',
+            subject: 'Bulk Delete Test 1',
+            message: 'This is a test message to be bulk deleted.'
+        });
+        const testMsg2 = await makeRequest('POST', '/api/inquiries/contact', {
+            name: 'Bulk Test Two',
+            email: 'bulk2@example.com',
+            subject: 'Bulk Delete Test 2',
+            message: 'This is a test message to be bulk deleted.'
+        });
+        assert('Bulk Delete: created test inquiry 1', testMsg1.status === 201 && testMsg1.data.data?.id);
+        assert('Bulk Delete: created test inquiry 2', testMsg2.status === 201 && testMsg2.data.data?.id);
+
+        const id1 = testMsg1.data.data.id;
+        const id2 = testMsg2.data.data.id;
+
+        const bulkDelRes = await makeRequest('POST', '/api/inquiries/contact/bulk-delete', { ids: [id1, id2] }, {
+            'Authorization': `Bearer ${token}`
+        });
+        assert('Bulk Delete: authenticated returns HTTP 200', bulkDelRes.status === 200);
+        assert('Bulk Delete: reports correct deletedCount', bulkDelRes.data?.deletedCount === 2);
+        assert('Bulk Delete: deletedIds contains both test IDs', bulkDelRes.data?.deletedIds?.includes(id1) && bulkDelRes.data?.deletedIds?.includes(id2));
+
+        // 37. Manage Inquiries Frontend Code Architecture
+        const manageInqHtml = fs.readFileSync(path.join(__dirname, '../admin/manage-inquiries.html'), 'utf8');
+        const manageInqJs = fs.readFileSync(path.join(__dirname, '../js/manage-inquiries.js'), 'utf8');
+        assert('Manage Inquiries UI: HTML includes btnBulkDelete button', manageInqHtml.includes('btnBulkDelete'));
+        assert('Manage Inquiries UI: HTML includes selectedCount counter', manageInqHtml.includes('selectedCount'));
+        assert('Manage Inquiries Controller: implements bulkDeleteSelected', manageInqJs.includes('bulkDeleteSelected'));
+        assert('Manage Inquiries Controller: manages selectedIds set', manageInqJs.includes('selectedIds'));
+        assert('Manage Inquiries Controller: wires selectAllInquiries', manageInqJs.includes('selectAllInquiries'));
+        assert('Manage Inquiries Controller: resolves flat and nested stats', manageInqJs.includes('totalContacts') && manageInqJs.includes('total_contacts'));
+
 
     } catch (err) {
         console.error('Test Suite encountered unhandled error:', err);

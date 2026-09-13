@@ -173,6 +173,13 @@ const Inquiries = {
         });
     },
 
+    async bulkDelete(type, ids) {
+        return apiCall(`/inquiries/${type}/bulk-delete`, {
+            method: 'POST',
+            body: JSON.stringify({ ids })
+        });
+    },
+
     async getStats() {
         return apiCall('/inquiries/stats/summary');
     }

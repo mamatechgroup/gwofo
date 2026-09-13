@@ -176,7 +176,7 @@
 
             <!-- Action Bar -->
             <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
-                <div class="filters" style="display:flex; gap:12px;">
+                <div class="filters" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                     <select id="inquiryStatusFilter" class="filter-select" title="Filter by Status">
                         <option value="all">All Statuses</option>
                         <option value="new">New / Unread</option>
@@ -185,10 +185,16 @@
                         <option value="approved">Approved</option>
                         <option value="rejected">Rejected / Archived</option>
                     </select>
+
+                    <button id="btnBulkDelete" class="btn-secondary" style="background:#fee2e2; color:#dc2626; border:1px solid #fecaca; display:none; align-items:center; gap:8px; padding:9px 16px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;" onclick="manageInquiries.bulkDeleteSelected()" title="Delete Selected Records">
+                        <i class="fas fa-trash-alt"></i> Delete Selected (<span id="selectedCount">0</span>)
+                    </button>
                 </div>
-                <button class="btn-secondary" onclick="manageInquiries.loadCurrentTab()" title="Refresh List">
-                    <i class="fas fa-sync-alt"></i> Refresh List
-                </button>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-secondary" onclick="manageInquiries.loadCurrentTab()" title="Refresh List">
+                        <i class="fas fa-sync-alt"></i> Refresh List
+                    </button>
+                </div>
             </div>
 
             <!-- Table Container -->
