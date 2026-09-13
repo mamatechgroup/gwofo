@@ -202,38 +202,35 @@
             </div>
         </div>
 
-        <!-- Slide Preview -->
+        <!-- Live Slide Preview -->
         <div class="content-section">
             <div class="section-header">
-                <h3>Live Slide Preview</h3>
-                <button class="btn-secondary" id="refreshPreview">
+                <h3><i class="fas fa-play-circle" style="color:var(--primary-color);margin-right:8px;"></i> Live Slide Preview</h3>
+                <button class="btn-secondary" id="refreshPreview" title="Reload live preview from database">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
             </div>
             
             <div class="slide-preview-container">
-                <div class="preview-window">
-                    <div class="preview-slide active">
-                        <div class="preview-image">
-                            <img src="../assets/slides/slide1.jpg" alt="Current Slide">
+                <div class="preview-window" id="previewWindow">
+                    <div class="preview-slide active" id="previewSlideContainer">
+                        <div class="preview-image" id="previewImageWrapper">
+                            <img id="previewSlideImg" src="../assets/images/Petition%20Session%20Group%20Photo%20(1).jpg" alt="Live Slide Preview">
                         </div>
                         <div class="preview-content">
-                            <h2>Education for Girls</h2>
-                            <p>Empowering young girls through quality education and mentorship programs that build confidence and skills for the future.</p>
-                            <button class="preview-btn">Learn More</button>
+                            <h2 id="previewSlideTitle">Loading Live Slides...</h2>
+                            <p id="previewSlideDesc">Previewing homepage carousel in real time.</p>
+                            <a href="#" id="previewSlideBtn" class="preview-btn" target="_blank">Learn More</a>
                         </div>
                     </div>
                     <div class="preview-controls">
-                        <button class="preview-control prev" aria-label="Previous slide">
+                        <button class="preview-control prev" id="previewPrevBtn" aria-label="Previous slide">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <div class="preview-dots">
+                        <div class="preview-dots" id="previewDotsContainer">
                             <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
                         </div>
-                        <button class="preview-control next" aria-label="Next slide">
+                        <button class="preview-control next" id="previewNextBtn" aria-label="Next slide">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -244,45 +241,34 @@
                     <div class="preview-stats">
                         <div class="preview-stat">
                             <span class="stat-label">Current Slide:</span>
-                            <span class="stat-value">Education for Girls</span>
+                            <span class="stat-value" id="previewMetaTitle">—</span>
                         </div>
                         <div class="preview-stat">
                             <span class="stat-label">Position:</span>
-                            <span class="stat-value">1 of 5</span>
+                            <span class="stat-value" id="previewMetaPosition">—</span>
                         </div>
                         <div class="preview-stat">
                             <span class="stat-label">Duration:</span>
-                            <span class="stat-value">5 seconds</span>
+                            <span class="stat-value" id="previewMetaDuration">5 seconds</span>
                         </div>
                         <div class="preview-stat">
                             <span class="stat-label">Status:</span>
-                            <span class="stat-value active">Active</span>
+                            <span class="stat-value active" id="previewMetaStatus">Active</span>
                         </div>
                     </div>
                     
                     <div class="preview-settings">
-                        <h5>Settings</h5>
+                        <h5>Live Preview Controls</h5>
                         <div class="setting-item">
-                            <label>
-                                <input type="checkbox" checked>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="checkbox" id="previewAutoRotateCheck" checked>
                                 Auto-rotate slides
                             </label>
                         </div>
                         <div class="setting-item">
-                            <label>
-                                Slide Duration (seconds)
-                                <input type="range" min="3" max="10" value="5">
-                                <span>5s</span>
-                            </label>
-                        </div>
-                        <div class="setting-item">
-                            <label>
-                                Transition Effect
-                                <select>
-                                    <option>Fade</option>
-                                    <option>Slide</option>
-                                    <option>Zoom</option>
-                                </select>
+                            <label style="display:block;margin-bottom:6px;">
+                                Rotation Speed: <strong id="previewDurationLabel">5s</strong>
+                                <input type="range" id="previewDurationSlider" min="2" max="10" value="5" style="width:100%;margin-top:6px;">
                             </label>
                         </div>
                     </div>

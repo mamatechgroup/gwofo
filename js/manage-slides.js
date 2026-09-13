@@ -7,6 +7,12 @@ class ManageSlides {
         this.editingId  = null;
         this.pendingPositions = {}; // slideId -> newPosition for Save Order
 
+        // Live Preview state
+        this.previewIndex = 0;
+        this.previewTimer = null;
+        this.previewAutoRotate = true;
+        this.previewDuration = 5;
+
         this.modal      = document.getElementById('slideModal');
         this.form       = this.modal?.querySelector('.crud-form');
         this.modalTitle = this.modal?.querySelector('.modal-header h2');
@@ -34,6 +40,7 @@ class ManageSlides {
                 this.updateStats();
                 this.updateActiveSlidesList();
                 this.updatePerformanceStats();
+                this.renderLivePreview();
             } else {
                 this.showError('Failed to load slides');
             }
@@ -66,7 +73,12 @@ class ManageSlides {
         document.getElementById('toggleAll')?.addEventListener('click', () => this.toggleAllStatus());
 
         // Refresh preview
-        document.getElementById('refreshPreview')?.addEventListener('click', () => this.updateActiveSlidesList());
+        document.getElementById('refreshPreview')?.addEventListener('click', () => {
+            this.loadSlides();
+        });
+
+        // Live Preview interactive controls
+        this.initLivePreviewEvents();
 
         // Modal close
         if (this.modal) {
@@ -431,6 +443,193 @@ class ManageSlides {
                 <span class="slide-position">Position ${s.position}</span>
                 <span class="slide-status-badge active">Active</span>
             </div>`).join('');
+    }
+
+    // ─── Live Slide Preview Controller ────────────────────────────────────────
+
+    initLivePreviewEvents() {
+        // Prev button
+        document.getElementById('previewPrevBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.prevPreviewSlide();
+        });
+
+        // Next button
+        document.getElementById('previewNextBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.nextPreviewSlide();
+        });
+
+        // Auto-rotate checkbox
+        const autoRotateCheck = document.getElementById('previewAutoRotateCheck');
+        if (autoRotateCheck) {
+            autoRotateCheck.addEventListener('change', (e) => {
+                this.previewAutoRotate = e.target.checked;
+                if (this.previewAutoRotate) {
+                    this.startPreviewTimer();
+                } else {
+                    this.stopPreviewTimer();
+                }
+            });
+        }
+
+        // Duration slider
+        const durationSlider = document.getElementById('previewDurationSlider');
+        const durationLabel = document.getElementById('previewDurationLabel');
+        if (durationSlider) {
+            durationSlider.addEventListener('input', (e) => {
+                this.previewDuration = Number(e.target.value) || 5;
+                if (durationLabel) durationLabel.textContent = `${this.previewDuration}s`;
+                if (this.previewAutoRotate) {
+                    this.startPreviewTimer();
+                }
+            });
+        }
+
+        // Pause on hover over preview window
+        const previewWin = document.getElementById('previewWindow');
+        if (previewWin) {
+            previewWin.addEventListener('mouseenter', () => this.stopPreviewTimer());
+            previewWin.addEventListener('mouseleave', () => {
+                if (this.previewAutoRotate) this.startPreviewTimer();
+            });
+        }
+    }
+
+    getActivePreviewSlides() {
+        const active = this.slides.filter(s => s.status === 'active');
+        return active.length > 0 ? active : this.slides;
+    }
+
+    renderLivePreview() {
+        const slides = this.getActivePreviewSlides();
+        if (!slides || slides.length === 0) {
+            const titleEl = document.getElementById('previewSlideTitle');
+            const descEl = document.getElementById('previewSlideDesc');
+            if (titleEl) titleEl.textContent = 'No slides available';
+            if (descEl) descEl.textContent = 'Create a new slide above to see it previewed here.';
+            return;
+        }
+
+        if (this.previewIndex >= slides.length) {
+            this.previewIndex = 0;
+        } else if (this.previewIndex < 0) {
+            this.previewIndex = slides.length - 1;
+        }
+
+        const slide = slides[this.previewIndex];
+        const imgEl = document.getElementById('previewSlideImg');
+        const titleEl = document.getElementById('previewSlideTitle');
+        const descEl = document.getElementById('previewSlideDesc');
+        const btnEl = document.getElementById('previewSlideBtn');
+        const wrapperEl = document.getElementById('previewImageWrapper');
+
+        // Render image with fallback
+        if (imgEl) {
+            const rawUrl = slide.image_url || '';
+            const normalized = this.normalizeImageUrl(rawUrl);
+            
+            imgEl.onerror = () => {
+                imgEl.style.display = 'none';
+                if (wrapperEl) {
+                    wrapperEl.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
+                }
+            };
+            
+            imgEl.onload = () => {
+                imgEl.style.display = 'block';
+            };
+
+            if (normalized) {
+                imgEl.src = normalized;
+            } else {
+                imgEl.style.display = 'none';
+                if (wrapperEl) {
+                    wrapperEl.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
+                }
+            }
+        }
+
+        // Render text
+        if (titleEl) titleEl.textContent = slide.title || 'Untitled Slide';
+        if (descEl) descEl.textContent = slide.description || '';
+        if (btnEl) {
+            btnEl.textContent = slide.button_text || 'Learn More';
+            btnEl.href = slide.button_link || 'projects.html';
+        }
+
+        // Render dots
+        const dotsContainer = document.getElementById('previewDotsContainer');
+        if (dotsContainer) {
+            dotsContainer.innerHTML = slides.map((s, idx) => `
+                <span class="dot ${idx === this.previewIndex ? 'active' : ''}" 
+                      data-index="${idx}" 
+                      style="cursor:pointer;"
+                      title="Slide ${idx + 1}: ${this.esc(s.title)}"></span>
+            `).join('');
+
+            dotsContainer.querySelectorAll('.dot').forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const idx = Number(dot.dataset.index);
+                    if (!isNaN(idx)) {
+                        this.goToPreviewSlide(idx);
+                    }
+                });
+            });
+        }
+
+        // Render metadata settings panel
+        const metaTitle = document.getElementById('previewMetaTitle');
+        const metaPos = document.getElementById('previewMetaPosition');
+        const metaDuration = document.getElementById('previewMetaDuration');
+        const metaStatus = document.getElementById('previewMetaStatus');
+
+        if (metaTitle) metaTitle.textContent = slide.title || '—';
+        if (metaPos) metaPos.textContent = `${this.previewIndex + 1} of ${slides.length}`;
+        if (metaDuration) metaDuration.textContent = `${slide.display_duration || this.previewDuration} seconds`;
+        if (metaStatus) {
+            metaStatus.textContent = slide.status === 'active' ? 'Active' : 'Inactive';
+            metaStatus.className = `stat-value ${slide.status === 'active' ? 'active' : 'inactive'}`;
+        }
+
+        if (this.previewAutoRotate) {
+            this.startPreviewTimer(slide.display_duration || this.previewDuration);
+        }
+    }
+
+    startPreviewTimer(durationSec) {
+        this.stopPreviewTimer();
+        const duration = (durationSec || this.previewDuration || 5) * 1000;
+        this.previewTimer = setTimeout(() => {
+            this.nextPreviewSlide();
+        }, duration);
+    }
+
+    stopPreviewTimer() {
+        if (this.previewTimer) {
+            clearTimeout(this.previewTimer);
+            this.previewTimer = null;
+        }
+    }
+
+    nextPreviewSlide() {
+        const slides = this.getActivePreviewSlides();
+        if (!slides || slides.length <= 1) return;
+        this.previewIndex = (this.previewIndex + 1) % slides.length;
+        this.renderLivePreview();
+    }
+
+    prevPreviewSlide() {
+        const slides = this.getActivePreviewSlides();
+        if (!slides || slides.length <= 1) return;
+        this.previewIndex = (this.previewIndex - 1 + slides.length) % slides.length;
+        this.renderLivePreview();
+    }
+
+    goToPreviewSlide(idx) {
+        this.previewIndex = idx;
+        this.renderLivePreview();
     }
 
     // ─── Performance Stats ────────────────────────────────────────────────────

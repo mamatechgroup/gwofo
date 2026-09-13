@@ -288,6 +288,22 @@ async function runTests() {
         assert('Frontend API: js/api.js supports window.__API_URL__ override', apiJsContent.includes('window.__API_URL__'));
         assert('Frontend API: js/api.js includes 15s timeout safety controller', apiJsContent.includes('AbortController') && apiJsContent.includes('timeoutMs'));
 
+        // 24. Admin Live Slide Preview Remediation
+        const manageSlidesHtml = fs.readFileSync(path.join(__dirname, '../admin/manage-slides.html'), 'utf8');
+        const manageSlidesJs = fs.readFileSync(path.join(__dirname, '../js/manage-slides.js'), 'utf8');
+        assert('Admin Preview: manage-slides.html eliminates broken mock image slide1.jpg', !manageSlidesHtml.includes('../assets/slides/slide1.jpg'));
+        assert('Admin Preview: manage-slides.html contains reactive preview element IDs', 
+            manageSlidesHtml.includes('id="previewSlideImg"') && 
+            manageSlidesHtml.includes('id="previewSlideTitle"') && 
+            manageSlidesHtml.includes('id="previewMetaPosition"') &&
+            manageSlidesHtml.includes('id="previewDotsContainer"') &&
+            manageSlidesHtml.includes('id="previewDurationSlider"'));
+        assert('Admin Preview: js/manage-slides.js implements renderLivePreview & interactive controls',
+            manageSlidesJs.includes('renderLivePreview()') &&
+            manageSlidesJs.includes('initLivePreviewEvents()') &&
+            manageSlidesJs.includes('nextPreviewSlide()') &&
+            manageSlidesJs.includes('prevPreviewSlide()'));
+
 
     } catch (err) {
         console.error('Test Suite encountered unhandled error:', err);
