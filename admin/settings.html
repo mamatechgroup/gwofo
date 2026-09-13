@@ -11,8 +11,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/apple-touch-icon.png">
     <link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="admin-dashboard">
@@ -312,20 +312,22 @@
                 
                 <div class="backup-list">
                     <h3>Available Backups</h3>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Backup File</th>
-                                <th>Date Created</th>
-                                <th>Size</th>
-                                <th>Type</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dynamically loaded by manage-backups.js -->
-                        </tbody>
-                    </table>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Backup File</th>
+                                    <th>Date Created</th>
+                                    <th>Size</th>
+                                    <th>Type</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamically loaded by manage-backups.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
                 <div class="backup-storage">

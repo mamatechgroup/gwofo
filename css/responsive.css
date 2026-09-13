@@ -717,15 +717,17 @@ img, video, iframe {
         gap: 15px !important;
     }
 
-    input, textarea, select {
+    body:not(.admin-dashboard) input:not([type="checkbox"]):not([type="radio"]),
+    body:not(.admin-dashboard) textarea,
+    body:not(.admin-dashboard) select {
         width: 100% !important;
         font-size: 16px !important; /* Prevents iOS auto-zoom on focus */
         padding: 12px 14px !important;
     }
 
-    .btn-primary,
-    .btn-secondary,
-    .btn-submit {
+    body:not(.admin-dashboard) .btn-primary,
+    body:not(.admin-dashboard) .btn-secondary,
+    body:not(.admin-dashboard) .btn-submit {
         display: inline-flex;
         align-items: center;
         justify-content: center;
