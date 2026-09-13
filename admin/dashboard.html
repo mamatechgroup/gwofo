@@ -215,31 +215,16 @@
             <div class="content-section">
                 <div class="section-header">
                     <h2>Recent Activity</h2>
+                    <button type="button" class="btn-action" id="refreshActivityBtn" title="Refresh Recent Activity" style="background: rgba(0,51,102,0.06); border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; cursor: pointer; color: var(--primary-color); font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; transition: all 0.2s ease;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                 </div>
                 
-                <div class="activity-timeline">
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">New team member added</div>
-                            <div class="activity-desc">Mary Kamara was added to the team</div>
-                            <div class="activity-time">Just now</div>
-                        </div>
+                <div class="activity-timeline" id="activityTimeline">
+                    <div style="padding: 24px; text-align: center; color: #64748b;">
+                        <i class="fas fa-circle-notch fa-spin" style="font-size: 1.6rem; color: var(--primary-color); display: block; margin-bottom: 8px;"></i>
+                        Loading recent activities...
                     </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Project updated</div>
-                            <div class="activity-desc">Girls Education Program progress updated to 75%</div>
-                            <div class="activity-time">2 hours ago</div>
-                        </div>
-                    </div>
-                    
                 </div>
             </div>
         </div>

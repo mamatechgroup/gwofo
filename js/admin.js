@@ -9,6 +9,7 @@ class AdminDashboard {
         this.checkAuthentication();
         this.setupEventListeners();
         this.loadDashboardData();
+        this.loadRecentActivity();
         this.setupCRUDOperations();
         this.setupSearchEnhancements();
         this.setupFileUploads();
@@ -63,6 +64,13 @@ class AdminDashboard {
     setupEventListeners() {
         this.setupLogoutListener();
         this.setupMobileMenu();
+        
+        const refreshBtn = document.getElementById('refreshActivityBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadRecentActivity(true);
+            });
+        }
         // Form submissions are handled by each page-specific JS file
     }
     
@@ -653,34 +661,81 @@ class AdminDashboard {
         badge.textContent = count;
     }
 
-    loadRecentActivity() {
-        const timeline = document.querySelector('.activity-timeline');
+    loadRecentActivity(isUserRefresh = false) {
+        const timeline = document.querySelector('.activity-timeline') || document.getElementById('activityTimeline');
         if (!timeline) return;
-        
-        fetch(`${API_BASE_URL}/dashboard/recent-activity`)
+
+        const refreshBtn = document.getElementById('refreshActivityBtn');
+        if (refreshBtn && isUserRefresh) {
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+        }
+
+        const baseUrl = window.API_BASE_URL || (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api');
+        const token = localStorage.getItem('adminToken');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        fetch(`${baseUrl}/dashboard/recent-activity`, { headers })
             .then(res => res.json())
             .then(result => {
+                if (refreshBtn && isUserRefresh) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                }
+
                 if (result.success && Array.isArray(result.data)) {
                     if (result.data.length === 0) {
-                        timeline.innerHTML = '<div style="padding: 20px; text-align: center; color: #6b7280;"><i class="fas fa-history" style="font-size: 1.5em; display: block; margin-bottom: 8px;"></i> No activity logged yet.</div>';
+                        timeline.innerHTML = '<div style="padding: 24px; text-align: center; color: #64748b;"><i class="fas fa-history" style="font-size: 1.8rem; color: #94a3b8; display: block; margin-bottom: 8px;"></i> No recent activities logged yet.</div>';
                         return;
                     }
-                    
+
+                    const entityConfig = {
+                        'post': { icon: 'fa-newspaper', label: 'News Post', color: '#003366', badgeBg: '#e0f2fe', badgeColor: '#0369a1' },
+                        'project': { icon: 'fa-project-diagram', label: 'Project', color: '#ff6600', badgeBg: '#ffedd5', badgeColor: '#c2410c' },
+                        'social_link': { icon: 'fa-share-alt', label: 'Social Media', color: '#8b5cf6', badgeBg: '#f3e8ff', badgeColor: '#7e22ce' },
+                        'project_comment': { icon: 'fa-comments', label: 'Project Comment', color: '#10b981', badgeBg: '#d1fae5', badgeColor: '#047857' },
+                        'post_comment': { icon: 'fa-comment-alt', label: 'Blog Comment', color: '#10b981', badgeBg: '#d1fae5', badgeColor: '#047857' },
+                        'contact_message': { icon: 'fa-envelope', label: 'Contact Message', color: '#0284c7', badgeBg: '#e0f2fe', badgeColor: '#0369a1' },
+                        'partnership_inquiry': { icon: 'fa-handshake', label: 'Partner Proposal', color: '#ea580c', badgeBg: '#ffedd5', badgeColor: '#c2410c' },
+                        'volunteer_application': { icon: 'fa-hand-holding-heart', label: 'Volunteer App', color: '#ec4899', badgeBg: '#fce7f3', badgeColor: '#be185d' },
+                        'partner': { icon: 'fa-handshake', label: 'Partner Org', color: '#0d9488', badgeBg: '#ccfbf1', badgeColor: '#0f766e' },
+                        'team_member': { icon: 'fa-user-tie', label: 'Team Member', color: '#4f46e5', badgeBg: '#e0e7ff', badgeColor: '#4338ca' },
+                        'slide': { icon: 'fa-images', label: 'Hero Slide', color: '#d97706', badgeBg: '#fef3c7', badgeColor: '#b45309' },
+                        'newsletter_subscription': { icon: 'fa-paper-plane', label: 'Newsletter', color: '#2563eb', badgeBg: '#dbeafe', badgeColor: '#1d4ed8' }
+                    };
+
                     timeline.innerHTML = result.data.map(act => {
-                        let icon = 'fa-info-circle';
-                        if (act.action === 'create') icon = 'fa-plus-circle';
-                        else if (act.action === 'update') icon = 'fa-edit';
-                        else if (act.action === 'delete') icon = 'fa-trash-alt';
-                        
+                        const rawType = (act.entity_type || 'system').toLowerCase();
+                        const rawAction = (act.action || 'activity').toLowerCase();
+                        const config = entityConfig[rawType] || {
+                            icon: 'fa-bell',
+                            label: rawType.replace(/_/g, ' '),
+                            color: '#003366',
+                            badgeBg: '#f1f5f9',
+                            badgeColor: '#475569'
+                        };
+
+                        let actionIcon = config.icon;
+                        if (rawAction === 'delete') actionIcon = 'fa-trash-alt';
+
+                        const actionTitle = `${rawAction.charAt(0).toUpperCase() + rawAction.slice(1)}`;
+                        const entityName = config.label;
+
                         return `
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas ${icon}"></i>
+                            <div class="activity-item animated">
+                                <div class="activity-icon" style="background: ${config.color};">
+                                    <i class="fas ${actionIcon}"></i>
                                 </div>
                                 <div class="activity-content">
-                                    <div class="activity-title">${act.action.charAt(0).toUpperCase() + act.action.slice(1)} ${act.entity_type.replace('_', ' ')}</div>
-                                    <div class="activity-desc">${act.description}</div>
-                                    <div class="activity-time">${this.formatRelativeTime(act.created_at)}</div>
+                                    <div class="activity-title">
+                                        <span><strong>${actionTitle}</strong> ${entityName}</span>
+                                        <span class="activity-badge" style="background: ${config.badgeBg}; color: ${config.badgeColor};">
+                                            ${entityName}
+                                        </span>
+                                    </div>
+                                    <div class="activity-desc">${act.description || 'Action recorded.'}</div>
+                                    <div class="activity-time">
+                                        <i class="far fa-clock"></i> ${this.formatRelativeTime(act.created_at)}
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -688,7 +743,11 @@ class AdminDashboard {
                 }
             })
             .catch(err => {
+                if (refreshBtn && isUserRefresh) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                }
                 console.error('Error loading recent activity:', err);
+                timeline.innerHTML = '<div style="padding: 20px; text-align: center; color: #ef4444;"><i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i> Could not load recent activity. Please try clicking Refresh.</div>';
             });
     }
 

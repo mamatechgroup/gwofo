@@ -11,6 +11,11 @@ const API_BASE_URL = (() => {
         return 'https://gwofo.onrender.com/api';
     }
     
+    // Direct file opening or headless testing
+    if (window.location.protocol === 'file:' || !hostname) {
+        return 'http://localhost:10000/api';
+    }
+    
     // Current host / local / custom domain
     return `${window.location.protocol}//${window.location.host}/api`;
 })();
